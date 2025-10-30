@@ -7,7 +7,7 @@ if [ -z "$ISO" ]; then
     exit 1
 fi
 
-echo "  [QEMU]  $ISO"
+echo "  [RUN] $ISO"
 
 qemu-system-x86_64 \
     -cdrom "$ISO" \
