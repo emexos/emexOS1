@@ -1,0 +1,24 @@
+#ifndef STDCLRS_H
+#define STDCLRS_H
+//nord theme
+#define GFX_BLACK   0xFF000000
+#define GFX_BG      0xFF3B4252
+#define GFX_RED     0xFFBF616A
+#define GFX_GREEN   0xFFA3BE8C
+#define GFX_YELLOW  0xFFEBCA8B
+#define GFX_BLUE    0xFF81A1C1
+#define GFX_PURPLE  0xFFB48EAD
+#define GFX_CYAN    0xFF88C0D0
+#define GFX_WHITE   0xFFE5E9F0
+
+#define GFX_GRAY_20     0xFF333333
+#define GFX_GRAY_50     0xFF808080
+
+
+#define TEXT_COLOR GFX_GRAY_50
+#define TITLE_COLOR GFX_WHITE
+#define FAIL_COLOR GFX_RED
+#define PASS_COLOR GFX_GREEN
+
+
+#endif
