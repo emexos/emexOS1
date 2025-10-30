@@ -1,27 +1,11 @@
-#.PHONY: all clean run iso
+include common.mk
 
-CC = x86_64-elf-gcc
-CXX = x86_64-elf-g++
-LD = x86_64-elf-ld
-AS = nasm
+.PHONY: all clean run iso
 
-CFLAGS = -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector \
-         -fno-stack-check -fno-lto -fno-PIE -fno-pic -m64 -march=x86-64 \
-         -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
-         -mcmodel=kernel -Ithird_party/limine -Isrc -nostdlib
+KERNEL = kernel.elf
+ISO = emexOS.iso
 
-CXXFLAGS = -Wall -Wextra -std=c++17 -ffreestanding -fno-stack-protector \
-           -fno-stack-check -fno-lto -fno-PIE -fno-pic -m64 -march=x86-64 \
-           -mno-80387 -mno-mmx -mno-sse -mno-sse2 -mno-red-zone \
-           -mcmodel=kernel -Ithird_party/limine -Isrc -nostdlib \
-           -fno-exceptions -fno-rtti
-
-LDFLAGS = -nostdlib -static -no-pie -z text -z max-page-size=0x1000 \
-          -T src/kernel/linker.ld
-
-ASFLAGS = -f elf64
-
-# C Source Files
+# Source files
 KERNEL_C_SRC = src/kernel/kernel.c \
                src/kernel/console/console.c \
                src/kernel/console/shell_screen.c \
@@ -44,50 +28,36 @@ KERNEL_C_SRC = src/kernel/kernel.c \
                src/libs/print/print.c \
                src/libs/memory/mem.c \
                src/drivers/ps2/keyboard/keyboard.c \
-               src/drivers/cmos/cmos.c \
+               src/drivers/cmos/cmos.c
 
-# Assembly Files
 KERNEL_ASM = src/kernel/cpu/idt.asm \
              src/kernel/cpu/isr.asm \
              src/kernel/cpu/irq.asm \
              src/kernel/cpu/gdt.asm
-             #\
-             #src/kernel/proc/scheduler.asm
 
-KERNEL_C_OBJ = $(patsubst src/%.c,build/%.o,$(KERNEL_C_SRC))
-KERNEL_CXX_OBJ = $(patsubst src/%.cpp,build/%.o,$(KERNEL_CXX_SRC))
+KERNEL_C_OBJ  = $(patsubst src/%.c,build/%.o,$(KERNEL_C_SRC))
 KERNEL_ASM_OBJ = $(patsubst src/%.asm,build/%_asm.o,$(KERNEL_ASM))
-KERNEL_OBJ = $(KERNEL_C_OBJ) $(KERNEL_CXX_OBJ) $(KERNEL_ASM_OBJ)
-
-KERNEL = kernel.elf
-ISO = doccrOS.iso
+KERNEL_OBJ = $(KERNEL_C_OBJ) $(KERNEL_ASM_OBJ)
 
 all: $(ISO)
 
-# C Compilation
 build/%.o: src/%.c
 	@mkdir -p $(dir $@)
-	@echo "  [CC]  $<"
-	@$(CC) $(CFLAGS) -c $< -o $@
+	$(VCC) $(CFLAGS) -c $< -o $@
 
-# C++ Compilation
 build/%.o: src/%.cpp
 	@mkdir -p $(dir $@)
-	@echo "  [CXX] $<"
-	@$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(VCXX) $(CXXFLAGS) -c $< -o $@
 
-# Assembly
 build/%_asm.o: src/%.asm
 	@mkdir -p $(dir $@)
-	@echo "  [AS]  $<"
-	@$(AS) $(ASFLAGS) $< -o $@
+	$(VAS) $(ASFLAGS) $< -o $@
 
-# Linking
+
 $(KERNEL): $(KERNEL_OBJ)
-	@echo "  [LD]  $(KERNEL)"
-	@$(LD) $(LDFLAGS) $(KERNEL_OBJ) -o $(KERNEL)
+	$(VLD) $(LDFLAGS) $(KERNEL_OBJ) -o $(KERNEL)
 
-# ISO Creation
+
 $(ISO): $(KERNEL)
 	@echo "  [ISO] Creating bootable image..."
 	@rm -rf iso_root
@@ -100,30 +70,19 @@ $(ISO): $(KERNEL)
 	@cp third_party/limine/BOOTX64.EFI iso_root/EFI/BOOT/
 	@cp third_party/limine/BOOTIA32.EFI iso_root/EFI/BOOT/
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
-	        -no-emul-boot -boot-load-size 4 -boot-info-table \
-	        --efi-boot boot/limine/limine-uefi-cd.bin \
-	        -efi-boot-part --efi-boot-image --protective-msdos-label \
-	        iso_root -o $(ISO) 2>/dev/null
+		-no-emul-boot -boot-load-size 4 -boot-info-table \
+		--efi-boot boot/limine/limine-uefi-cd.bin \
+		-efi-boot-part --efi-boot-image --protective-msdos-label \
+		iso_root -o $(ISO) 2>/dev/null
 	@echo "  [OK]  $(ISO)"
 
+
 run: $(ISO)
-	@echo "  [RUN] Starting QEMU..."
-	@qemu-system-x86_64 \
-		-cdrom $(ISO) \
-		-m 256M \
-		#-enable-kvm \
-		#-device qemu-xhci,id=xhci \
-		#-device usb-kbd \
-		#-device usb-mouse \
-	2>/dev/null || \
-	qemu-system-x86_64 \
-		-cdrom $(ISO) \
-		-m 256M \
-		#-device qemu-xhci,id=xhci \
-		#-device usb-kbd \
-		#-device usb-mouse
+#   @echo "  [RUN]  emexOS"
+	@chmod +x ./run_qemu.sh
+	@./run_qemu.sh $(ISO)
 
 clean:
-	@echo "  [CLR] Removing build files..."
+	@echo "  [CLR] Cleanup..."
 	@rm -rf build $(KERNEL) $(ISO) iso_root
-	@echo "  [OK]  Clean complete"
+	@echo "  [OK]"
