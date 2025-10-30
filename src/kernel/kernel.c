@@ -37,7 +37,7 @@ static u8 kernel_heap[HEAP_SIZE] __attribute__((aligned(16)));
 
 void main(void)
 {
-    // doccrOS
+    // emexOS
 
     //delay(30);
 
