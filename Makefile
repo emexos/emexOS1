@@ -78,7 +78,7 @@ $(ISO): $(KERNEL)
 
 
 run: $(ISO)
-	@echo "  [RUN]   emexOS"
+#   @echo "  [RUN]  emexOS"
 	@chmod +x ./run_qemu.sh
 	@./run_qemu.sh $(ISO)
 
