@@ -100,7 +100,7 @@ void isr_unregister_handler(u8 num)
 
 void isr_handler(cpu_state_t* state)
 {
-    // Rufe registrierten Handler auf
+    // move the panic to kernel/panic.c/.h
     if (state->int_no < 32 && isr_handlers[state->int_no] != NULL) {
         isr_handlers[state->int_no](state);
     } else {
