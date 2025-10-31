@@ -29,8 +29,8 @@ void timer_handler(cpu_state_t* state)
     timer_ticks++;
 
     // call schedule
-    if (scheduler_is_enabled()) {
-        scheduler_tick();
+    if (sched_is_enabled()) {
+        sched_tick();
     }
     //schedule not really implemented
 }
@@ -104,7 +104,7 @@ void timer_handler_internal(void)
 
     timer_ticks++;
 
-    if (scheduler_is_enabled()) {
-        scheduler_tick();
+    if (sched_is_enabled()) {
+        sched_tick();
     }
 }
