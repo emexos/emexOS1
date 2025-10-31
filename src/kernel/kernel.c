@@ -23,7 +23,7 @@
 #include "cpu/irq.h"
 #include "cpu/timer.h"
 
-#include "mem_manager/physmem.h"
+#include "mem_manager/phys/physmem.h"
 //#include "mem_manager/virtmem.h" //not implemendet
 
 #include "proc/process.h"
@@ -37,14 +37,14 @@ static u8 kernel_heap[HEAP_SIZE] __attribute__((aligned(16)));
 
 void main(void)
 {
-    // emexOS
+    // doccrOS
 
     //delay(30);
 
     clear(BOOTSCREEN_COLOR);
 
     // init memory
-    print("Memory\n", TITLE_COLOR);
+    print("Memory", TITLE_COLOR);
     mem_init(kernel_heap, HEAP_SIZE);
 
     //actually not needed but maybe later
@@ -58,7 +58,7 @@ void main(void)
     delay(10);
 
     char buf[128];
-    str_copy(buf, "Heap: ");
+    str_copy(buf, "\nHeap: ");
     str_append_uint(buf, HEAP_SIZE / 1024);
     str_append(buf, " KB\n");
     print(buf, GFX_GRAY_50);
@@ -104,23 +104,23 @@ void main(void)
 
     process_init();
     print("Process manager\n", GFX_GREEN);
-    scheduler_init();
+    sched_init();
     print("Scheduler\n", GFX_GREEN);
 
     putchar('\n', GFX_WHITE);
     putchar('\n', GFX_WHITE);
 
     // Initialize PCI
-    print("Hardware Detection\n", TITLE_COLOR);
+    //print("Hardware Detection\n", TITLE_COLOR);
 
     //pci_init();
-    print("PCI/PCIe bus\n", GFX_GREEN);
+    //print("PCI/PCIe bus\n", GFX_GREEN);
 
-    putchar('\n', GFX_WHITE);
+    //putchar('\n', GFX_WHITE);
 
     // Show system info
     str_copy(buf, "Free Memory: ");
-    str_append_uint(buf, (u32)(physmem_get_free_pages() * 4) / 1024);
+    str_append_uint(buf, (u32)(physmem_get_free() * 4) / 1024);
     str_append(buf, " MB\n");
     print(buf, GFX_CYAN);
 
@@ -170,3 +170,4 @@ void _start(void)
     main();
     // hcf(); cannot ever reach this
 };
+
