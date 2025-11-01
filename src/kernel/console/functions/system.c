@@ -4,7 +4,56 @@
 #include "../../../libs/string/string.h"
 #include "../../../libs/memory/main.h"
 #include "../../../drivers/cmos/cmos.h"
+#include "../../module/module.h"
 
+FHDR(cmd_modules)
+{
+    (void)s; // unused
+
+    print("\n", GFX_WHITE);
+    print("Loaded Modules:\n", GFX_WHITE);
+
+    int count = module_get_count();
+
+    if (count == 0) {
+        print("No modules loaded\n", GFX_RED);
+        return;
+    }
+
+    char buf[128];
+    for (int i = 0; i < count; i++) {
+        driver_module_t *mod = module_get_by_index(i);
+        if (mod) {
+
+            print("- ", GFX_WHITE);
+            print(mod->name, GFX_GREEN);
+
+            print(" -> ", GFX_WHITE);
+            print(mod->mount, GFX_CYAN);
+
+            u32 ver = mod->version;
+            u32 major = (ver >> 24) & 0xFF;
+            u32 minor = (ver >> 16) & 0xFF;
+            u32 patch = (ver >> 8) & 0xFF;
+
+            str_copy(buf, " [v");
+            str_append_uint(buf, major);
+            str_append(buf, ".");
+            str_append_uint(buf, minor);
+            str_append(buf, ".");
+            str_append_uint(buf, patch);
+            str_append(buf, "]");
+            print(buf, GFX_GRAY_50);
+
+            print("\n", GFX_WHITE);
+        }
+    }
+
+    str_copy(buf, "\nTotal: ");
+    str_append_uint(buf, count);
+    str_append(buf, " module(s)\n");
+    print(buf, GFX_WHITE);
+}
 
 FHDR(cmd_meminfo)
 {
@@ -39,10 +88,10 @@ FHDR(cmd_sysinfo)
 
     print("\n", GFX_WHITE);
     print("                        \n", GFX_GREEN);
-    print("   ###########;m;       user@doccros\n", GFX_GREEN);
+    print("   ###########;m;       user@emexos\n", GFX_GREEN);
     print("   # #########;m;       ----------------\n", GFX_GREEN);
-    print("   # #;m;               OS: ", GFX_GREEN); print("doccrOS x86 \n", GFX_WHITE);
-    print("   # #;m;               version: ", GFX_GREEN); print("pav0.1\n", GFX_WHITE);
+    print("   # #;m;               OS: ", GFX_GREEN); print("emexOS x86 \n", GFX_WHITE);
+    print("   # #;m;               version: ", GFX_GREEN); print("1\n", GFX_WHITE);
     print("   # ########;m;        Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
     print("   # ########;m;        Resolution: ", GFX_GREEN); print("1280x800\n", GFX_WHITE);
     print("   # #;m;               CPU: ", GFX_GREEN); /*ShowCPUName();*/ print("not detected\n", GFX_WHITE);
@@ -51,15 +100,5 @@ FHDR(cmd_sysinfo)
     print("   ###########;m;       \n", GFX_GREEN);
     print("                        ", GFX_GREEN);
     print("\n", GFX_WHITE);
-
-
-    /*print("\n  --------------------------------------------------------------------", 0x0F);
-    print("\n   Developer: ", 0x0A); Print("/salsaJon\n", 0x0F);
-    print("   First gfx Build: ", 0x0A); Print("05/04/2025\n\n", 0x0F);
-
-    print("   This OS is made for a school Project, its open source \n", 0x0F);
-    print("   Also, emexOS is the most hardest and best project i made.\n", 0x0F);
-    print("   this is my first OS with a GUI\n\n", 0x0F);
-
-    print("\n  --------------------------------------------------------------------", 0x0F);*/
 }
+

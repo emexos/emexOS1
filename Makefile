@@ -6,19 +6,23 @@ KERNEL = kernel.elf
 ISO = emexOS.iso
 
 # Source files
+# $(shell find . -name '*.c')
 KERNEL_C_SRC = src/kernel/kernel.c \
                src/kernel/console/console.c \
+               src/kernel/console/module.c \
                src/kernel/console/shell_screen.c \
                src/kernel/console/functions/text.c \
                src/kernel/console/functions/system.c \
                src/kernel/console/functions/cmos.c \
+               src/kernel/module/module.c \
                src/kernel/include/logo.c \
                src/kernel/cpu/idt.c \
                src/kernel/cpu/isr.c \
                src/kernel/cpu/irq.c \
                src/kernel/cpu/gdt.c \
                src/kernel/cpu/timer.c \
-               src/kernel/mem_manager/physmem.c \
+               src/kernel/mem_manager/phys/physmem.c \
+               src/kernel/mem_manager/alloc/alloc.c \
                src/kernel/proc/process.c \
                src/kernel/proc/scheduler.c \
                src/libs/graphics/graphics.c \
@@ -74,11 +78,11 @@ $(ISO): $(KERNEL)
 		--efi-boot boot/limine/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o $(ISO) 2>/dev/null
-	@echo "  [OK]  $(ISO)"
+	@echo "  ------------------------"
+	@echo "  [OK]  $(ISO) created"
 
 
 run: $(ISO)
-#   @echo "  [RUN]  emexOS"
 	@chmod +x ./run_qemu.sh
 	@./run_qemu.sh $(ISO)
 

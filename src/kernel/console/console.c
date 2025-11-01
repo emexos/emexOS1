@@ -10,12 +10,13 @@ static int input_pos = 0;
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 8;
+static int cmd_count = 7;
 
 static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
     CMDENTRY(cmd_clear, "clear", "clears the screen", "clear [color]"),
     CMDENTRY(cmd_help, "help", "displays all available commands", "help [command]"),
+    CMDENTRY(cmd_modules, "modules", "list loaded modules", "modules"),
     CMDENTRY(cmd_meminfo, "meminfo", "displays memory infos", "meminfo"),
     //CMDENTRY(cmd_memtest, "memtest", "Memory test suite", "memtest"),
     CMDENTRY(cmd_sysinfo, "dofetch", "displays doccrOS fetch", "dofetch"),
