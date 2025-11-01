@@ -9,6 +9,7 @@ FHDR(cmd_clear);
 FHDR(cmd_help);
 
 // system.c
+FHDR(cmd_modules);
 FHDR(cmd_meminfo);
 FHDR(cmd_memtest);
 FHDR(cmd_sysinfo);
