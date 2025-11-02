@@ -1,7 +1,7 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "../../shared/types.h"
+#include "../../../shared/types.h"
 //https://github.com/SloopyCode/BitFonts
 
 static const u8 font_8x8[132][8] = {
