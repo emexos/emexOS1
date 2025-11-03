@@ -1,8 +1,6 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#pragma once
-
 extern u32 *framebuffer;
 extern u32 fb_width;
 extern u32 fb_height;
@@ -10,12 +8,8 @@ extern u32 fb_pitch;
 extern u32 cursor_x;
 extern u32 cursor_y;
 
-
 #include "../../../shared/types.h"
 #include "../../../third_party/limine/limine.h"
-#include "theme/stdclrs.h"
-#include "../print/print.h"
-#include "../string/string.h"
 
 void graphics_init(struct limine_framebuffer *fb);
 void putpixel(u32 x, u32 y, u32 color);

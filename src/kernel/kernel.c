@@ -1,12 +1,11 @@
 #include "include/assembly.h"
-#include "../libs/graphics/graphics.h"
+#include "../klib/graphics/graphics.h"
 //#include "../libs/graphics/standard/screen.h"
 //#include "../libs/graphics/draw.h"
-#include "../libs/graphics/theme/stdclrs.h"
-#include "../libs/string/string.h"
-#include "../libs/print/print.h"
+#include "../klib/string/string.h"
+#include "../klib/string/print.h"
 
-#include "../libs/memory/main.h"
+#include "../klib/memory/main.h"
 #include "../drivers/ps2/ps2.h"
 //#include "../drivers/pci/pci.h"
 /*#include "../drivers/usb/usb.h"
@@ -14,6 +13,7 @@
 #include "../drivers/usb/usb_keyboard.h"*/
 #include "console/console.h"
 #include "../../shared/theme/doccr.h"
+#include "../../shared/theme/stdclrs.h"
 
 #include "include/logo.h"
 
@@ -37,9 +37,12 @@ static u8 kernel_heap[HEAP_SIZE] __attribute__((aligned(16)));
 
 void main(void)
 {
-    // doccrOS
+    // ==============================================
+    // ==                                          ==
+    // ==                  emexOS                  ==
+    // ==                                          ==
+    // ==============================================
 
-    //delay(30);
 
     clear(BOOTSCREEN_COLOR);
 
@@ -54,8 +57,6 @@ void main(void)
 
     cursor_x = 20;
     cursor_y = 10;
-
-    delay(10);
 
     char buf[128];
     str_copy(buf, "\nHeap: ");
@@ -89,15 +90,11 @@ void main(void)
     timer_init(1000); // 1000 Hz = 1ms ticks
     print("Timer initialized 1000Hz 1mstick\n", GFX_GREEN);
 
-    delay(2);
-
     putchar('\n', GFX_WHITE);
 
     // MEM
     physmem_init(256 * 1024 * 1024); // 256 MB
     print("Physical memory 256 MB\n", GFX_GREEN);
-
-    delay(10);
 
     putchar('\n', GFX_WHITE);
 
@@ -127,9 +124,6 @@ void main(void)
     // USB which is not implemented
     //print("\n[USB Initialization]\n", GFX_CYAN);
      //xhci_init();
-
-
-    delay(10);
 
     clear(BOOTSCREEN_COLOR);
     reset_cursor();
@@ -170,4 +164,3 @@ void _start(void)
     main();
     // hcf(); cannot ever reach this
 };
-

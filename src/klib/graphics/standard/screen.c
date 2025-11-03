@@ -1,8 +1,8 @@
 #include "../../../../shared/types.h"
 #include "../graphics.h"
-#include "../theme/stdclrs.h"
+#include "../../../../shared/theme/stdclrs.h"
 //#include "../draw.h"
-#include "../../print/print.h"
+#include "../../string/print.h"
 
 void clear(u32 color)
 {

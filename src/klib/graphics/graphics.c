@@ -1,10 +1,10 @@
 #include "../../../shared/types.h"
 #include "../../../third_party/limine/limine.h"
-#include "theme/stdclrs.h"
+#include "../../../shared/theme/stdclrs.h"
 #include "graphics.h"
 //#include "standard/screen.h"
 #include "../string/string.h"
-#include "../print/print.h"
+#include "../string/print.h"
 
 //donnot put static before the uints!
 u32 *framebuffer = NULL;

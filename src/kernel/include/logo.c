@@ -1,12 +1,8 @@
 #include "../../../shared/types.h"
-#include "../../libs/graphics/graphics.h"
+#include "../../klib/graphics/graphics.h"
 #include "../../../shared/theme/doccr.h"
+#include "../../../shared/theme/stdclrs.h"
 #include "logo.h"
-
-//TODOcreate bitmap
-const char *small_logo_text =	"emexOS\n";
-
-
 
 const u32 logo_width  = 80;
 const u32 logo_height = 16;
@@ -58,7 +54,6 @@ void draw_logo(void) {
     u32 start_x = (screen_w - logo_width * LOGO_SCALE) / 2;
     u32 start_y = (screen_h - logo_height * LOGO_SCALE) / 2;
 
-    //u32 fg_color = 0xFFFFFFFF;
     u32 fg_color = GFX_WHITE;
 
     for (u32 y = 0; y < logo_height; y++) {

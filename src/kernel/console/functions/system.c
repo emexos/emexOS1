@@ -1,9 +1,10 @@
 #include "../console.h"
-#include "../../../libs/print/print.h"
-#include "../../../libs/graphics/graphics.h"
-#include "../../../libs/string/string.h"
-#include "../../../libs/memory/main.h"
+#include "../../../klib/string/print.h"
+#include "../../../klib/graphics/graphics.h"
+#include "../../../klib/string/string.h"
+#include "../../../klib/memory/main.h"
 #include "../../../drivers/cmos/cmos.h"
+#include "../../../../shared/theme/stdclrs.h"
 #include "../../module/module.h"
 
 FHDR(cmd_modules)
@@ -101,4 +102,3 @@ FHDR(cmd_sysinfo)
     print("                        ", GFX_GREEN);
     print("\n", GFX_WHITE);
 }
-

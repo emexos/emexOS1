@@ -1,6 +1,5 @@
-
 #include "keyboard.h"
-#include "../../../libs/graphics/graphics.h"
+#include "../../../klib/graphics/graphics.h"
 #include "../../../kernel/console/console.h"
 
 static inline u8 inb(u16 port) {
