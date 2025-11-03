@@ -1,18 +1,17 @@
-ARCH       ?= x86_64-elf
+OS_NAME ?= emexOS
+ARCH ?= x86_64
 
-ifeq "$(origin CC)" "default"
-CC         := $(ARCH)-gcc
-endif
-ifeq "$(origin CXX)" "default"
-CXX        := $(ARCH)-g++
-endif
+# Build toolchain
+CC := $(ARCH)-elf-gcc
+CXX := $(ARCH)-elf-g++
+LD := $(ARCH)-elf-ld
+AS := nasm
+OBJCOPY := $(ARCH)-elf-objcopy
 
-LD         := $(ARCH)-ld
-AS         := nasm
-AR         := $(ARCH)-ar
-OBJCOPY    := $(ARCH)-objcopy
-
-BUILD_DIR  := build
+VCC  = @echo "  [CC]  $<" && $(CC)
+VCXX = @echo "  [CXX] $<" && $(CXX)
+VAS  = @echo "  [AS]  $<" && $(AS)
+VLD  = @echo "  [LD]  $@" && $(LD)
 
 # Compiler Flags
 COMMON_FLAGS ?= -ffreestanding -nostdlib -fno-stack-protector -fno-lto \
@@ -25,15 +24,8 @@ LDFLAGS     ?= -nostdlib -static -no-pie -z text -z max-page-size=0x1000 \
                -T src/kernel/linker.ld
 ASFLAGS     ?= -f elf64
 
-
-ifeq ($(V),1)
-  VCC   = $(CC)
-  VCXX  = $(CXX)
-  VAS   = $(AS)
-  VLD   = $(LD)
-else
-  VCC   = @echo "  [CC]  $<" && $(CC)
-  VCXX  = @echo "  [CXX] $<" && $(CXX)
-  VAS   = @echo "  [AS]  $<" && $(AS)
-  VLD   = @echo "  [LD]  $@" && $(LD)
-endif
+# Directories and files
+SRC_DIR := src
+BUILD_DIR := build
+ISO_DIR := $(BUILD_DIR)/isodir
+ISO := $(BUILD_DIR)/$(OS_NAME).iso

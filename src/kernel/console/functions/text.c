@@ -1,8 +1,9 @@
 #include "../console.h"
-#include "../../../libs/print/print.h"
-#include "../../../libs/graphics/graphics.h"
-#include "../../../libs/string/string.h"
+#include "../../../klib/string/print.h"
+#include "../../../klib/graphics/graphics.h"
+#include "../../../klib/string/string.h"
 #include "../../../../shared/theme/doccr.h"
+#include "../../../../shared/theme/stdclrs.h"
 
 FHDR(cmd_echo)
 {

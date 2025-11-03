@@ -24,9 +24,6 @@ typedef i16 int16_t;
 typedef i32 int32_t;
 typedef i64 int64_t;
 
-/*typedef unsigned long  ULONG;
-typedef unsigned short USHORT;
-*/
 
 #define NULL ((void*)0)
 

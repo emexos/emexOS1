@@ -1,1 +1,13 @@
-.vscode 
+.vscode
+build/
+third_party/
+iso_root/
+
+
+*.iso
+
+run_qemu.sh
+
+.DS_Store
+*.swp
+*.swo

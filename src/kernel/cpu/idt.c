@@ -1,7 +1,7 @@
 #include "idt.h"
 #include "isr.h"
 #include "irq.h"
-#include "../../libs/memory/main.h"
+#include "../../klib/memory/main.h"
 
 static idt_entry_t idt[IDT_ENTRIES];
 static idt_ptr_t idt_ptr;
