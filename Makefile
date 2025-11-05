@@ -4,32 +4,38 @@ include common.mk
 SRCS = $(shell find $(SRC_DIR) -name "*.c" -or -name "*.cpp" -or -name "*.asm")
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
-.PHONY: all clean run iso
+.PHONY: all fetchDeps iso run clean
 all: $(ISO)
+
+# Fetch dependencies/libraries
+fetchDeps:
+	@echo "[DEPS] Fetching dependencies/libraries"
+	@mkdir -p $(INCLUDE_DIR)
+
+	# Limine
+	@rm -rf $(INCLUDE_DIR)/limine
+	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(INCLUDE_DIR)/limine
 
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 	$(VLD) $(LDFLAGS) -T $< $(OBJS) -o $@
 
-# Bootable OS ISO
-$(ISO): $(BUILD_DIR)/kernel.elf
-	@echo "  [ISO] Creating bootable image..."
-	@rm -rf iso_root
-	@mkdir -p iso_root/boot/limine iso_root/EFI/BOOT
-	@cp $(BUILD_DIR)/kernel.elf iso_root/boot/
-	@cp limine.conf iso_root/boot/limine/
-	@cp third_party/limine/limine-bios.sys iso_root/boot/limine/
-	@cp third_party/limine/limine-bios-cd.bin iso_root/boot/limine/
-	@cp third_party/limine/limine-uefi-cd.bin iso_root/boot/limine/
-	@cp third_party/limine/BOOTX64.EFI iso_root/EFI/BOOT/
-	@cp third_party/limine/BOOTIA32.EFI iso_root/EFI/BOOT/
+# Create bootable ISO
+$(ISO): limine.conf $(BUILD_DIR)/kernel.elf
+	@echo "[ISO] Creating bootable image..."
+	@rm -rf $(ISODIR)
+	@mkdir -p $(ISODIR)/boot/limine $(ISODIR)/EFI/BOOT
+	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/
+	@cp $< $(ISODIR)/boot/limine/
+	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
+	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot boot/limine/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o $(ISO) 2>/dev/null
-	@echo "  ------------------------"
-	@echo "  [OK]  $(ISO) created"
+		$(ISODIR) -o $(ISO) 2>/dev/null
+	@echo "------------------------"
+	@echo "[OK] $(ISO) created"
 
 # Run/Emulate OS
 run: $(ISO)
