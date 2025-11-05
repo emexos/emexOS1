@@ -20,8 +20,7 @@ COMMON_FLAGS ?= -ffreestanding -nostdlib -fno-stack-protector -fno-lto \
 
 CFLAGS      ?= $(COMMON_FLAGS) -std=gnu11
 CXXFLAGS    ?= $(COMMON_FLAGS) -std=c++17 -fno-exceptions -fno-rtti
-LDFLAGS     ?= -nostdlib -static -no-pie -z text -z max-page-size=0x1000 \
-               -T src/kernel/linker.ld
+LDFLAGS     ?= -nostdlib -static -no-pie -z text -z max-page-size=0x1000 
 ASFLAGS     ?= -f elf64
 
 # Directories and files
