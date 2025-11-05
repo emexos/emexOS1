@@ -1,7 +1,7 @@
 #ifndef PROCESS_H
 #define PROCESS_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 
 // process states
 typedef enum {

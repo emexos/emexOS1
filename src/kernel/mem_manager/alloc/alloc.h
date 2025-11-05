@@ -1,7 +1,7 @@
 #ifndef ALLOC_H
 #define ALLOC_H
 
-#include "../../../../shared/types.h"
+#include <types.h>
 
 #define ALIGN_SIZE 16
 #define MIN_BLOCK_SIZE 32

@@ -1,7 +1,7 @@
 #ifndef KEYBOARD_H
 #define KEYBOARD_H
 
-#include "../../../../shared/types.h"
+#include <types.h>
 
 #define KEY_BUFFER_SIZE 128
 

@@ -1,7 +1,6 @@
 #ifndef ISR_H
 #define ISR_H
 
-#include "../../../shared/types.h"
 #include "idt.h"
 
 // Exception Messages

@@ -1,10 +1,5 @@
 #include "console.h"
 #include "functions.h"
-#include "../../klib/string/print.h"
-#include "../../klib/graphics/graphics.h"
-//#include "../../libs/string/string.h"
-#include "../../../shared/theme/doccr.h"
-#include "../../../shared/theme/stdclrs.h"
 
 static char input_buffer[MAX_INPUT_LEN];
 static int input_pos = 0;

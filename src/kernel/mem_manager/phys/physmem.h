@@ -1,7 +1,7 @@
 #ifndef PHYSMEM_H
 #define PHYSMEM_H
 
-#include "../../../../shared/types.h"
+#include <types.h>
 
 #define PAGE_SIZE 4096
 #define PAGES_PER_BLOCK 8

@@ -1,7 +1,7 @@
 #ifndef DRIVER_MODULE_H
 #define DRIVER_MODULE_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 
 #define VERSION_NUM(major, minor, patch, build) \
     ((major << 24) | (minor << 16) | (patch << 8) | build)

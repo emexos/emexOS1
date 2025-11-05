@@ -1,13 +1,8 @@
+# IDE specific stuff
 .vscode
-build/
-third_party/
-iso_root/
 
+# Build output
+build
 
-*.iso
-
-run_qemu.sh
-
-.DS_Store
-*.swp
-*.swo
+# Dependencies
+include/limine

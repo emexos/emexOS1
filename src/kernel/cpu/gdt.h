@@ -1,7 +1,7 @@
 #ifndef GDT_H
 #define GDT_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 
 #define GDT_ENTRIES 7
 

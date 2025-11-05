@@ -1,7 +1,6 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-#include "../../../shared/types.h"
 #include "idt.h"
 
 // IRQ Numbers

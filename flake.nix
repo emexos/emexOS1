@@ -5,16 +5,13 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
   outputs = inputs: inputs.flake-utils.lib.eachDefaultSystem(system: let
-    pkgs = import inputs.nixpkgs;
+    pkgs = import inputs.nixpkgs {inherit system;};
   in {
     devShells.default = pkgs.mkShellNoCC {
       nativeBuildInputs = with pkgs; [
-        # Toolchain
-        pkgsCross.x86-embedded.stdenv.cc
+        pkgsCross.x86_64-embedded.stdenv.cc
         nasm
-        make
-
-        # For fetching dependencies
+        libisoburn
         git
       ];
     };

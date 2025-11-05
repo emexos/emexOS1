@@ -1,10 +1,5 @@
-#include "../../../shared/types.h"
-#include "../../../shared/theme/stdclrs.h"
-#include "../../klib/graphics/graphics.h"
-#include "../../klib/string/string.h"
-#include "../../klib/string/print.h"
-
 #include "cmos.h"
+#include <klib/graphics/graphics.h>
 
 /*
  * ----------------------------------------------------------------------------------

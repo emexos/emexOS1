@@ -1,7 +1,8 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include "../../../shared/types.h"
+#include <types.h>
+#include <klib/graphics/graphics.h>
 
 #define MAX_INPUT_LEN 256
 #define MAX_CMDS 32

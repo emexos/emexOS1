@@ -4,16 +4,25 @@ include common.mk
 SRCS = $(shell find $(SRC_DIR) -name "*.c" -or -name "*.cpp" -or -name "*.asm")
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
-.PHONY: all clean run iso
+.PHONY: all fetchDeps iso run clean
 all: $(ISO)
+
+# Fetch dependencies/libraries
+fetchDeps:
+	# Ensure include directory exists
+	mkdir -p $(INCLUDE_DIR)
+
+	# Fetch Limine
+	rm -rf $(INCLUDE_DIR)/limine
+	git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(INCLUDE_DIR)/limine
 
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 	$(VLD) $(LDFLAGS) -T $< $(OBJS) -o $@
 
-# Bootable OS ISO
+# Create bootable ISO
 $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
-	@echo "  [ISO] Creating bootable image..."
+	@echo "[ISO] Creating bootable ISO..."
 	@rm -rf $(ISODIR)
 	@mkdir -p $(ISODIR)/boot/limine $(ISODIR)/EFI/BOOT/
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/
@@ -24,9 +33,9 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot boot/limine/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		iso_root -o $(ISO) 2>/dev/null
-	@echo "  ------------------------"
-	@echo "  [OK]  $(ISO) created"
+		$(ISODIR) -o $(ISO) 2>/dev/null
+	@echo "------------------------"
+	@echo "[OK] $(ISO) created"
 
 # Run/Emulate OS
 run: $(ISO)

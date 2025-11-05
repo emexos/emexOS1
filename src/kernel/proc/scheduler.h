@@ -1,7 +1,7 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 #include "process.h"
 
 typedef struct {
