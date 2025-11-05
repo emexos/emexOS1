@@ -1,7 +1,7 @@
 #ifndef IDT_H
 #define IDT_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 
 #define IDT_ENTRIES 256
 

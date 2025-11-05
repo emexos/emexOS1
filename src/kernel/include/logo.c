@@ -1,8 +1,5 @@
-#include "../../../shared/types.h"
-#include "../../klib/graphics/graphics.h"
-#include "../../../shared/theme/doccr.h"
-#include "../../../shared/theme/stdclrs.h"
 #include "logo.h"
+#include <klib/graphics/graphics.h>
 
 const u32 logo_width  = 80;
 const u32 logo_height = 16;

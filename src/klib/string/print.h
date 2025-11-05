@@ -1,7 +1,7 @@
 #ifndef PRINT_H
 #define PRINT_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 
 // text output functions
 void putchar(char c, u32 color);

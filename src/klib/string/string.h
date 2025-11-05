@@ -1,8 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include "../../../shared/types.h"
-#include "../graphics/graphics.h"
+#include <types.h>
 
 void str_copy(char *dest, const char *src);
 void str_append(char *dest, const char *src);

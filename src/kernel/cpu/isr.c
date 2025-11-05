@@ -1,9 +1,6 @@
 #include "isr.h"
 #include "idt.h"
-#include "../../klib/string/print.h"
-#include "../../klib/graphics/graphics.h"
-#include "../../klib/string/string.h"
-#include "../../../shared/theme/stdclrs.h"
+#include <klib/graphics/graphics.h>
 
 static isr_handler_t isr_handlers[32];
 

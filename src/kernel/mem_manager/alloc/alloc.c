@@ -1,5 +1,5 @@
 #include "alloc.h"
-#include "../../../klib/memory/main.h"
+#include <klib/memory/main.h>
 
 typedef struct blk {
     size_t sz;

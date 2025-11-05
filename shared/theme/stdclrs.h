@@ -1,5 +1,6 @@
 #ifndef STDCLRS_H
 #define STDCLRS_H
+
 //nord theme
 #define GFX_BLACK   0xFF000000
 #define GFX_BG      0xFF3B4252
@@ -14,11 +15,9 @@
 #define GFX_GRAY_20     0xFF333333
 #define GFX_GRAY_50     0xFF808080
 
-
 #define TEXT_COLOR GFX_GRAY_50
 #define TITLE_COLOR GFX_WHITE
 #define FAIL_COLOR GFX_RED
 #define PASS_COLOR GFX_GREEN
-
 
 #endif

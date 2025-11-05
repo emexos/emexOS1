@@ -13,7 +13,7 @@ VAS = @echo "[AS] $<" && $(AS)
 VLD = @echo "[LD] $@" && $(LD)
 
 # Compiler Flags
-COMMON_FLAGS ?= -ffreestanding -nostdlib -fno-stack-protector -fno-lto \
+COMMON_FLAGS ?= -I $(INCLUDE_DIR) -I $(SRC_DIR) -I shared/ -ffreestanding -nostdlib -fno-stack-protector -fno-lto \
                 -fno-PIE -fno-pic -m64 -march=x86-64 -mno-80387 -mno-mmx \
                 -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel -Wall -Wextra
 CFLAGS ?= $(COMMON_FLAGS) -std=gnu11

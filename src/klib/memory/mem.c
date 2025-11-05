@@ -1,6 +1,6 @@
 #include "main.h"
 
-#include "../../kernel/mem_manager/alloc/alloc.h"
+#include <kernel/mem_manager/alloc/alloc.h>
 
 //todo: split in files
 #define BLOCK_SIZE 32

@@ -1,11 +1,7 @@
-#include "../console.h"
-#include "../../../klib/string/print.h"
-#include "../../../klib/graphics/graphics.h"
-#include "../../../klib/string/string.h"
-#include "../../../klib/memory/main.h"
-#include "../../../drivers/cmos/cmos.h"
-#include "../../../../shared/theme/stdclrs.h"
-#include "../../module/module.h"
+#include <kernel/console/console.h>
+#include <klib/memory/main.h>
+#include <drivers/cmos/cmos.h>
+#include <kernel/module/module.h>
 
 FHDR(cmd_modules)
 {

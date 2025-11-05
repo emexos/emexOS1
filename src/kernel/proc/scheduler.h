@@ -1,8 +1,8 @@
 #ifndef SCHEDULER_H
 #define SCHEDULER_H
 
-#include "../../../shared/types.h"
 #include "process.h"
+#include <types.h>
 
 typedef struct {
     proc_t *queue[32];

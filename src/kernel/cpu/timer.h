@@ -1,7 +1,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-#include "../../../shared/types.h"
+#include <types.h>
 
 #define TIMER_FREQUENCY 1000  // 1000 Hz = 1ms Ticks
 

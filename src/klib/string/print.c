@@ -1,8 +1,6 @@
-#include "../../../shared/types.h"
-#include "../../../shared/fonts/font.h"
 #include "print.h"
-#include "../string/string.h"
-#include "../graphics/graphics.h"
+#include <klib/graphics/graphics.h>
+#include <fonts/font.h>
 
 static void putchar_at(char c, u32 x, u32 y, u32 color)
 {

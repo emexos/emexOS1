@@ -1,6 +1,6 @@
 #include "timer.h"
 #include "irq.h"
-#include "../proc/scheduler.h"
+#include <kernel/proc/scheduler.h>
 
 static volatile u64 timer_ticks = 0;
 static volatile int timer_initialized = 0;

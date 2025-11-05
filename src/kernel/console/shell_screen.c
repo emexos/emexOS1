@@ -1,7 +1,4 @@
 #include "console.h"
-#include "../../klib/string/print.h"
-#include "../../klib/graphics/graphics.h"
-#include "../../../shared/theme/stdclrs.h"
 
 void shell_clear_screen(u32 color)
 {

@@ -1,5 +1,4 @@
-#include "console.h"
-#include "../module/module.h"
+#include "module.h"
 
 static int console_module_init(void) {
     // console already initialized in main

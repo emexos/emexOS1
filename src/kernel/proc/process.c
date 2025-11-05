@@ -1,5 +1,5 @@
 #include "process.h"
-#include "../mem_manager/alloc/alloc.h"
+#include <kernel/mem_manager/alloc/alloc.h>
 
 #define STACK_SIZE 8192
 

@@ -1,8 +1,8 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-#include "../../../shared/types.h"
 #include "idt.h"
+#include <types.h>
 
 // IRQ Numbers
 #define IRQ0  32    // Timer - used

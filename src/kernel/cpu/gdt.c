@@ -1,5 +1,5 @@
 #include "gdt.h"
-#include "../../klib/memory/main.h"
+#include <klib/memory/main.h>
 
 static gdt_entry_t gdt[GDT_ENTRIES];
 //static gdt_tss_entry_t tss_entry;

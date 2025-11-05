@@ -1,8 +1,8 @@
 #ifndef ISR_H
 #define ISR_H
 
-#include "../../../shared/types.h"
 #include "idt.h"
+#include <types.h>
 
 // Exception Messages
 #define ISR_DIVISION_ERROR          0
@@ -30,8 +30,6 @@
 
 // ISR Handler Type
 typedef void (*isr_handler_t)(cpu_state_t* state);
-
-
 
 void isr_install(void);
 void isr_register_handler(u8 num, isr_handler_t handler);
@@ -70,6 +68,5 @@ extern void isr28(void);
 extern void isr29(void);
 extern void isr30(void);
 extern void isr31(void);
-
 
 #endif

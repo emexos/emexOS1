@@ -9,7 +9,6 @@
 //console
 #define CONSOLESCREEN_COLOR 0xFF3B4252
 
-
 /*
 // ******************
 // userspace theme:

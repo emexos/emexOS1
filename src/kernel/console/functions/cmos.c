@@ -1,8 +1,5 @@
-#include "../console.h"
-#include "../../../klib/string/print.h"
-#include "../../../klib/graphics/graphics.h"
-#include "../../../drivers/cmos/cmos.h"
-#include "../../../../shared/theme/stdclrs.h"
+#include <kernel/console/console.h>
+#include <drivers/cmos/cmos.h>
 
 FHDR(cmd_date) {
     (void)s;

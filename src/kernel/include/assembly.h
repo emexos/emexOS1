@@ -1,9 +1,8 @@
 #ifndef ASSEMBLY_H
 #define ASSEMBLY_H
 
-#include "../../../shared/types.h"
-#include "../../../third_party/limine/limine.h"
-
+#include <types.h>
+#include <limine/limine.h>
 
 // limine reqs
 __attribute__((used, section(".requests")))

@@ -24,7 +24,6 @@ typedef i16 int16_t;
 typedef i32 int32_t;
 typedef i64 int64_t;
 
-
 #define NULL ((void*)0)
 
 #define TRUE  1

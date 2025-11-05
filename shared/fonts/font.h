@@ -1,9 +1,8 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "../types.h"
+#include <types.h>
 //https://github.com/SloopyCode/BitFonts
-
 static const u8 font_8x8[132][8] = {
     // all unused characters can be used as a custom texture (0x00 to 0x1F)
     [0x00] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00},    // null

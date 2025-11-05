@@ -1,10 +1,4 @@
-#include "../../../shared/types.h"
-#include "../../../third_party/limine/limine.h"
-#include "../../../shared/theme/stdclrs.h"
 #include "graphics.h"
-//#include "standard/screen.h"
-#include "../string/string.h"
-#include "../string/print.h"
 
 //donnot put static before the uints!
 u32 *framebuffer = NULL;
@@ -39,6 +33,14 @@ void graphics_init(struct limine_framebuffer *fb)
     print(res_buf, GFX_WHITE);
 }
 
+void clear(u32 color)
+{
+    u32 w = get_fb_width();
+    u32 h = get_fb_height();
+    draw_rect(0, 0, w, h, color);
+    reset_cursor();
+    print(" ", GFX_BG);
+}
 
 void putpixel(u32 x, u32 y, u32 color)
 {
