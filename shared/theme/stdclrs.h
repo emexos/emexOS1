@@ -1,0 +1,22 @@
+#ifndef STDCLRS_H
+#define STDCLRS_H
+//fluent neutral
+#define GFX_BLACK   0xFF111111
+#define GFX_BG      0xFF1F1F1F
+#define GFX_RED     0xFF9E6E6E
+#define GFX_GREEN   0xFF7A8A7A
+#define GFX_YELLOW  0xFFB8A788
+#define GFX_BLUE    0xFF6E7F8E
+#define GFX_PURPLE  0xFF857A8E
+#define GFX_CYAN    0xFF7A8E8E
+#define GFX_WHITE   0xFFD8D8D8
+
+#define GFX_GRAY_20     0xFF2E2E2E
+#define GFX_GRAY_50     0xFF757575
+
+#define TEXT_COLOR GFX_GRAY_50
+#define TITLE_COLOR GFX_WHITE
+#define FAIL_COLOR GFX_RED
+#define PASS_COLOR GFX_GREEN
+
+#endif
