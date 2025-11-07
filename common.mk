@@ -13,13 +13,13 @@ VAS = @echo "[AS] $<" && $(AS)
 VLD = @echo "[LD] $@" && $(LD)
 
 # Compiler Flags
-COMMON_FLAGS ?= -I $(INCLUDE_DIR) -I $(SRC_DIR) -I shared/ -ffreestanding -nostdlib -fno-stack-protector -fno-lto \
+COMMON_FLAGS += -I $(INCLUDE_DIR) -I $(SRC_DIR) -I shared/ -ffreestanding -fno-stack-protector -fno-lto \
                 -fno-PIE -fno-pic -m64 -march=x86-64 -mno-80387 -mno-mmx \
                 -mno-sse -mno-sse2 -mno-red-zone -mcmodel=kernel -Wall -Wextra
-CFLAGS ?= $(COMMON_FLAGS) -std=gnu11
-CXXFLAGS ?= $(COMMON_FLAGS) -std=c++17 -fno-exceptions -fno-rtti
-LDFLAGS ?= -nostdlib -static -no-pie -z text -z max-page-size=0x1000 
-ASFLAGS ?= -f elf64
+CFLAGS += $(COMMON_FLAGS) -std=gnu11
+CXXFLAGS += $(COMMON_FLAGS) -std=c++17 -fno-exceptions -fno-rtti
+LDFLAGS := -nostdlib -static -no-pie -z text -z max-page-size=0x1000 
+ASFLAGS := -f elf64
 
 # Directories and files
 SRC_DIR := src
