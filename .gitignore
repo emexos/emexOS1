@@ -6,3 +6,5 @@ build/
 
 # Libraries/Dependencies
 include/
+
+.DS_Store
