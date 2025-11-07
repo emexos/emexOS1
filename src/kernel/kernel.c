@@ -142,10 +142,6 @@ void _start(void)
     // start os
     //
 
-    if (LIMINE_BASE_REVISION_SUPPORTED == 0) {
-        hcf();
-    }
-
     if (framebuffer_request.response == NULL ||
         framebuffer_request.response->framebuffer_count < 1) {
         hcf();
