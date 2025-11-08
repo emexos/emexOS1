@@ -82,7 +82,7 @@ FHDR(cmd_sysinfo)
 {
     (void)s; // unused parameter
 
-    print("                     \n", GFX_GREEN);
+    print("                    \n", GFX_GREEN);
     print(" ###########;m;      user@emexos\n", GFX_GREEN);
     print(" # #########;m;      ----------------\n", GFX_GREEN);
     print(" # #;m;              kernel: ", GFX_GREEN); print("emexOS x86 \n", GFX_WHITE);
@@ -94,14 +94,14 @@ FHDR(cmd_sysinfo)
     //print(" # #########;m;      graphic: ", GFX_GREEN); print("not detected\n", GFX_WHITE); //should show like nvidia or something like video card
     print(" # #########;m;      \n", GFX_GREEN);
     print(" ###########;m;      ", GFX_GREEN);
-        print("\x02 ", GFX_WHITE); //all colors:
-        print("\x02 ", GFX_RED);
-        print("\x02 ", GFX_GREEN);
-        print("\x02 ", GFX_YELLOW);
-        print("\x02 ", GFX_BLUE);
-        print("\x02 ", GFX_PURPLE);
-        print("\x02 ", GFX_CYAN);
-        print("\x02 \n", GFX_BG); //i think nobody will see this xd
+        print("\x06 ", GFX_WHITE); //all colors:
+        print("\x06 ", GFX_RED);
+        print("\x06 ", GFX_GREEN);
+        print("\x06 ", GFX_YELLOW);
+        print("\x06 ", GFX_BLUE);
+        print("\x06 ", GFX_PURPLE);
+        print("\x06 ", GFX_CYAN);
+        print("\x06 \n", GFX_BG); //i think nobody will see this xd
     print("                        ", GFX_GREEN); // empty/new line
 
 }

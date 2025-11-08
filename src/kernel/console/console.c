@@ -149,7 +149,7 @@ void console_execute(const char *input)
     if (cmd) {
         cmd->func(args);
     } else {
-        print(" Unknown command, Type 'help' for available commands...\n", GFX_RED);
+        print("> Unknown command, Type 'help' for available commands...", GFX_RED);
     }
 }
 

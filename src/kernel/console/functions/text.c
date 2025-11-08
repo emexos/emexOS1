@@ -46,7 +46,7 @@ FHDR(cmd_fsize)
 {
     if (*s == '\0') {
         char buf[64];
-        str_copy(buf, " Current font size: ");
+        str_copy(buf, "Current font size: ");
         str_append_uint(buf, font_scale);
         print(buf, GFX_WHITE);
         return;
@@ -63,31 +63,34 @@ FHDR(cmd_fsize)
     }
 
     if (size < 1 || size > 4) {
-        print(" Invalid size. Use 1-4\n", GFX_RED);
+        print("Invalid size. Use 1-4\n", GFX_RED);
         return;
     }
 
+    clear(CONSOLESCREEN_COLOR);
     set_font_scale(size);
-    char buf[64];
+    char buf[64];/*
     str_copy(buf, " Font size set to ");
     str_append_uint(buf, size);
     print(buf, GFX_GREEN);
+    */
+    clear(CONSOLESCREEN_COLOR);
 }
 
 FHDR(cmd_help)
 {
     if (*s == '\0') {
         // show all commands
-        print(" [COMMMON]\n", GFX_YELLOW);
-        print("   echo       - echo [text]\n", GFX_WHITE);
-        print("   clear      - clear screen\n", GFX_WHITE);
-        print("   help       - displays this list\n", GFX_WHITE);
-        print("   fsize      - change font size", GFX_WHITE);
-        print("\n [SYSTEM]\n", GFX_YELLOW);
-        print("   meminfo    - heap memory information\n", GFX_WHITE);
-        print("   dofetch    - emexOS system fetch\n", GFX_WHITE);
-        print("   date       - show current date\n", GFX_WHITE);
-        print(" Type 'help <command>' for details", GFX_GRAY_50);
+        print("[COMMMON]\n", GFX_YELLOW);
+        print("  echo       - echo [text]\n", GFX_WHITE);
+        print("  clear      - clear screen\n", GFX_WHITE);
+        print("  help       - displays this list\n", GFX_WHITE);
+        print("  fsize      - change font size", GFX_WHITE);
+        print("\n[SYSTEM]\n", GFX_YELLOW);
+        print("  meminfo    - heap memory information\n", GFX_WHITE);
+        print("  dofetch    - emexOS system fetch\n", GFX_WHITE);
+        print("  date       - show current date\n", GFX_WHITE);
+        print("Type 'help <command>' for details", GFX_GRAY_50);
     } else {
         // show specific command help
         const char *p = s;
@@ -97,16 +100,16 @@ FHDR(cmd_help)
         if (cmd) {
             char buf[128];
 
-            str_copy(buf, "\n ");
+            str_copy(buf, "\n");
             str_append(buf, cmd->description);
             print(buf, GFX_WHITE);
 
-            str_copy(buf, "\n Usage: ");
+            str_copy(buf, "\nUsage: ");
             str_append(buf, cmd->usage);
             print(buf, GFX_YELLOW);
             print("\n", GFX_WHITE);
         } else {
-            print("\n Command not found", GFX_RED);
+            print("\nCommand not found", GFX_RED);
         }
     }
 }
