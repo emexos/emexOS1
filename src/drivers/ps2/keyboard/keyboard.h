@@ -2,6 +2,7 @@
 #define KEYBOARD_H
 
 #include <types.h>
+#include <kernel/module/module.h>
 
 #define KEY_BUFFER_SIZE 128
 
@@ -15,5 +16,7 @@ void keyboard_init(void);
 void keyboard_poll(void);
 int keyboard_has_key(void);
 char keyboard_get_key(void);
+
+extern driver_module keyboard_module;
 
 #endif

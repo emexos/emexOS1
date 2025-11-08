@@ -47,6 +47,7 @@ static const unsigned char scancode_to_ascii_shift[128] = {
 
 void keyboard_init(void) {
     //
+    // DON'T call keyboard_poll() here!
 }
 
 void keyboard_poll(void) {
@@ -83,3 +84,23 @@ void keyboard_poll(void) {
         }
     }
 }
+
+static int keyboard_module_init(void) {
+    keyboard_init();
+    return 0;
+}
+
+static void keyboard_module_fini(void) {
+    //
+}
+
+driver_module keyboard_module = (driver_module) {
+    .name = "ps2_keyboard",
+    .mount = "/drivers/keyboard",
+    .version = VERSION_NUM(0, 1, 0, 0),
+    .init = keyboard_module_init,
+    .fini = keyboard_module_fini,
+    .open = NULL, // later for fs
+    .read = NULL, // later for fs
+    .write = NULL, // later for fs
+};

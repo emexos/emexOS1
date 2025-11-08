@@ -6,12 +6,13 @@ static int input_pos = 0;
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 7;
+static int cmd_count = 8;
 
 static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
     CMDENTRY(cmd_clear, "clear", "clears the screen", "clear [color]"),
     CMDENTRY(cmd_help, "help", "displays all available commands", "help [command]"),
+    CMDENTRY(cmd_fsize, "fsize", "change font size", "fsize [2-4]"),
     CMDENTRY(cmd_modules, "modules", "list loaded modules", "modules"),
     CMDENTRY(cmd_meminfo, "meminfo", "displays memory infos", "meminfo"),
     //CMDENTRY(cmd_memtest, "memtest", "Memory test suite", "memtest"),
@@ -22,15 +23,40 @@ static console_cmd_t commands[MAX_CMDS] = {
 
 //----------------------------------
 
+//module---------------------------
+static int console_module_init(void) {
+    // console already initialized in main
+    return 0;
+}
+
+static void console_module_fini(void) {
+    //
+}
+
+driver_module console_module = (driver_module) {
+    .name = "console",
+    .mount = "/dev/console",
+    .version = VERSION_NUM(0, 1, 0, 0), //should print like [v0.1.0.0]
+    .init = console_module_init,
+    .fini = console_module_fini,
+    .open = NULL, // later for fs
+    .read = NULL, // later for fs
+    .write = NULL, // later for fs
+};
+
+//---------------------------------
+
 void console_init(void)
 {
     input_pos = 0;
     input_buffer[0] = '\0';
 
-    //clear(CONSOLESCREEN_COLOR);
-    //reset_cursor();
+    clear(CONSOLESCREEN_COLOR);
+    reset_cursor();
+    //
+    //module_register_driver(&console_module);
 
-    if (cursor_x == 10 && cursor_y == 10) {
+    if (cursor_x == 0 && cursor_y == 0) {
         clear(CONSOLESCREEN_COLOR);
         reset_cursor();
         print(" ", GFX_WHITE); //there is a glitch where the first print is always 10px left printed... so we just print the first line with nothing
@@ -70,12 +96,13 @@ void console_handle_key(char c)
             input_buffer[input_pos] = '\0';
 
             // just move the cursor back then print space, draw rext, and move back again
-            if (cursor_x >= 29) {
-                cursor_x -= 9;
+            u32 char_width = 8 * font_scale + font_scale;
+            if (cursor_x >= 20 + char_width) {
+                cursor_x -= char_width;
                 putchar(' ', GFX_WHITE);
-                cursor_x -= 9;
+                cursor_x -= char_width;
 
-                draw_rect(cursor_x, cursor_y, 9, 16, CONSOLESCREEN_COLOR);
+                draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_COLOR);
             }
         }
         return;
@@ -122,7 +149,7 @@ void console_execute(const char *input)
     if (cmd) {
         cmd->func(args);
     } else {
-        print("Unknown command, Type 'help' for available commands...\n", GFX_RED);
+        print(" Unknown command, Type 'help' for available commands...\n", GFX_RED);
     }
 }
 

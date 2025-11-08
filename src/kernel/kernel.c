@@ -21,12 +21,16 @@
 #include "proc/process.h"
 #include "proc/scheduler.h"
 
+// modules
+#include <kernel/module/module.h>
+
 // 16MB heap
 #define HEAP_SIZE (8 * 1024 * 1024)
 static u8 kernel_heap[HEAP_SIZE] __attribute__((aligned(16)));
 
 void _start(void)
 {
+    // emexOS start
     // Ensure that Limine base revision is supported and that we have a framebuffer
     if (framebuffer_request.response == NULL ||
         framebuffer_request.response->framebuffer_count < 1) {
@@ -38,6 +42,7 @@ void _start(void)
     graphics_init(fb);
     draw_logo();
 
+    // main kernel
     // ==============================================
     // ==                                          ==
     // ==                  emexOS                  ==
@@ -63,7 +68,7 @@ void _start(void)
     //draw_rect(10, 10, fb_width - 20, fb_height - 20, GFX_BG);
 
     draw_logo();
-    cursor_x = 20;
+    cursor_x = 10;
     cursor_y = 10;
 
     // Initialize the CPU
@@ -81,6 +86,17 @@ void _start(void)
     print("Process manager\n", GFX_GREEN);
     sched_init();
     print("Scheduler\n", GFX_GREEN);
+
+    putchar('\n', GFX_WHITE);
+    module_init();
+    print("Module system initialized\n", GFX_GREEN);
+
+    // Register driver modules
+    module_register(&console_module);
+    print("test1\n", GFX_GREEN);
+
+    module_register(&keyboard_module);
+    print("test2\n", GFX_GREEN);
 
     // Show system info
     str_copy(buf, "Free Memory: ");

@@ -1,4 +1,6 @@
 #include "graphics.h"
+#include <kernel/module/module.h>
+#include <fonts/font_8x8.h>
 
 //donnot put static before the uints!
 u32 *framebuffer = NULL;
@@ -7,6 +9,8 @@ u32 fb_height = 0;
 u32 fb_pitch = 0;
 u32 cursor_x = 20;
 u32 cursor_y = 20;
+u32 font_scale = 1; //for console scalin g
+
 
 void graphics_init(struct limine_framebuffer *fb)
 {
@@ -14,15 +18,11 @@ void graphics_init(struct limine_framebuffer *fb)
     fb_width = fb->width;
     fb_height = fb->height;
     fb_pitch = fb->pitch;
-
-    //cursor_x = 20;
     cursor_y = 20;
-
-    // background rect (test)
-    //draw_rect(10, 10, fb_width - 20, fb_height - 20, GFX_BG);
+    font_scale = 1;
 
     print("Welcome to doccrOS \n", GFX_WHITE);
-    print("v0.0.1 (alph)\n", GFX_WHITE);
+    print("v0.0.1 (alpha)\n", GFX_WHITE);
 
     print("Graphics\n", GFX_WHITE);
     char res_buf[64];
@@ -42,13 +42,33 @@ void clear(u32 color)
     print(" ", GFX_BG);
 }
 
+void scroll_up(u32 lines)
+{
+    u32 pixels_to_scroll = lines;
+    u32 pitch_dwords = fb_pitch / 4;
+
+    // Move framebuffer content up
+    for (u32 y = pixels_to_scroll; y < fb_height; y++) {
+        for (u32 x = 0; x < fb_width; x++) {
+            framebuffer[(y - pixels_to_scroll) * pitch_dwords + x] =
+                framebuffer[y * pitch_dwords + x];
+        }
+    }
+
+    // Clear bottom lines
+    for (u32 y = fb_height - pixels_to_scroll; y < fb_height; y++) {
+        for (u32 x = 0; x < fb_width; x++) {
+            framebuffer[y * pitch_dwords + x] = CONSOLESCREEN_COLOR;
+        }
+    }
+}
+
 void putpixel(u32 x, u32 y, u32 color)
 {
     if (x < fb_width && y < fb_height) {
         framebuffer[y * (fb_pitch / 4) + x] = color;
     }
 }
-//move to draw.c later
 
 u32 get_fb_width(void){
     return fb_width;
@@ -64,6 +84,26 @@ u32* get_framebuffer(void){
 
 u32 get_fb_pitch(void){
     return fb_pitch;
+}
+
+void graphics_set_font_scale(u32 scale) {
+    if (scale >= 1 && scale <= 4) {
+        font_scale = scale;
+    }
+}
+
+u32 graphics_get_font_scale(void) {
+    return font_scale;
+}
+
+void set_font_scale(u32 scale) {
+    if (scale >= 1 && scale <= 4) {
+        font_scale = scale;
+    }
+}
+
+u32 get_font_scale(void) {
+    return font_scale;
 }
 
 /*void reset_cursor(void)

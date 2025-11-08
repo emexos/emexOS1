@@ -1,6 +1,6 @@
 #include "module.h"
 
-static driver_module_t *modules[MAX_MODULES];
+static driver_module *modules[MAX_MODULES];
 static int module_count = 0;
 
 void module_init(void) {
@@ -10,7 +10,7 @@ void module_init(void) {
     module_count = 0;
 }
 
-int module_register(driver_module_t *module) {
+int module_register(driver_module *module) {
     if (!module || module_count >= MAX_MODULES) {
         return -1;
     }
@@ -71,7 +71,7 @@ void module_unregister(const char *name) {
     }
 }
 
-driver_module_t* module_find(const char *name) {
+driver_module* module_find(const char *name) {
     if (!name) return NULL;
 
     for (int i = 0; i < module_count; i++) {
@@ -102,7 +102,7 @@ int module_get_count(void) {
     return module_count;
 }
 
-driver_module_t* module_get_by_index(int idx) {
+driver_module* module_get_by_index(int idx) {
     if (idx < 0 || idx >= module_count) {
         return NULL;
     }

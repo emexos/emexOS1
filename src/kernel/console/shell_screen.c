@@ -18,11 +18,11 @@ void shell_print_prompt(void)
     //
 
     string("\n", GFX_WHITE);
-    string("> ", GFX_YELLOW);
+    string("\x01 ", GFX_YELLOW);
 }
 
 void shell_redraw_input(void)
 {
     // for future use: redraw current input line
-    // useful when implementing line editing features
+    // useful when implementing line editing features (programms)
 }

@@ -3,6 +3,9 @@
 
 #include <klib/graphics/graphics.h>
 
+#include <kernel/module/module.h>
+extern driver_module console_module;
+
 #define MAX_INPUT_LEN 256
 #define MAX_CMDS 32
 
@@ -33,6 +36,7 @@ console_cmd_t* console_find_cmd(const char *name);
 FHDR(cmd_echo);
 FHDR(cmd_clear);
 FHDR(cmd_help);
+FHDR(cmd_fsize);
 FHDR(cmd_modules);
 FHDR(cmd_meminfo);
 FHDR(cmd_sysinfo);

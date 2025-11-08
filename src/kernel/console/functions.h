@@ -7,6 +7,7 @@
 FHDR(cmd_echo);
 FHDR(cmd_clear);
 FHDR(cmd_help);
+FHDR(cmd_fsize);
 
 // system.c
 FHDR(cmd_modules);
