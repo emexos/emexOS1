@@ -84,7 +84,7 @@ FHDR(cmd_sysinfo)
 
     print("                    \n", GFX_GREEN);
     print(" ###########;m;      user@emexos\n", GFX_GREEN);
-    print(" # #########;m;      ----------------\n", GFX_GREEN);
+    print(" # #########;m;      ---------------\n", GFX_GREEN);
     print(" # #;m;              kernel: ", GFX_GREEN); print("emexOS x86 \n", GFX_WHITE);
     print(" # #;m;              version: ", GFX_GREEN); print("v2.0 [64bit]\n", GFX_WHITE);
     print(" # ########;m;       Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
