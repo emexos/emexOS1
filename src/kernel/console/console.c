@@ -96,13 +96,13 @@ void console_handle_key(char c)
             input_buffer[input_pos] = '\0';
 
             // just move the cursor back then print space, draw rext, and move back again
-            u32 char_width = 8 * font_scale + font_scale;
+            u32 char_width = 8 * font_scale + font_scale - 1 * font_scale; // -1 IS FOR NO SPACE!!!!!!! DO REMOVE IF .CONFIG IS ADDED
             if (cursor_x >= 20 + char_width) {
                 cursor_x -= char_width;
                 putchar(' ', GFX_WHITE);
                 cursor_x -= char_width;
 
-                draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_COLOR);
+                draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale -1 * font_scale, CONSOLESCREEN_COLOR); // SAME FOR HERE -1
             }
         }
         return;
