@@ -1,7 +1,7 @@
 #ifndef ISR_H
 #define ISR_H
 
-#include "idt.h"
+#include <kernel/cpu/idt.h>
 #include <types.h>
 
 // Exception Messages
@@ -35,7 +35,7 @@ void isr_install(void);
 void isr_register_handler(u8 num, isr_handler_t handler);
 void isr_unregister_handler(u8 num);
 
-// ISR Assembly Stubs
+// ISR Assembly Stubs (in exception_vectors.S)
 extern void isr0(void);
 extern void isr1(void);
 extern void isr2(void);

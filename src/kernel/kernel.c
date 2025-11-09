@@ -1,25 +1,31 @@
 #include <kernel/include/assembly.h>
+#include <kernel/include/reqs.h>
 #include <kernel/console/console.h>
 #include <kernel/include/logo.h>
 
 // Drivers
 #include <drivers/ps2/ps2.h>
-#include <drivers/ps2/keyboard/keyboard.h>
+//#include <drivers/ps2/keyboard/keyboard.h>
 
 // CPU
 #include <kernel/cpu/gdt.h>
 #include <kernel/cpu/idt.h>
-#include <kernel/cpu/isr.h>
+/*#include <kernel/cpu/isr.h>
 #include <kernel/cpu/irq.h>
-#include <kernel/cpu/timer.h>
+#include <kernel/cpu/timer.h>*/ // moved to /exception
 
 // Memory
 #include <klib/memory/main.h>
 #include <kernel/mem_manager/phys/physmem.h>
 //#include "mem_manager/virtmem.h" //not implemendet
 
+//process
 #include "proc/process.h"
 #include "proc/scheduler.h"
+
+//exception/timer
+#include <kernel/exceptions/timer.h>
+#include <kernel/exceptions/panic.h>
 
 // modules
 #include <kernel/module/module.h>
@@ -68,8 +74,8 @@ void _start(void)
     //draw_rect(10, 10, fb_width - 20, fb_height - 20, GFX_BG);
 
     draw_logo();
-    cursor_x = 10;
-    cursor_y = 10;
+    //cursor_x = 10;
+    //cursor_y = 10;
 
     // Initialize the CPU
     gdt_init();
@@ -112,5 +118,9 @@ void _start(void)
     keyboard_poll();
 
     //should not reach here
-    hcf();
+    #ifdef USE_HCF
+        hcf();
+    #else
+        panic("USE_HCF; FAILED --> USING PANIC");
+    #endif
 };

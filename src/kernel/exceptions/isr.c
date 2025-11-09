@@ -1,47 +1,12 @@
 #include "isr.h"
-#include "idt.h"
-#include <klib/graphics/graphics.h>
+#include "exception_handler.h"
+#include <kernel/cpu/idt.h>
 
 static isr_handler_t isr_handlers[32];
 
-static const char* exception_messages[] = {
-    "Division By Zero",
-    "Debug",
-    "Non Maskable Interrupt",
-    "Breakpoint",
-    "Overflow",
-    "Bound Range Exceeded",
-    "Invalid Opcode",
-    "Device Not Available",
-    "Double Fault",
-    "Coprocessor Segment Overrun",
-    "Invalid TSS",
-    "Segment Not Present",
-    "Stack-Segment Fault",
-    "General Protection Fault",
-    "Page Fault",
-    "Reserved",
-    "x87 FPU Error",
-    "Alignment Check",
-    "Machine Check",
-    "SIMD Floating-Point Exception",
-    "Virtualization Exception",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Reserved",
-    "Security Exception",
-    "Reserved"
-};
-
 void isr_install(void)
 {
-    // handler Array
+    // Handler Array
     for (int i = 0; i < 32; i++) {
         isr_handlers[i] = NULL;
     }
@@ -85,7 +50,6 @@ void isr_register_handler(u8 num, isr_handler_t handler)
 {
     if (num < 32) {
         isr_handlers[num] = handler;
-
     }
 }
 
@@ -98,42 +62,11 @@ void isr_unregister_handler(u8 num)
 
 void isr_handler(cpu_state_t* state)
 {
-    // move the panic to kernel/panic.c/.h
     if (state->int_no < 32 && isr_handlers[state->int_no] != NULL) {
+        // Custom handler registered
         isr_handlers[state->int_no](state);
     } else {
-        // no Handler
-        // TODO: move to kernel/panic.c/.h
-        print("", GFX_WHITE);
-        print("!!! --- KERNEL PANIC --- !!!", GFX_RED);
-
-        char buf[128];
-        str_copy(buf, "\nException: ");
-        str_append(buf, exception_messages[state->int_no]);
-        print(buf, GFX_RED);
-
-        str_copy(buf, "\nINT: ");
-        str_append_uint(buf, (u32)state->int_no);
-        str_append(buf, " ERR: ");
-        str_append_uint(buf, (u32)state->err_code);
-        print(buf, GFX_YELLOW);
-
-        str_copy(buf, "\nRIP: 0x");
-        str_append_uint(buf, (u32)(state->rip >> 32));
-        str_append_uint(buf, (u32)(state->rip & 0xFFFFFFFF));
-        print(buf, GFX_YELLOW);
-
-        str_copy(buf, "\nRSP: 0x");
-        str_append_uint(buf, (u32)(state->rsp >> 32));
-        str_append_uint(buf, (u32)(state->rsp & 0xFFFFFFFF));
-        print(buf, GFX_YELLOW);
-
-        print("\n\n", GFX_WHITE);
-        print("System halted.", GFX_WHITE);
-
-        // HALT
-        while(1) {
-            __asm__ volatile("cli; hlt");
-        }
+        // No handler - panic
+        exception_handler(state);
     }
 }

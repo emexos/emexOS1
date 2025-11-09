@@ -1,22 +1,10 @@
 #include "timer.h"
 #include "irq.h"
+#include <kernel/include/ports.h>
 #include <kernel/proc/scheduler.h>
 
 static volatile u64 timer_ticks = 0;
 static volatile int timer_initialized = 0;
-
-//TODO: create ports.c/.h
-//TODO: implement apic/tsc/pic
-static inline void outb(u16 port, u8 val)
-{
-    __asm__ volatile("outb %0, %1" : : "a"(val), "Nd"(port));
-}
-
-static inline void io_wait(void)
-{
-    // Short delay for I/O operations
-    __asm__ volatile("outb %%al, $0x80" : : "a"(0));
-}
 
 void timer_handler(cpu_state_t* state)
 {
@@ -32,7 +20,6 @@ void timer_handler(cpu_state_t* state)
     if (sched_is_enabled()) {
         sched_tick();
     }
-    //schedule not really implemented
 }
 
 void timer_init(u32 frequency)
@@ -41,7 +28,7 @@ void timer_init(u32 frequency)
         frequency = TIMER_FREQUENCY;
     }
 
-    // regist Timer IRQ Handler
+    // register Timer IRQ Handler
     irq_register_handler(0, timer_handler);
 
     // for PIT
@@ -54,7 +41,7 @@ void timer_init(u32 frequency)
     outb(0x43, 0x36);
     io_wait();
 
-    // Sende Frequency Divisor
+    // send frequency divisor
     outb(0x40, divisor & 0xFF);         // Low byte
     io_wait();
     outb(0x40, (divisor >> 8) & 0xFF);  // High byte
@@ -76,7 +63,8 @@ void timer_wait(u32 ticks)
     }
 }
 
-u64 timer_get_ticks(void){
+u64 timer_get_ticks(void)
+{
     return timer_ticks;
 }
 
@@ -94,17 +82,4 @@ u64 timer_get_milliseconds(void)
         return 0;
     }
     return timer_ticks;
-}
-
-void timer_handler_internal(void)
-{
-    if (!timer_initialized) {
-        return;
-    }
-
-    timer_ticks++;
-
-    if (sched_is_enabled()) {
-        sched_tick();
-    }
 }

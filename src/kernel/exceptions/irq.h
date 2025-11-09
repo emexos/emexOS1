@@ -1,7 +1,7 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-#include "idt.h"
+#include <kernel/cpu/idt.h>
 #include <types.h>
 
 // IRQ Numbers
@@ -39,7 +39,7 @@ void irq_unregister_handler(u8 irq);
 void irq_set_mask(u8 irq, int enable);
 void irq_ack(u8 irq);
 
-// IRQ Assembly Stubs irq.asm
+// IRQ Assembly Stubs (in exception_vectors.S)
 extern void irq0(void);
 extern void irq1(void);
 extern void irq2(void);
