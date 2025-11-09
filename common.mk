@@ -7,7 +7,6 @@ CXX := $(ARCH)-elf-g++
 LD := $(ARCH)-elf-ld
 AS := nasm
 OBJCOPY := $(ARCH)-elf-objcopy
-
 VCC  = @echo "[CC]  $<" && $(CC)
 VCXX = @echo "[CXX] $<" && $(CXX)
 VAS  = @echo "[AS]  $<" && $(AS)
