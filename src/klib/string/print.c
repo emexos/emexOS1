@@ -26,7 +26,7 @@ static void putchar_at(char c, u32 x, u32 y, u32 color)
 
 void putchar(char c, u32 color)
 {
-    u32 char_width = 8 * font_scale - 1 * font_scale;
+    u32 char_width = 8 * font_scale;
     u32 char_height = 8 * font_scale;
     u32 char_spacing = char_width + font_scale;
     u32 line_height = char_height + 2 * font_scale;
