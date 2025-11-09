@@ -17,4 +17,11 @@ void kfree(void *ptr);
 size_t mem_get_free(void);
 size_t mem_get_used(void);
 
+// DMA memory allocation (for disk I/O) (fat32)
+void* kmalloc_dma(size_t size, size_t alignment);
+void kfree_dma(void *ptr);
+
+//page aligned allocation
+void* kmalloc_aligned(size_t size, size_t alignment);
+
 #endif

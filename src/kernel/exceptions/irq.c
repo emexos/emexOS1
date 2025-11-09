@@ -1,26 +1,9 @@
 #include "irq.h"
-#include "idt.h"
+#include <kernel/cpu/idt.h>
+#include <kernel/include/ports.h>
 
 static irq_handler_t irq_handlers[16];
 static volatile int irq_initialized = 0;
-
-//TODO: create ports.c/.h
-static inline void outb(u16 port, u8 val)
-{
-    __asm__ volatile("outb %0, %1" : : "a"(val), "Nd"(port));
-}
-
-static inline u8 inb(u16 port)
-{
-    u8 ret;
-    __asm__ volatile("inb %1, %0" : "=a"(ret) : "Nd"(port));
-    return ret;
-}
-
-static inline void io_wait(void)
-{
-    __asm__ volatile("outb %%al, $0x80" : : "a"(0));
-}
 
 static void pic_remap(void)
 {
@@ -43,9 +26,9 @@ static void pic_remap(void)
     io_wait();
 
     // ICW3 cascading
-    outb(PIC1_DATA, 0x04); //Master PIC > slave at IRQ2
+    outb(PIC1_DATA, 0x04); // Master PIC > slave at IRQ2
     io_wait();
-    outb(PIC2_DATA, 0x02); // Slacxe PIC its cascade identity
+    outb(PIC2_DATA, 0x02); // Slave PIC its cascade identity
     io_wait();
 
     // ICW4
@@ -54,7 +37,7 @@ static void pic_remap(void)
     outb(PIC2_DATA, 0x01);
     io_wait();
 
-    // Restore saved masks (but disable)
+    // Restore saved masks (disable all)
     outb(PIC1_DATA, 0xFF);
     io_wait();
     outb(PIC2_DATA, 0xFF);
@@ -71,7 +54,7 @@ void irq_install(void)
     // Remap PIC
     pic_remap();
 
-    // Setze IDT Gates für alle IRQs
+    // Set IDT Gates for all IRQs
     idt_set_gate(32, (u64)irq0, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(33, (u64)irq1, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(34, (u64)irq2, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
@@ -89,22 +72,18 @@ void irq_install(void)
     idt_set_gate(46, (u64)irq14, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(47, (u64)irq15, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
 
-    // Timer (IRQ0) , Keyboard (IRQ1)
+    // Enable Timer (IRQ0) and Keyboard (IRQ1)
     irq_set_mask(0, 0); // Timer
     irq_set_mask(1, 0); // Keyboard
 
     irq_initialized = 1;
-
-    // Interrupts
-    //__asm__ volatile("sti");
-    // this crashes ^
 }
 
 void irq_register_handler(u8 irq, irq_handler_t handler)
 {
     if (irq < 16) {
         irq_handlers[irq] = handler;
-        irq_set_mask(irq, 0); // in-...
+        irq_set_mask(irq, 0); // enable
     }
 }
 
@@ -112,7 +91,7 @@ void irq_unregister_handler(u8 irq)
 {
     if (irq < 16) {
         irq_handlers[irq] = NULL;
-        irq_set_mask(irq, 1); // un-...
+        irq_set_mask(irq, 1); // disable
     }
 }
 

@@ -1,4 +1,5 @@
 #include "cmos.h"
+#include <kernel/include/ports.h>
 #include <klib/graphics/graphics.h>
 
 /*
@@ -8,20 +9,6 @@
  * *MODIFIED
  * ----------------------------------------------------------------------------------
  */
-
-void outb(u16 port, u8 value)
-{
-    asm volatile ("outb %1, %0" : : "dN" (port), "a" (value));
-}
-
-char inb(u16 port)
-{
-    char ret;
-
-    asm volatile("inb %1, %0" : "=a" (ret) : "dN" (port));
-
-    return ret;
-}
 
 USHORT GetCMOSMem()
 {

@@ -1,15 +1,6 @@
 #include "keyboard.h"
 #include <kernel/console/console.h>
-
-static inline u8 inb(u16 port) {
-    u8 ret;
-    asm volatile("inb %1, %0" : "=a"(ret) : "Nd"(port));
-    return ret;
-}
-
-static inline void outb(u16 port, u8 val) {
-    asm volatile("outb %0, %1" : : "a"(val), "Nd"(port));
-}
+#include <kernel/include/ports.h>
 
 //GERMAN LAYOUT (0x81,0x80,... is from font.h so donnot change)
 

@@ -1,6 +1,6 @@
 #include "idt.h"
-#include "isr.h"
-#include "irq.h"
+#include <kernel/exceptions/isr.h>
+#include <kernel/exceptions/irq.h>
 #include <klib/memory/main.h>
 
 static idt_entry_t idt[IDT_ENTRIES];
@@ -29,15 +29,15 @@ void idt_load(void)
 
 void idt_init(void)
 {
-    // Lösche IDT
+    // Clear IDT
     memset(&idt, 0, sizeof(idt));
 
-    // Setze ISR Handler (Exceptions 0-31)
+    // Set ISR Handler (Exceptions 0-31)
     isr_install();
 
-    // Setze IRQ Handler (32-47)
+    // Set IRQ Handler (32-47)
     irq_install();
 
-    // Lade IDT
+    // Load IDT
     idt_load();
 }
