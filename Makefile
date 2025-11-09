@@ -4,7 +4,7 @@ include common.mk
 SRCS = $(shell find $(SRC_DIR) -name "*.c" -or -name "*.cpp" -or -name "*.asm")
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
-.PHONY: all fetchDeps iso run clean
+.PHONY: all fetchDeps run clean
 all: $(ISO)
 
 # Fetch dependencies/libraries
@@ -32,9 +32,9 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot boot/limine/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
-		$(ISODIR) -o $(ISO) 2>/dev/null
+		$(ISODIR) -o $@ 2>/dev/null
 	@echo "------------------------"
-	@echo "[OK] $(ISO) created"
+	@echo "[OK] $@ created"
 
 # Run/Emulate OS
 run: $(ISO)
