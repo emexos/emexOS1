@@ -16,3 +16,6 @@ Now that you have all the required build dependencies installed, you can finally
 - `make` - Builds emexOS
 - `make run` - Emulates emexOS using QEMU
 - `make clean` - Cleans up all build outputs
+
+## 
+ - README.md by Voxi0
