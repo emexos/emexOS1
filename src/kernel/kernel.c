@@ -19,6 +19,9 @@
 #include <kernel/mem_manager/phys/physmem.h>
 //#include "mem_manager/virtmem.h" //not implemendet
 
+//debug
+#include <klib/debug/serial.h>
+
 //process
 #include "proc/process.h"
 #include "proc/scheduler.h"
@@ -114,6 +117,9 @@ void _start(void)
     clear(BOOTSCREEN_COLOR);
     reset_cursor();
     draw_logo();
+
+    printf("test printf\n");
+    printf("test printf\n");
     console_init();
     keyboard_poll();
 

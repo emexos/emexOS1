@@ -38,7 +38,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 
 # Run/Emulate OS
 run: $(ISO)
-	@qemu-system-$(ARCH) -m 512 -cdrom $<
+	@qemu-system-$(ARCH) -m 512 -cdrom $< -serial stdio 2>&1
 
 # Compilation rules
 $(BUILD_DIR)/%.c.o: %.c
