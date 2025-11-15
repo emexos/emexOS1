@@ -12,6 +12,8 @@
 static volatile u64 timer_ticks = 0;
 static volatile int timer_initialized = 0;
 static u64 boot_timestamp = 0;
+static timer_callback_t timer_callbacks[MAX_TIMER_CALLBACKS];
+static int callback_count = 0;
 
 void timer_handler(cpu_state_t* state)
 {
@@ -22,6 +24,14 @@ void timer_handler(cpu_state_t* state)
     }
 
     timer_ticks++;
+
+    for (int i = 0; i < callback_count; i++) {
+        if (timer_callbacks[i]) {
+            timer_callbacks[i]();
+        }
+    }
+
+    //banner_tick();
 
     // call schedule
     if (sched_is_enabled()) {
@@ -36,6 +46,11 @@ void timer_init(u32 frequency)
         //TODO:
         // the frequency could be moved to theme/doccr.h or in the os to esr/
     }
+
+    for (int i = 0; i < MAX_TIMER_CALLBACKS; i++) {
+        timer_callbacks[i] = NULL;
+    }
+    callback_count = 0;
 
     // register Timer IRQ Handler
     irq_register_handler(0, timer_handler);
@@ -61,6 +76,42 @@ void timer_init(u32 frequency)
 
     // Enable interrupts to start timer
     __asm__ volatile("sti");
+}
+
+// reg callback
+int timer_register_callback(timer_callback_t callback)
+{
+    if (!callback || callback_count >= MAX_TIMER_CALLBACKS) {
+        return -1;
+    }
+
+    // check if already registered
+    for (int i = 0; i < callback_count; i++) {
+        if (timer_callbacks[i] == callback) {
+            return -1;
+        }
+    }
+
+    timer_callbacks[callback_count++] = callback;
+    return 0;
+}
+
+// unreg callback
+void timer_unregister_callback(timer_callback_t callback)
+{
+    if (!callback) return;
+
+    for (int i = 0; i < callback_count; i++) {
+        if (timer_callbacks[i] == callback) {
+            // shift remaining callbacks
+            for (int j = i; j < callback_count - 1; j++) {
+                timer_callbacks[j] = timer_callbacks[j + 1];
+            }
+            timer_callbacks[callback_count - 1] = NULL;
+            callback_count--;
+            return;
+        }
+    }
 }
 
 void timer_wait(u32 ticks)

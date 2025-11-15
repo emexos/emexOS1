@@ -2,6 +2,8 @@
 #include <klib/graphics/graphics.h>
 #include <fonts/font_8x8.h>
 
+#include <kernel/console/graph/dos.h>
+
 static void putchar_at(char c, u32 x, u32 y, u32 color)
 {
     const u8 *glyph = font_8x8[(u8)c];
@@ -36,11 +38,8 @@ void putchar(char c, u32 color)
         cursor_x = 20;
         cursor_y += line_height;
 
-        // Check if we need to scroll
-        if (cursor_y + char_height >= fb_height) {
-            scroll_up(line_height);
-            cursor_y = fb_height - char_height - 10;
-        }
+        // use console window scroll check
+        console_window_check_scroll();
         return;
     }
 
@@ -49,20 +48,10 @@ void putchar(char c, u32 color)
     {
         cursor_x = 20;
         cursor_y += line_height;
-
-        // Check if we need to scroll after wrapping
-        if (cursor_y + char_height >= fb_height) {
-            scroll_up(line_height);
-            cursor_y = fb_height - char_height - 10;
-        }
+        console_window_check_scroll();
     }
 
-    // Check if we're at bottom before printing
-    if (cursor_y + char_height >= fb_height)
-    {
-        scroll_up(line_height);
-        cursor_y = fb_height - char_height - 10;
-    }
+    console_window_check_scroll();
 
     putchar_at(c, cursor_x, cursor_y, color);
     cursor_x += char_spacing;
