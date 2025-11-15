@@ -40,7 +40,9 @@ FHDR(cmd_fsize);
 FHDR(cmd_modules);
 FHDR(cmd_meminfo);
 FHDR(cmd_sysinfo);
+FHDR(cmd_cal);
 FHDR(cmd_date);
+FHDR(cmd_time);
 FHDR(cmd_uptime);
 
 #endif

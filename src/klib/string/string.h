@@ -2,6 +2,7 @@
 #define STRING_H
 
 #include <types.h>
+#include "print.h"
 
 void str_copy(char *dest, const char *src);
 void str_append(char *dest, const char *src);

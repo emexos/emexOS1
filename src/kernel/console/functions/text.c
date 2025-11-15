@@ -85,11 +85,15 @@ FHDR(cmd_help)
         print("  echo       - echo [text]\n", GFX_WHITE);
         print("  clear      - clear screen\n", GFX_WHITE);
         print("  help       - displays this list\n", GFX_WHITE);
-        print("  fsize      - change font size", GFX_WHITE);
-        print("\n[SYSTEM]\n", GFX_YELLOW);
-        print("  meminfo    - heap memory information\n", GFX_WHITE);
-        print("  dofetch    - emexOS system fetch\n", GFX_WHITE);
+        print("  fsize      - change font size\n", GFX_WHITE);
         print("  date       - show current date\n", GFX_WHITE);
+        print("  time       - show current time\n", GFX_WHITE);
+        print("  calendar   - show date & time\n", GFX_WHITE);
+        print("  uptime     - displays the uptime\n", GFX_WHITE);
+        print("  dofetch    - emexOS system fetch\n", GFX_WHITE);
+        print("[SYSTEM]\n", GFX_YELLOW);
+        print("  meminfo    - heap memory information\n", GFX_WHITE);
+        print("  modules    - shows all modules in fs\n", GFX_WHITE);
         print("Type 'help <command>' for details", GFX_GRAY_50);
     } else {
         // show specific command help
