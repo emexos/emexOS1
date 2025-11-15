@@ -2,6 +2,7 @@
 #include <klib/memory/main.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/module/module.h>
+#include <kernel/exceptions/timer.h>
 
 FHDR(cmd_modules)
 {
@@ -85,13 +86,12 @@ FHDR(cmd_sysinfo)
     print("                    \n", GFX_GREEN);
     print(" ###########;m;      user@emexos\n", GFX_GREEN);
     print(" # #########;m;      \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN); //15 characters
-    print(" # #;m;              Kernel: ", GFX_GREEN); print("emexOS x86 \n", GFX_WHITE);
-    print(" # #;m;              Version: ", GFX_GREEN); print("v2.1 [64bit]\n", GFX_WHITE);
+    print(" # #;m;              Kernel: ", GFX_GREEN); print("emexOS [64] v2.1\n", GFX_WHITE);
+    print(" # #;m;              Resolution: ", GFX_GREEN); print("1280x800\n", GFX_WHITE); //TODO: add a graphics detecting function
     print(" # ########;m;       Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
-    print(" # ########;m;       Resolution: ", GFX_GREEN); print("1280x800\n", GFX_WHITE);
-    print(" # #;m;              CPU: ", GFX_GREEN); /*ShowCPUName();*/ print("not detected\n", GFX_WHITE);
+    print(" # ########;m;       CPU: ", GFX_GREEN); /*ShowCPUName();*/ print("not detected\n", GFX_WHITE);
     print(" # #;m;              Date: ", GFX_GREEN); GetCMOSDate(); print("\n", GFX_WHITE);
-    //print(" # #########;m;      graphic: ", GFX_GREEN); print("not detected\n", GFX_WHITE); //should show like nvidia or something like video card
+    print(" # #;m;              Uptime: ", GFX_GREEN); timer_print_uptime(); print("\n", GFX_WHITE);
     print(" # #########;m;      \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN);
     print(" ###########;m;      ", GFX_GREEN);
         print("\x09 ", GFX_WHITE); //all colors:

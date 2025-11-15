@@ -6,7 +6,7 @@ static int input_pos = 0;
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 8;
+static int cmd_count = 11;
 
 static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -17,8 +17,10 @@ static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_meminfo, "meminfo", "displays memory infos", "meminfo"),
     //CMDENTRY(cmd_memtest, "memtest", "Memory test suite", "memtest"),
     CMDENTRY(cmd_sysinfo, "dofetch", "displays doccrOS fetch", "dofetch"),
-    CMDENTRY(cmd_date, "date", "displays the date", "date"),
-    //CMDENTRY(cmd_uptime, "uptime", "System uptime", "uptime")
+    CMDENTRY(cmd_cal, "calendar", "displays current date & time", "calendar"),
+    CMDENTRY(cmd_date, "date", "displays current date", "date"),
+    CMDENTRY(cmd_uptime, "uptime", "System uptime", "uptime"),
+    CMDENTRY(cmd_time, "time", "displays current time", "time"),
 };
 
 //----------------------------------
@@ -36,7 +38,7 @@ static void console_module_fini(void) {
 driver_module console_module = (driver_module) {
     .name = "console",
     .mount = "/dev/console",
-    .version = VERSION_NUM(0, 1, 0, 0), //should print like [v0.1.0.0]
+    .version = VERSION_NUM(0, 1, 1, 0), //should print like [v0.1.0.0]
     .init = console_module_init,
     .fini = console_module_fini,
     .open = NULL, // later for fs
@@ -59,8 +61,6 @@ void console_init(void)
     if (cursor_x == 0 && cursor_y == 0) {
         clear(CONSOLESCREEN_COLOR);
         reset_cursor();
-        print(" ", GFX_WHITE); //there is a glitch where the first print is always 10px left printed... so we just print the first line with nothing
-                                //print("console", GFX_WHITE);
     }
 
     shell_print_prompt();
@@ -87,6 +87,12 @@ void console_handle_key(char c)
         }
 
         shell_print_prompt();
+        return;
+    }
+
+    if (c == '\r') {
+        putchar('\n', GFX_WHITE);
+        input_buffer[input_pos++] = '\n';
         return;
     }
 

@@ -18,5 +18,7 @@ FHDR(cmd_sysinfo);
 //FHDR(cmd_usbinfo);
 
 //cmos.c
+FHDR(cmd_cal);
 FHDR(cmd_date);
-//FHDR(cmd_uptime);
+FHDR(cmd_time);
+FHDR(cmd_uptime);

@@ -61,7 +61,15 @@ void keyboard_poll(void) {
         if (sc == 0x2A || sc == 0x36) { shift = 1; continue; }
         if (sc == 0x3A) { caps = !caps; continue; }
         if (sc == 0x0E) { console_handle_key('\b'); continue; }
-        if (sc == 0x1C) { console_handle_key('\n'); continue; }
+        if (sc == 0x1C) {
+            if (shift) {
+                console_handle_key('\r');
+                continue;
+            }
+            console_handle_key('\n');
+            continue;
+        }
+
 
         // Convert scancode to character
         if (sc < 128) {
