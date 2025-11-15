@@ -2,6 +2,8 @@
 #define CONSOLE_H
 
 #include <klib/graphics/graphics.h>
+#include "graph/uno.h"
+#include "graph/dos.h"
 
 #include <kernel/module/module.h>
 extern driver_module console_module;

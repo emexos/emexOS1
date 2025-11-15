@@ -1,8 +1,11 @@
 #include "console.h"
+#include "graph/uno.h"
+#include "graph/dos.h"
 
 void shell_clear_screen(u32 color)
 {
-    clear(color);
+
+    console_window_clear(color);
 }
 
 void shell_print_prompt(void)

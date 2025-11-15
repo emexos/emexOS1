@@ -12,7 +12,7 @@ static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
     CMDENTRY(cmd_clear, "clear", "clears the screen", "clear [color]"),
     CMDENTRY(cmd_help, "help", "displays all available commands", "help [command]"),
-    CMDENTRY(cmd_fsize, "fsize", "change font size", "fsize [2-4]"),
+    CMDENTRY(cmd_fsize, "scale", "change screen size", "scale [2-4]"),
     CMDENTRY(cmd_modules, "modules", "list loaded modules", "modules"),
     CMDENTRY(cmd_meminfo, "meminfo", "displays memory infos", "meminfo"),
     //CMDENTRY(cmd_memtest, "memtest", "Memory test suite", "memtest"),
@@ -53,15 +53,20 @@ void console_init(void)
     input_pos = 0;
     input_buffer[0] = '\0';
 
-    clear(CONSOLESCREEN_COLOR);
-    reset_cursor();
+    clear(CONSOLESCREEN_BG_COLOR);
+    reset_cursor();/*
     //
     //module_register_driver(&console_module);
 
     if (cursor_x == 0 && cursor_y == 0) {
         clear(CONSOLESCREEN_COLOR);
         reset_cursor();
-    }
+        }*/
+
+    banner_init();
+
+    // Initialize console window
+    console_window_init();
 
     shell_print_prompt();
 }
@@ -108,11 +113,13 @@ void console_handle_key(char c)
                 putchar(' ', GFX_WHITE);
                 cursor_x -= char_width;
 
-                draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_COLOR);
+                draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_BG_COLOR);
             }
         }
         return;
     }
+
+    console_window_check_scroll();
 
     // add character to buffer
     if (input_pos < MAX_INPUT_LEN - 1) {
@@ -154,6 +161,8 @@ void console_execute(const char *input)
     console_cmd_t *cmd = console_find_cmd(cmd_name);
     if (cmd) {
         cmd->func(args);
+
+        banner_force_update();
     } else {
         print("> Unknown command, Type 'help' for available commands...", GFX_RED);
     }

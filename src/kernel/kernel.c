@@ -23,6 +23,7 @@
 #include <klib/debug/serial.h>
 
 //process
+#include "exceptions/panic.h"
 #include "proc/process.h"
 #include "proc/scheduler.h"
 
@@ -60,7 +61,7 @@ void _start(void)
     printf("==                                          ==\n");
     printf("==============================================\n");
 
-    clear(BOOTSCREEN_COLOR);
+    clear(BOOTSCREEN_BG_COLOR);
 
     char buf[256]; //for all string operations
 
@@ -133,9 +134,8 @@ void _start(void)
     print(buf, GFX_CYAN);
 
     // Initialize console and halt CPU
-    clear(BOOTSCREEN_COLOR);
-    reset_cursor();
-    draw_logo();
+
+    //panic("test");
 
     printf("test printf\n");
     printf("test printf\n");
