@@ -59,7 +59,7 @@ void console_window_check_scroll(void)
         // cls top line
         for (u32 y = fb_h - line_height; y < fb_h; y++) {
             for (u32 x = 0; x < fb_w; x++) {
-                fb[y * pitch_dwords + x] = CONSOLESCREEN_COLOR;
+                fb[y * pitch_dwords + x] = CONSOLESCREEN_BG_COLOR;
             }
         }
 

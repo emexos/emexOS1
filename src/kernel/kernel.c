@@ -8,6 +8,7 @@
 //#include <drivers/ps2/keyboard/keyboard.h>
 
 // CPU
+#include <kernel/cpu/cpu.h>
 #include <kernel/cpu/gdt.h>
 #include <kernel/cpu/idt.h>
 /*#include <kernel/cpu/isr.h>
@@ -87,6 +88,8 @@ void _start(void)
     //cursor_y = 10;
 
     // Initialize the CPU
+    cpu_detect();
+    print(" [CPU] Detected CPU\n", GFX_GREEN);
     gdt_init();
     print(" [GDT] init (Global Descriptor Table)\n", GFX_GREEN);
     idt_init();
