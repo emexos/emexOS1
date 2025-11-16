@@ -7,7 +7,8 @@
 
 #define BANNER_HEIGHT 15
 #define BANNER_Y_SPACING 4  // vertical spacing
-#define BANNER_BG_COLOR GFX_GRAY_20  // TODO: add borders
+#define BANNER_BG_COLOR GFX_GRAY_20 // bar background
+#define BANNER_BORDER_COLOR GFX_GRAY_40 // border bottom
 #define BANNER_TEXT_COLOR CONSOLESCREEN_COLOR // White text
 #define BANNER_UPDATE_INTERVAL 60
 

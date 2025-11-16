@@ -9,7 +9,7 @@ u32 fb_height = 0;
 u32 fb_pitch = 0;
 u32 cursor_x = 20;
 u32 cursor_y = 20;
-u32 font_scale = 1; //for console scalin g
+u32 font_scale = 2; //for console scalin g
 
 
 void graphics_init(struct limine_framebuffer *fb)
@@ -19,7 +19,7 @@ void graphics_init(struct limine_framebuffer *fb)
     fb_height = fb->height;
     fb_pitch = fb->pitch;
     cursor_y = 20;
-    font_scale = 1;
+    font_scale = 2;
 
     print("Welcome to doccrOS \n", GFX_WHITE);
     print("v0.0.1 (alpha)\n", GFX_WHITE);
@@ -58,7 +58,7 @@ void scroll_up(u32 lines)
     // Clear bottom lines
     for (u32 y = fb_height - pixels_to_scroll; y < fb_height; y++) {
         for (u32 x = 0; x < fb_width; x++) {
-            framebuffer[y * pitch_dwords + x] = CONSOLESCREEN_COLOR;
+            framebuffer[y * pitch_dwords + x] = CONSOLESCREEN_BG_COLOR;
         }
     }
 }

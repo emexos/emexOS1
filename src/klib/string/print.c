@@ -30,7 +30,7 @@ void putchar(char c, u32 color)
 {
     u32 char_width = 8 * font_scale;
     u32 char_height = 8 * font_scale;
-    u32 char_spacing = char_width + font_scale;
+    u32 char_spacing = char_width;
     u32 line_height = char_height + 2 * font_scale;
 
     if (c == '\n')

@@ -38,6 +38,7 @@ void banner_draw(void)
     current_banner_height = char_height + (banner_y_s * 2);
 
     draw_rect(0, banner_y, fb_w, current_banner_height, BANNER_BG_COLOR); //comes from GFX_GRAY_20
+    draw_rect(0, banner_y + current_banner_height - font_scale, fb_w, font_scale, BANNER_BORDER_COLOR);
 
     // use current screen_scale for banner
 
@@ -126,6 +127,9 @@ void banner_update_time(void)
     for (int i = 0; time_buf[i]; i++) {
         putchar(time_buf[i], BANNER_TEXT_COLOR);
     }
+
+    //otherwise the time banner will overwrite the line
+    draw_rect(fb_w - text_pixel_width - 8, banner_y + current_banner_height - font_scale, text_pixel_width + 8, font_scale, BANNER_BORDER_COLOR);
 
     font_scale = o_scale;
     cursor_x = o_cursor_x;
