@@ -22,3 +22,11 @@ volatile struct limine_memmap_request memmap_request = {
     .id = LIMINE_MEMMAP_REQUEST_ID,
     .revision = 0
 };
+
+// hhdm
+__attribute__((used, section(".requests")))
+volatile struct limine_hhdm_request hhdm_request = {
+    .id = LIMINE_HHDM_REQUEST_ID,
+    .revision = 0,
+    .response = NULL
+};

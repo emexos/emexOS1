@@ -7,11 +7,12 @@ static volatile int irq_initialized = 0;
 
 static void pic_remap(void)
 {
-    u8 mask1, mask2;
+    /*u8 mask1, mask2;
 
     // save masks
     //mask1 = inb(PIC1_DATA);
     //mask2 = inb(PIC2_DATA);
+    */
 
     // ICW1
     outb(PIC1_COMMAND, 0x11);
