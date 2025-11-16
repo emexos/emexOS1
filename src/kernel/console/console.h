@@ -35,16 +35,5 @@ void shell_print_prompt(void);
 void shell_redraw_input(void);
 
 console_cmd_t* console_find_cmd(const char *name);
-FHDR(cmd_echo);
-FHDR(cmd_clear);
-FHDR(cmd_help);
-FHDR(cmd_fsize);
-FHDR(cmd_modules);
-FHDR(cmd_meminfo);
-FHDR(cmd_sysinfo);
-FHDR(cmd_cal);
-FHDR(cmd_date);
-FHDR(cmd_time);
-FHDR(cmd_uptime);
 
 #endif
