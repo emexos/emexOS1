@@ -1,6 +1,6 @@
 # emexOS - a simple 64 Bit OS written in C
 
-![screenshot1](./screenshots/screenshot1.png)
+![screenshot2](./screenshots/screenshot2.png)
 #
 <br/>
 
