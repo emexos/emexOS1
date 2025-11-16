@@ -11,8 +11,28 @@
 #define GFX_CYAN    0xFF7A8E8E
 #define GFX_WHITE   0xFFD8D8D8
 
+//std
+#define GFX_ST_BLACK   0xFF000000
+#define GFX_ST_BG      0xFF1C1C1C
+#define GFX_ST_RED     0xFFFF0000
+#define GFX_ST_GREEN   0xFF00FF00
+#define GFX_ST_YELLOW  0xFFFFFF00
+#define GFX_ST_BLUE    0xFF0000FF
+#define GFX_ST_PURPLE  0xFF800080
+#define GFX_ST_CYAN    0xFF00FFFF
+#define GFX_ST_WHITE   0xFFFFFFFF
+
+//greys
+#define GFX_GRAY_10     0xFF1A1A1A
 #define GFX_GRAY_20     0xFF2E2E2E
+#define GFX_GRAY_30     0xFF4B4B4B
+#define GFX_GRAY_40     0xFF606060
 #define GFX_GRAY_50     0xFF757575
+#define GFX_GRAY_60     0xFF8A8A8A
+#define GFX_GRAY_70     0xFFA0A0A0
+#define GFX_GRAY_80     0xFFB5B5B5
+#define GFX_GRAY_90     0xFFCACACA
+
 
 #define TEXT_COLOR GFX_GRAY_50
 #define TITLE_COLOR GFX_WHITE

@@ -8,6 +8,7 @@
 //#include <drivers/ps2/keyboard/keyboard.h>
 
 // CPU
+#include <kernel/cpu/cpu.h>
 #include <kernel/cpu/gdt.h>
 #include <kernel/cpu/idt.h>
 /*#include <kernel/cpu/isr.h>
@@ -23,6 +24,7 @@
 #include <klib/debug/serial.h>
 
 //process
+#include "exceptions/panic.h"
 #include "proc/process.h"
 #include "proc/scheduler.h"
 
@@ -32,6 +34,8 @@
 
 // modules
 #include <kernel/module/module.h>
+
+#include <kernel/pci/pci.h>
 
 // 16MB heap
 #define HEAP_SIZE (8 * 1024 * 1024)
@@ -52,17 +56,20 @@ void _start(void)
     draw_logo();
 
     // main kernel
-    // ==============================================
-    // ==                                          ==
-    // ==                  emexOS                  ==
-    // ==                                          ==
-    // ==============================================
-    clear(BOOTSCREEN_COLOR);
+    printf("==============================================\n");
+    printf("==                                          ==\n");
+    printf("==                  emexOS                  ==\n");
+    printf("==                                          ==\n");
+    printf("==============================================\n");
+
+    clear(BOOTSCREEN_BG_COLOR);
+
+    char buf[256]; //for all string operations
 
     // Initialize heap and physical memory manager
     print("Initialized memory", TITLE_COLOR);
     mem_init(kernel_heap, HEAP_SIZE);
-    char buf[128];
+    //char buf[128];
     str_copy(buf, "\nHeap: ");
     str_append_uint(buf, HEAP_SIZE / 1024);
     str_append(buf, " KB\n");
@@ -81,24 +88,40 @@ void _start(void)
     //cursor_y = 10;
 
     // Initialize the CPU
+    cpu_detect();
+    print(" [CPU] Detected CPU\n", GFX_GREEN);
     gdt_init();
-    print("Initialized GDT (Global Descriptor Table)\n", GFX_GREEN);
+    print(" [GDT] init (Global Descriptor Table)\n", GFX_GREEN);
     idt_init();
-    print("Initialized interrupts\n", GFX_GREEN);
+    print(" [IDT] Init interrupts\n", GFX_GREEN);
     timer_init(1000);
-    print("Initialized timer (1000Hz 1ms tick)\n", GFX_GREEN);
+    timer_set_boot_time(); //for uptime command
+    //TODO:
+    // its not exactly uptime because everything before imer_set_boot_time() doesnt get count
+    // so we could set it to +50 milliseconds or something so its a bit more realistic i think...
+    print(" [TIME] Init timer (1000Hz 1ms tick)\n", GFX_GREEN);
+    print(" [TIME] started uptime now...\n", GFX_GREEN);
+
     putchar('\n', GFX_WHITE);
 
+    pci_init();
+    //char buf[64]; //its now at the top for every string operations
+    str_copy(buf, " [PCI]: ");
+    str_append_uint(buf, pci_get_device_count());
+    str_append(buf, " device(s) found\n");
+    print(buf, GFX_GREEN);
+    //pci will get really useful with xhci/other usb
+    //
+
     // Initialize process manager and scheduler
-    putchar('\n', GFX_WHITE);
     process_init();
-    print("Process manager\n", GFX_GREEN);
+    print(" [PROC]  Process manager\n", GFX_GREEN);
     sched_init();
-    print("Scheduler\n", GFX_GREEN);
+    print(" [SCHED] Scheduler\n", GFX_GREEN);
 
     putchar('\n', GFX_WHITE);
     module_init();
-    print("Module system initialized\n", GFX_GREEN);
+    print(" [MOD] Module system initialized\n", GFX_GREEN);
 
     // Register driver modules
     module_register(&console_module);
@@ -114,9 +137,8 @@ void _start(void)
     print(buf, GFX_CYAN);
 
     // Initialize console and halt CPU
-    clear(BOOTSCREEN_COLOR);
-    reset_cursor();
-    draw_logo();
+
+    //panic("test");
 
     printf("test printf\n");
     printf("test printf\n");

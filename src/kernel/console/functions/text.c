@@ -12,7 +12,7 @@ FHDR(cmd_echo)
 
 FHDR(cmd_clear)
 {
-    u32 color = CONSOLESCREEN_COLOR;
+    u32 color = CONSOLESCREEN_BG_COLOR;
 
     // parse color argument if provided
     if (*s != '\0') {
@@ -40,6 +40,7 @@ FHDR(cmd_clear)
     }
 
     shell_clear_screen(color);
+    banner_force_update();
 }
 
 FHDR(cmd_fsize)
@@ -67,14 +68,19 @@ FHDR(cmd_fsize)
         return;
     }
 
-    clear(CONSOLESCREEN_COLOR);
+    clear(CONSOLESCREEN_BG_COLOR);
     set_font_scale(size);
-    char buf[64];/*
+    /*char buf[64];
     str_copy(buf, " Font size set to ");
     str_append_uint(buf, size);
     print(buf, GFX_GREEN);
     */
-    clear(CONSOLESCREEN_COLOR);
+    clear(CONSOLESCREEN_BG_COLOR);
+    banner_force_update();
+    console_window_update_layout();
+
+    cursor_x = CONSOLE_PADDING_X;
+    cursor_y = banner_get_height();
 }
 
 FHDR(cmd_help)
@@ -82,14 +88,18 @@ FHDR(cmd_help)
     if (*s == '\0') {
         // show all commands
         print("[COMMMON]\n", GFX_YELLOW);
-        print("  echo       - echo [text]\n", GFX_WHITE);
-        print("  clear      - clear screen\n", GFX_WHITE);
-        print("  help       - displays this list\n", GFX_WHITE);
-        print("  fsize      - change font size", GFX_WHITE);
-        print("\n[SYSTEM]\n", GFX_YELLOW);
-        print("  meminfo    - heap memory information\n", GFX_WHITE);
-        print("  dofetch    - emexOS system fetch\n", GFX_WHITE);
-        print("  date       - show current date\n", GFX_WHITE);
+        print("  echo [text]    - echo [text]\n", GFX_WHITE);
+        print("  clear [color]  - clear screen\n", GFX_WHITE);
+        print("  help [command] - displays this list\n", GFX_WHITE);
+        print("  scale [1-4]    - change screen size\n", GFX_WHITE);
+        print("  date           - show current date\n", GFX_WHITE);
+        print("  time           - show current time\n", GFX_WHITE);
+        print("  calendar       - show date & time\n", GFX_WHITE);
+        print("  uptime         - displays the uptime\n", GFX_WHITE);
+        print("  dofetch        - emexOS system fetch\n", GFX_WHITE);
+        print("[SYSTEM]\n", GFX_YELLOW);
+        print("  meminfo        - heap memory information\n", GFX_WHITE);
+        print("  modules        - shows all modules in fs\n", GFX_WHITE);
         print("Type 'help <command>' for details", GFX_GRAY_50);
     } else {
         // show specific command help

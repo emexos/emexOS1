@@ -2,6 +2,8 @@
 #include <klib/memory/main.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/module/module.h>
+#include <kernel/exceptions/timer.h>
+#include <kernel/cpu/cpu.h>
 
 FHDR(cmd_modules)
 {
@@ -78,22 +80,40 @@ FHDR(cmd_meminfo)
 
 }
 
+void print_res() {
+    char buf[128];
+    str_copy(buf, "");
+    str_append_uint(buf, get_fb_width());
+    str_append(buf, "x");
+    str_append_uint(buf, get_fb_height());
+    str_append(buf, "\n");
+    print(buf, GFX_WHITE);
+}
+
+void ShowCPUName(){
+    const char *cpu_name = cpu_get_brand();
+    if (cpu_name[0]) {
+        print(cpu_name, GFX_WHITE);
+    } else {
+        print("Unknown CPU", GFX_WHITE);
+    }
+}
+
 FHDR(cmd_sysinfo)
 {
     (void)s; // unused parameter
 
-    print("                    \n", GFX_GREEN);
-    print(" ###########;m;      user@emexos\n", GFX_GREEN);
-    print(" # #########;m;      \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN); //15 characters
-    print(" # #;m;              Kernel: ", GFX_GREEN); print("emexOS x86 \n", GFX_WHITE);
-    print(" # #;m;              Version: ", GFX_GREEN); print("v2.1 [64bit]\n", GFX_WHITE);
-    print(" # ########;m;       Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
-    print(" # ########;m;       Resolution: ", GFX_GREEN); print("1280x800\n", GFX_WHITE);
-    print(" # #;m;              CPU: ", GFX_GREEN); /*ShowCPUName();*/ print("not detected\n", GFX_WHITE);
-    print(" # #;m;              Date: ", GFX_GREEN); GetCMOSDate(); print("\n", GFX_WHITE);
-    //print(" # #########;m;      graphic: ", GFX_GREEN); print("not detected\n", GFX_WHITE); //should show like nvidia or something like video card
-    print(" # #########;m;      \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN);
-    print(" ###########;m;      ", GFX_GREEN);
+    print("                  \n", GFX_GREEN);
+    print(" ###########;m;    user@emexos\n", GFX_GREEN);
+    print(" # #########;m;    \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN); //15 characters
+    print(" # #;m;            Kernel: ", GFX_GREEN); print("emexOS [64] v2.1\n", GFX_WHITE);
+    print(" # #;m;            Resolution: ", GFX_GREEN); print_res();
+    print(" # ########;m;     Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
+    print(" # ########;m;     CPU: ", GFX_GREEN); ShowCPUName(); print("\n", GFX_WHITE);
+    print(" # #;m;            Date: ", GFX_GREEN); GetCMOSDate(); print("\n", GFX_WHITE);
+    print(" # #;m;            Uptime: ", GFX_GREEN); timer_print_uptime(); print("\n", GFX_WHITE);
+    print(" # #########;m;    \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN);
+    print(" ###########;m;    ", GFX_GREEN);
         print("\x09 ", GFX_WHITE); //all colors:
         print("\x09 ", GFX_RED);
         print("\x09 ", GFX_GREEN);
