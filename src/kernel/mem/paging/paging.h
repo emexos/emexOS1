@@ -2,10 +2,10 @@
 #define PAGGING_H
 
 #include <types.h>
-#include "physmem.h"
+#include "../phys/physmem.h"
 
 #define PTE_PRESENT    (1ULL << 0)
-#define PTE_WRITABLE   (1ULL << 1) 
+#define PTE_WRITABLE   (1ULL << 1)
 #define PTE_USER       (1ULL << 2)
 #define PTE_PWT        (1ULL << 3)
 #define PTE_PCD        (1ULL << 4)

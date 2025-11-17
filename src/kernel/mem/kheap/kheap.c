@@ -1,6 +1,6 @@
 #include "kheap.h"
-#include "physmem.h"
-#include <limine.h>
+#include "../phys/physmem.h"
+#include <limine/limine.h>
 #include <kernel/exceptions/panic.h>
 #include <klib/memory/main.h>
 #include <kernel/mem/paging/paging.h>
@@ -25,7 +25,7 @@ static struct {
 
 static void kheap_merge_free_blocks(kheap_block_t *block) {
     kheap_block_t *current = block;
-    
+
     while (current->next && !current->next->used) {
         current->size += sizeof(kheap_block_t) + current->next->size;
         current->next = current->next->next;
@@ -35,7 +35,7 @@ static void kheap_merge_free_blocks(kheap_block_t *block) {
         kheap_stats.total_blocks--;
         kheap_stats.free_size += sizeof(kheap_block_t);
     }
-    
+
     current = block;
     while (current->prev && !current->prev->used) {
         kheap_block_t *prev = current->prev;
@@ -46,7 +46,7 @@ static void kheap_merge_free_blocks(kheap_block_t *block) {
         }
         kheap_stats.total_blocks--;
         kheap_stats.free_size += sizeof(kheap_block_t);
-        current = prev; 
+        current = prev;
     }
 }
 
@@ -89,8 +89,8 @@ u64 *kmalloc(u64 size) {
         new_block->magic = BLOCK_MAGIC;
         new_block->size = best_fit->size - size - sizeof(kheap_block_t);
         new_block->used = 0;
-        new_block->next = best_fit->next;        
-        new_block->prev = best_fit;        
+        new_block->next = best_fit->next;
+        new_block->prev = best_fit;
 
         if (best_fit->next) {
             best_fit->next->prev = new_block;
@@ -181,5 +181,3 @@ u64 *krealloc(u64 *ptr, u64 size) {
     }
     return ptr_new;
 }
-
-
