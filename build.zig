@@ -52,22 +52,37 @@ pub fn findAllDirs(gpa: std.mem.Allocator) ![][]const u8 {
 }
 
 pub fn build(b: *std.Build) !void {
-    const liminePath = "limine";
-    const liminePathRemove = b.addRemoveDirTree(b.path(liminePath));
+    const clean = b.option(bool, "clean", "removes .zig-cahe and zig-out");
+    const fetchLimine = b.option(bool, "nofetch", "do not fetch limine");
 
-    const limineGitClone = b.addSystemCommand(&.{
-        "git",
-        "clone",
-        "https://codeberg.org/Limine/Limine.git",
-        "--branch=v10.x-binary",
-        "--depth=1",
-        liminePath,
-    });
+    const start = b.step("start", "start");
 
-    limineGitClone.step.dependOn(&liminePathRemove.step);
+    if (clean != null) {
+        const rmCache = b.addRemoveDirTree(b.path(".zig-cache/"));
+        start.dependOn(&rmCache.step);
+        const rmOut = b.addRemoveDirTree(b.path("zig-out/"));
+        start.dependOn(&rmOut.step);
+    }
+
+    if (fetchLimine == null) {
+        const liminePath = "limine";
+        const liminePathRemove = b.addRemoveDirTree(b.path(liminePath));
+
+        const limineGitClone = b.addSystemCommand(&.{
+            "git",
+            "clone",
+            "https://codeberg.org/Limine/Limine.git",
+            "--branch=v10.x-binary",
+            "--depth=1",
+            liminePath,
+        });
+
+        limineGitClone.step.dependOn(&liminePathRemove.step);
+        start.dependOn(&limineGitClone.step);
+    }
 
     const mkdirOut = b.addSystemCommand(&.{ "mkdir", "-p", "zig-out/bin" });
-    mkdirOut.step.dependOn(&limineGitClone.step);
+    mkdirOut.step.dependOn(start);
     b.getInstallStep().dependOn(&mkdirOut.step);
 
     const target = b.resolveTargetQuery(.{
@@ -230,14 +245,14 @@ pub fn build(b: *std.Build) !void {
         isoDir ++ "/boot/limine/",
     });
     limineCopy.step.dependOn(&isoCreatePath.step);
-    limineCopy.step.dependOn(&limineGitClone.step);
+    limineCopy.step.dependOn(start);
 
     const efiCopy = b.addSystemCommand(&.{
         "sh",
         "-c",
         try std.fmt.allocPrint(b.allocator, "\\cp limine/BOOTIA32.EFI {s}/EFI/BOOT\ncp limine/BOOTX64.EFI {s}/EFI/BOOT/", .{ isoDir, isoDir }),
     });
-    efiCopy.step.dependOn(&limineGitClone.step);
+    efiCopy.step.dependOn(start);
     efiCopy.step.dependOn(&isoCreatePath.step);
 
     copyFiles.dependOn(&isoCopy.step);
