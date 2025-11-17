@@ -107,7 +107,7 @@ void console_handle_key(char c)
             input_buffer[input_pos] = '\0';
 
             // just move the cursor back then print space, draw rext, and move back again
-            u32 char_width = 8 * font_scale + font_scale;
+            u32 char_width = 8 * font_scale;
             if (cursor_x >= 20 + char_width) {
                 cursor_x -= char_width;
                 putchar(' ', GFX_WHITE);
