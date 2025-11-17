@@ -19,7 +19,7 @@ proc_t *process_create(const char *name, u64 entry) {
 
     u64 stk = (u64)kmalloc(STACK_SIZE);
     if (!stk) {
-        kfree(p);
+        kfree((u64 *)p);
         return NULL;
     }
 
@@ -53,8 +53,8 @@ void process_destroy(proc_t *p) {
 
             if (current == p) current = NULL;
 
-            kfree((void *)p->stack_base);
-            kfree(p);
+            kfree((u64 *)p->stack_base);
+            kfree((u64 *)p);
             return;
         }
         prev = cur;
