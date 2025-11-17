@@ -1,5 +1,5 @@
 #include "process.h"
-#include <kernel/mem_manager/alloc/alloc.h>
+#include <kernel/mem/kheap/kheap.h>
 
 #define STACK_SIZE 8192
 
@@ -14,10 +14,10 @@ void process_init(void) {
 }
 
 proc_t *process_create(const char *name, u64 entry) {
-    proc_t *p = (proc_t *)kalloc(sizeof(proc_t));
+    proc_t *p = (proc_t *)kmalloc(sizeof(proc_t));
     if (!p) return NULL;
 
-    u64 stk = (u64)kalloc(STACK_SIZE);
+    u64 stk = (u64)kmalloc(STACK_SIZE);
     if (!stk) {
         kfree(p);
         return NULL;

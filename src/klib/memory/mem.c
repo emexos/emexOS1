@@ -1,25 +1,7 @@
 #include "main.h"
+#include <kernel/mem/kheap/kheap.h>
 
-#include <kernel/mem_manager/alloc/alloc.h>
-
-//todo: split in files
 #define BLOCK_SIZE 32
-
-//now in alloc.c
-/*
-typedef struct block {
-    size_t size;
-    int used;
-    struct block *next;
-} block_t;
-
-static u8 *heap_start = NULL;
-static size_t heap_size = 0;
-static block_t *first_block = NULL;
-
-static size_t free_mem = 0;
-static size_t used_mem = 0;
-*/
 
 // BASIC
 void memset(void *ptr, u8 val, size_t n)
@@ -63,17 +45,15 @@ int memcmp(const void *a, const void *b, size_t n)
     return 0;
 }
 
-
-void mem_init(void *heap_addr, size_t heap_sz) {
-    alloc_init(heap_addr, heap_sz);
+u64 mem_get_free(void) {
+    return kheap_get_free_size();
 }
 
-//stats maybe for the console
-size_t mem_get_free(void) {
-    return alloc_get_free();
+u64 mem_get_used(void) {
+    return kheap_get_used_size();
 }
 
-size_t mem_get_used(void) {
-    return alloc_get_used();
+u64 mem_get_total(void) {
+    return kheap_get_total_size();
 }
 
