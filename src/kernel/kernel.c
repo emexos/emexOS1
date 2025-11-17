@@ -17,7 +17,9 @@
 
 // Memory
 #include <klib/memory/main.h>
-#include <kernel/mem_manager/phys/physmem.h>
+#include <kernel/mem/phys/physmem.h>
+#include <kernel/mem/paging/paging.h>
+#include <kernel/mem/kheap/kheap.h>
 //#include "mem_manager/virtmem.h" //not implemendet
 
 //debug
@@ -36,10 +38,6 @@
 #include <kernel/module/module.h>
 
 #include <kernel/pci/pci.h>
-
-// 16MB heap
-#define HEAP_SIZE (8 * 1024 * 1024)
-static u8 kernel_heap[HEAP_SIZE] __attribute__((aligned(16)));
 
 void _start(void)
 {
@@ -66,19 +64,12 @@ void _start(void)
 
     char buf[256]; //for all string operations
 
-    // Initialize heap and physical memory manager
-    print("Initialized memory", TITLE_COLOR);
-    mem_init(kernel_heap, HEAP_SIZE);
-    //char buf[128];
-    str_copy(buf, "\nHeap: ");
-    str_append_uint(buf, HEAP_SIZE / 1024);
-    str_append(buf, " KB\n");
-    print(buf, GFX_GRAY_50);
-
-    putchar('\n', GFX_WHITE);
-
-    physmem_init(256 * 1024 * 1024); // 256 MB
-    print("Physical memory 256 MB\n", GFX_GREEN);
+    {
+        // Initialize mem
+        physmem_init(memmap_request.response, hhdm_request.response);
+        paging_init(hhdm_request.response);
+        kheap_init();
+    }
 
     //actually not needed but maybe later
     //draw_rect(10, 10, fb_width - 20, fb_height - 20, GFX_BG);
@@ -129,12 +120,6 @@ void _start(void)
 
     module_register(&keyboard_module);
     print("test2\n", GFX_GREEN);
-
-    // Show system info
-    str_copy(buf, "Free Memory: ");
-    str_append_uint(buf, (u32)(physmem_get_free() * 4) / 1024);
-    str_append(buf, " MB\n");
-    print(buf, GFX_CYAN);
 
     // Initialize console and halt CPU
 

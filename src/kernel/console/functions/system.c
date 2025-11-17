@@ -62,19 +62,28 @@ FHDR(cmd_meminfo)
 
     char buf[128];
 
-    str_copy(buf, "Free:  ");
-    str_append_uint(buf, (u32)(mem_get_free() / 1024));
+    u64 free = mem_get_free() / 1024;
+    u64 used = mem_get_used() / 1024;
+    u64 total = mem_get_total() / 1024;
+
+    str_copy(buf, "Free :  ");
+    str_append_uint(buf, (u32)(free >> 32));
+    str_append(buf, ":");
+    str_append_uint(buf, (u32)(free));
     str_append(buf, " KB");
     print(buf, GFX_GREEN);
 
-    str_copy(buf, "\nUsed:  ");
-    str_append_uint(buf, (u32)(mem_get_used() / 1024));
+    str_copy(buf, "\nUsed :  ");
+    str_append_uint(buf, (u32)(used >> 32));
+    str_append(buf, ":");
+    str_append_uint(buf, (u32)(used));
     str_append(buf, " KB");
     print(buf, GFX_YELLOW);
 
-    size_t total = mem_get_free() + mem_get_used();
-    str_copy(buf, "\nTotal: ");
-    str_append_uint(buf, (u32)(total / 1024));
+    str_copy(buf, "\nTotal:  ");
+    str_append_uint(buf, (u32)(total >> 32));
+    str_append(buf, ":");
+    str_append_uint(buf, (u32)(total));
     str_append(buf, " KB");
     print(buf, GFX_WHITE);
 
