@@ -23,8 +23,8 @@ typedef struct proc {
 } proc_t;
 
 void process_init(void);
-proc_t *process_create(const char *name, u64 entry);
-void process_destroy(proc_t *p);
+// proc_t *process_create(const char *name, u64 entry);
+// void process_destroy(proc_t *p);
 proc_t *process_get_current(void);
 void process_set_state(proc_t *p, proc_state_t state);
 

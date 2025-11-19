@@ -1,5 +1,5 @@
 #include "main.h"
-#include <kernel/mem/kheap/kheap.h>
+#include <kernel/mem/heap/heap.h>
 
 #define BLOCK_SIZE 32
 
@@ -45,15 +45,15 @@ int memcmp(const void *a, const void *b, size_t n)
     return 0;
 }
 
-u64 mem_get_free(void) {
-    return kheap_get_free_size();
-}
+// u64 mem_get_free() {
+//     return kheap_get_free_size();
+// }
 
-u64 mem_get_used(void) {
-    return kheap_get_used_size();
-}
+// u64 mem_get_used(void) {
+//     return kheap_get_used_size();
+// }
 
-u64 mem_get_total(void) {
-    return kheap_get_total_size();
-}
+// u64 mem_get_total(void) {
+//     return kheap_get_total_size();
+// }
 

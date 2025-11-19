@@ -58,34 +58,34 @@ FHDR(cmd_modules)
 
 FHDR(cmd_meminfo)
 {
-    (void)s; // unused parameter
+    // (void)s; // unused parameter
 
-    char buf[128];
+    // char buf[128];
 
-    u64 free = mem_get_free() / 1024;
-    u64 used = mem_get_used() / 1024;
-    u64 total = mem_get_total() / 1024;
+    // u64 free = mem_get_free() / 1024;
+    // u64 used = mem_get_used() / 1024;
+    // u64 total = mem_get_total() / 1024;
 
-    str_copy(buf, "Free :  ");
-    str_append_uint(buf, (u32)(free >> 32));
-    str_append(buf, ":");
-    str_append_uint(buf, (u32)(free));
-    str_append(buf, " KB");
-    print(buf, GFX_GREEN);
+    // str_copy(buf, "Free :  ");
+    // str_append_uint(buf, (u32)(free >> 32));
+    // str_append(buf, ":");
+    // str_append_uint(buf, (u32)(free));
+    // str_append(buf, " KB");
+    // print(buf, GFX_GREEN);
 
-    str_copy(buf, "\nUsed :  ");
-    str_append_uint(buf, (u32)(used >> 32));
-    str_append(buf, ":");
-    str_append_uint(buf, (u32)(used));
-    str_append(buf, " KB");
-    print(buf, GFX_YELLOW);
+    // str_copy(buf, "\nUsed :  ");
+    // str_append_uint(buf, (u32)(used >> 32));
+    // str_append(buf, ":");
+    // str_append_uint(buf, (u32)(used));
+    // str_append(buf, " KB");
+    // print(buf, GFX_YELLOW);
 
-    str_copy(buf, "\nTotal:  ");
-    str_append_uint(buf, (u32)(total >> 32));
-    str_append(buf, ":");
-    str_append_uint(buf, (u32)(total));
-    str_append(buf, " KB");
-    print(buf, GFX_WHITE);
+    // str_copy(buf, "\nTotal:  ");
+    // str_append_uint(buf, (u32)(total >> 32));
+    // str_append(buf, ":");
+    // str_append_uint(buf, (u32)(total));
+    // str_append(buf, " KB");
+    // print(buf, GFX_WHITE);
 
 }
 

@@ -1,7 +1,8 @@
 #include "paging.h"
 #include <limine/limine.h>
 
-#include "../kheap/kheap.h"
+#include "../mem/mem.h"
+#include "../phys/physmem.h"
 #include <kernel/exceptions/panic.h>
 #include <klib/memory/main.h>
 
@@ -13,7 +14,6 @@ extern u8 _kernel_start[];
 extern u8 _kernel_end[];
 
 static page_table_t *kernel_pml4 = NULL;
-
 
 /// Summary
 /// 2025/11/17 tsaraki
@@ -82,31 +82,29 @@ void paging_map_page(
     asm volatile("invlpg (%0)" : : "r" (virtual_addr) : "memory");
 }
 
-/// Summary
-/// 2025/11/17 tsaraki
-/// limine already done paging
-/// just paging for kernel heap
-/// @Question: paging for drivers, io, etc?
-void paging_init(limine_hhdm_response_t *hpr) {
+u64 paging_init(limine_hhdm_response_t *hpr, u64 size) {
     u64 current_cr3;
     asm volatile("mov %%cr3, %0" : "=r" (current_cr3));
 
     kernel_pml4 = (page_table_t*)((current_cr3 & 0x000FFFFFFFFFF000) + hpr->offset);
-
-    u64 heap_frames_len = (HEAP_SIZE / PAGE_SIZE);
-
-    u64 phys = physmem_alloc_to(heap_frames_len);
-    if  (!phys) panic("ERROR: Could not allocate physmem for heap");
-
-    // paging for the kernel heap
-    for (u64 i = 0; i < heap_frames_len; i++) {
-        u64 virt = HEAP_START + (i * PAGE_SIZE);
-
-        paging_map_page(hpr, virt, phys + i, PTE_PRESENT | PTE_WRITABLE);
-    }
-
-    // there should be paging of smth else
-    // if it need to be done while kernel initializing
-
-    return;
+    
+    u64 phys_frames = size / PAGE_SIZE;
+    u64 phys = physmem_alloc_to(phys_frames);
+    if  (!phys) panic("ERROR: Could not allocate physmem in lime request");
+    
+    return phys;
 }
+
+void map_region(limine_hhdm_response_t *hpr, u64 phys, u64 virt, u64 size) {
+    u64 frames = size / PAGE_SIZE;
+
+    for (u64 i = 0; i < frames; i++) {
+        u64 virt_to_page = virt + (i * PAGE_SIZE);
+        u64 phys_to_page = phys + (i * PAGE_SIZE);
+
+        paging_map_page(hpr, virt_to_page, phys_to_page, PTE_PRESENT | PTE_WRITABLE);
+    }
+    
+    memset((u64 *)virt, 0, size);
+}
+
