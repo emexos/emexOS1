@@ -1,4 +1,6 @@
 #include "scheduler.h"
+#include <klib/string/string.h>
+#include <theme/stdclrs.h>
 
 #define QUANTUM 10
 
@@ -31,6 +33,8 @@ static proc_t *queue_pop(sched_queue_t *q) {
 }
 
 void sched_init(void) {
+    print("[SCHED] ", GFX_GRAY_70);
+    print("init Scheduler\n", GFX_ST_WHITE);
     queue_init(&ready_q);
     running = NULL;
     enabled = 0;

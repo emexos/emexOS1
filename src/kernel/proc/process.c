@@ -1,5 +1,7 @@
 #include "process.h"
-#include <kernel/mem/heap/heap.h>
+#include <kernel/mem/kheap/kheap.h>
+#include <klib/string/string.h>
+#include <theme/stdclrs.h>
 
 #define STACK_SIZE 8192
 
@@ -8,6 +10,8 @@ static proc_t *current;
 static u64 next_pid;
 
 void process_init(void) {
+    print("[PROC] ", GFX_GRAY_70);
+    print("init Process manager\n", GFX_ST_WHITE);
     head = NULL;
     current = NULL;
     next_pid = 1;

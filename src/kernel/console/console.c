@@ -54,14 +54,18 @@ void console_init(void)
     input_buffer[0] = '\0';
 
     clear(CONSOLESCREEN_BG_COLOR);
-    reset_cursor();/*
-    //
+    //reset_cursor();
+    /*
     //module_register_driver(&console_module);
 
     if (cursor_x == 0 && cursor_y == 0) {
         clear(CONSOLESCREEN_COLOR);
         reset_cursor();
-        }*/
+    }
+    */
+
+    cursor_x = 0;
+    cursor_y = 0;
 
     banner_init();
 
@@ -86,7 +90,22 @@ void console_handle_key(char c)
 
         if (input_pos > 0) {
             input_buffer[input_pos] = '\0';
-            console_execute(input_buffer);
+
+            // check for && and use chained execution
+            int has_chain = 0;
+            for (int i = 0; i < input_pos - 1; i++) {
+                if (input_buffer[i] == '&' && input_buffer[i+1] == '&') {
+                    has_chain = 1;
+                    break;
+                }
+            }
+
+            if (has_chain) {
+                parse_and_execute_chained(input_buffer);
+            } else {
+                console_execute(input_buffer);
+            }
+
             input_pos = 0;
             input_buffer[0] = '\0';
         }
@@ -108,7 +127,7 @@ void console_handle_key(char c)
 
             // just move the cursor back then print space, draw rext, and move back again
             u32 char_width = 8 * font_scale;
-            if (cursor_x >= 20 + char_width) {
+            if (cursor_x >= char_width) {
                 cursor_x -= char_width;
                 putchar(' ', GFX_WHITE);
                 cursor_x -= char_width;
