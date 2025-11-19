@@ -2,6 +2,8 @@
 #include <kernel/exceptions/isr.h>
 #include <kernel/exceptions/irq.h>
 #include <klib/memory/main.h>
+#include <klib/string/string.h>
+#include <theme/stdclrs.h>
 
 static idt_entry_t idt[IDT_ENTRIES];
 static idt_ptr_t idt_ptr;
@@ -29,6 +31,8 @@ void idt_load(void)
 
 void idt_init(void)
 {
+    print("[IDT] ", GFX_GRAY_70);
+    print("Init interrupts\n", GFX_ST_WHITE);
     // Clear IDT
     memset(&idt, 0, sizeof(idt));
 

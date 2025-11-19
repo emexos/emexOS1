@@ -11,3 +11,7 @@ include/
 **/.DS_Store
 
 disk.img
+
+test
+
+etc.txt
