@@ -66,7 +66,7 @@ void _start(void)
     {
         // Initialize mem
         physmem_init(memmap_request.response, hhdm_request.response);
-        int phys_start = paging_init(hhdm_request.response, HEAP_SIZE + GRAPHICS_SIZE);
+        u64 phys_start = paging_init(hhdm_request.response, HEAP_SIZE + GRAPHICS_SIZE);
 
         {
             // kernel lifetime
