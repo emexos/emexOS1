@@ -7,9 +7,9 @@ u32 *framebuffer = NULL;
 u32 fb_width = 0;
 u32 fb_height = 0;
 u32 fb_pitch = 0;
-u32 cursor_x = 20;
-u32 cursor_y = 20;
-u32 font_scale = 2; //for console scalin g
+u32 cursor_x = 16; // 8 = space-character means 8+ text
+u32 cursor_y = 16;
+u32 font_scale = 1; //for console scaling
 
 
 void graphics_init(struct limine_framebuffer *fb)
@@ -19,7 +19,7 @@ void graphics_init(struct limine_framebuffer *fb)
     fb_height = fb->height;
     fb_pitch = fb->pitch;
     cursor_y = 20;
-    font_scale = 2;
+    font_scale = 1;
 
     print("Welcome to doccrOS \n", GFX_WHITE);
     print("v0.0.1 (alpha)\n", GFX_WHITE);

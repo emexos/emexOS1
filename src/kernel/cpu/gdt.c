@@ -1,5 +1,7 @@
 #include "gdt.h"
 #include <klib/memory/main.h>
+#include <klib/string/string.h>
+#include <theme/stdclrs.h>
 
 static gdt_entry_t gdt[GDT_ENTRIES];
 //static gdt_tss_entry_t tss_entry;
@@ -41,6 +43,8 @@ static void tss_set_entry(void)
 
 void gdt_init(void)
 {
+    print("[GDT] ", GFX_GRAY_70);
+    print("init (Global Descriptor Table)\n", GFX_ST_WHITE);
     // Setup GDT pointer
     gdt_ptr.limit = sizeof(gdt) - 1;
     gdt_ptr.base = (u64)&gdt;

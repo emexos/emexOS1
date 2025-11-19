@@ -1,5 +1,6 @@
 #include "print.h"
 #include <klib/graphics/graphics.h>
+#include <klib/debug/serial.h>
 #include <fonts/font_8x8.h>
 
 #include <kernel/console/graph/dos.h>
@@ -35,7 +36,7 @@ void putchar(char c, u32 color)
 
     if (c == '\n')
     {
-        cursor_x = 20;
+        cursor_x = 0; // past was 20
         cursor_y += line_height;
 
         // use console window scroll check
@@ -46,7 +47,7 @@ void putchar(char c, u32 color)
     // Check if we need to wrap to next line
     if (cursor_x + char_width >= fb_width)
     {
-        cursor_x = 20;
+        cursor_x = 0; // past was 20
         cursor_y += line_height;
         console_window_check_scroll();
     }
@@ -63,6 +64,7 @@ void string(const char *str, u32 color)
     {
         putchar(str[i], color);
     }
+    printf("%s", str); // prints everything from the os terminal to the host-terminal
 }
 
 void IntToString(int value, char *buffer)

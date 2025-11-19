@@ -51,6 +51,7 @@ void _start(void)
     // Initialize framebuffer graphics
     struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
     graphics_init(fb);
+    printf("init graphics, draw logo\n");
     draw_logo();
 
     // main kernel
@@ -62,7 +63,7 @@ void _start(void)
 
     clear(BOOTSCREEN_BG_COLOR);
 
-    char buf[256]; //for all string operations
+    char buf[128]; //for all string operations
 
     {
         // Initialize mem
@@ -75,56 +76,60 @@ void _start(void)
     //draw_rect(10, 10, fb_width - 20, fb_height - 20, GFX_BG);
 
     draw_logo();
-    //cursor_x = 10;
-    //cursor_y = 10;
+    cursor_x = 0;
+    cursor_y = 10;
+
+    printf("\n");
 
     // Initialize the CPU
     cpu_detect();
-    print(" [CPU] Detected CPU\n", GFX_GREEN);
     gdt_init();
-    print(" [GDT] init (Global Descriptor Table)\n", GFX_GREEN);
     idt_init();
-    print(" [IDT] Init interrupts\n", GFX_GREEN);
-    timer_init(1000);
+    u32 freq = 1000;
+    timer_init(freq);
+    printInt(freq, GFX_ST_WHITE);
+    print(" 1ms tick)\n", GFX_ST_WHITE);
     timer_set_boot_time(); //for uptime command
-    //TODO:
-    // its not exactly uptime because everything before imer_set_boot_time() doesnt get count
-    // so we could set it to +50 milliseconds or something so its a bit more realistic i think...
-    print(" [TIME] Init timer (1000Hz 1ms tick)\n", GFX_GREEN);
-    print(" [TIME] started uptime now...\n", GFX_GREEN);
-
-    putchar('\n', GFX_WHITE);
 
     pci_init();
-    //char buf[64]; //its now at the top for every string operations
-    str_copy(buf, " [PCI]: ");
-    str_append_uint(buf, pci_get_device_count());
-    str_append(buf, " device(s) found\n");
-    print(buf, GFX_GREEN);
     //pci will get really useful with xhci/other usb
-    //
-
     // Initialize process manager and scheduler
     process_init();
-    print(" [PROC]  Process manager\n", GFX_GREEN);
     sched_init();
-    print(" [SCHED] Scheduler\n", GFX_GREEN);
 
-    putchar('\n', GFX_WHITE);
     module_init();
-    print(" [MOD] Module system initialized\n", GFX_GREEN);
-
     // Register driver modules
+    print("[MOD] ", GFX_GRAY_70);
+    print("Init regs: ", GFX_ST_WHITE);
     module_register(&console_module);
-    print("test1\n", GFX_GREEN);
-
     module_register(&keyboard_module);
-    print("test2\n", GFX_GREEN);
+    int count = module_get_count();
+    str_append_uint(buf, count);
+    print(buf, GFX_ST_YELLOW);
+    putchar('\n', GFX_ST_WHITE);
 
+    buf[0] = '\0'; // clear buffer so it can be used again
+
+
+    print("[FONT] ", GFX_GRAY_70);
+    print("scaling...\n", GFX_ST_WHITE);
+    font_scale = 2;
+    str_append_uint(buf, font_scale);
+    print("[FONT] ", GFX_GRAY_70);
+    print("scaled to: ", GFX_ST_WHITE);
+    print(buf, GFX_WHITE);
+    putchar('\n', GFX_ST_WHITE);
+
+    buf[0] = '\0'; // clear buffer so it can be used again
+
+    print("[CONSOLE] ", GFX_GRAY_70);
+    print("starting console...\n", GFX_ST_WHITE);
+    clear(BOOTSCREEN_COLOR);
     // Initialize console and halt CPU
 
     //panic("test");
 
+    printf("\n");
     printf("test printf\n");
     printf("test printf\n");
     console_init();

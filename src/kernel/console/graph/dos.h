@@ -3,7 +3,7 @@
 
 #include <types.h>
 
-#define CONSOLE_PADDING_X 23 // 15(baner) + 8(font scale)
+#define CONSOLE_PADDING_X 0 // 15(baner) + 8(font scale) 23
 
 void console_window_init(void);
 void console_window_clear(u32 color);

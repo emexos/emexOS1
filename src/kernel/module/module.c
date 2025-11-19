@@ -1,9 +1,13 @@
 #include "module.h"
+#include <klib/string/string.h>
+#include <theme/stdclrs.h>
 
 static driver_module *modules[MAX_MODULES];
 static int module_count = 0;
 
 void module_init(void) {
+    print("[MOD] ", GFX_GRAY_70);
+    print("init module system\n", GFX_ST_WHITE);
     for (int i = 0; i < MAX_MODULES; i++) {
         modules[i] = NULL;
     }
