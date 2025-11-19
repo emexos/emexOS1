@@ -2,7 +2,7 @@
 #define MEM_H
 
 #include <types.h>
-#include <limine.h>
+#include <limine/limine.h>
 
 typedef struct limine_memmap_response limine_memmap_response_t;
 typedef struct limine_hhdm_response limine_hhdm_response_t;
@@ -34,7 +34,7 @@ typedef struct limine_framebuffer limine_framebuffer_t;
 #define FRAME_FREE       0x00    // Frame is available
 #define FRAME_USED       0x01    // Frame is allocated
 #define FRAME_KERNEL     0x02    // Frame contains kernel data/code
-#define FRAME_USER       0x04    // Frame belongs to user process  
+#define FRAME_USER       0x04    // Frame belongs to user process
 #define FRAME_DMA        0x08    // Frame used for DMA operations
 #define FRAME_SHARED     0x10    // Frame shared between processes
 #define FRAME_COW        0x20    // Copy-on-write frame
@@ -75,4 +75,3 @@ typedef struct klime_response {
 } klime_response_t;
 
 #endif
-

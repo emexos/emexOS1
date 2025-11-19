@@ -1,7 +1,7 @@
 #include "paging.h"
 #include <limine/limine.h>
 
-#include "../mem/mem.h"
+#include "../mem.h"
 #include "../phys/physmem.h"
 #include <kernel/exceptions/panic.h>
 #include <klib/memory/main.h>
@@ -87,11 +87,11 @@ u64 paging_init(limine_hhdm_response_t *hpr, u64 size) {
     asm volatile("mov %%cr3, %0" : "=r" (current_cr3));
 
     kernel_pml4 = (page_table_t*)((current_cr3 & 0x000FFFFFFFFFF000) + hpr->offset);
-    
+
     u64 phys_frames = size / PAGE_SIZE;
     u64 phys = physmem_alloc_to(phys_frames);
     if  (!phys) panic("ERROR: Could not allocate physmem in lime request");
-    
+
     return phys;
 }
 
@@ -104,7 +104,6 @@ void map_region(limine_hhdm_response_t *hpr, u64 phys, u64 virt, u64 size) {
 
         paging_map_page(hpr, virt_to_page, phys_to_page, PTE_PRESENT | PTE_WRITABLE);
     }
-    
+
     memset((u64 *)virt, 0, size);
 }
-

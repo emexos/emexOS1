@@ -2,7 +2,7 @@
 #define PHYSMEM_H
 
 #include <types.h>
-#include <../mem.h>
+#include "../mem.h"
 
 typedef struct physmem_pageframe {
     u32 rc;

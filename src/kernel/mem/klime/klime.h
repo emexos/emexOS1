@@ -1,10 +1,10 @@
 #ifndef KLIME_H
 #define KLIME_H
 
-#include <../mem.h>
+#include "../mem.h"
 #include <types.h>
-#include <../slab/slab.h>
-#include <../heap/heap.h>
+#include "../slab/slab.h"
+#include "../heap/heap.h"
 
 typedef struct klime {
     u64 *start_slab_meta;
@@ -30,7 +30,7 @@ u64 *klime_alloc(klime_t *klime, u64 size, u64 count);
 void klime_free(klime_t *klime, u64 *ptr);
 
 u64  klime_get_total_size(klime_t *klime);
-u64  klime_get_used_size(klime_t *klime); 
+u64  klime_get_used_size(klime_t *klime);
 u64  klime_get_free_size(klime_t *klime);
 
 #endif

@@ -2,7 +2,7 @@
 #define PAGGING_H
 
 #include <types.h>
-#include <../mem.h>
+#include "../mem.h"
 
 #define PTE_PRESENT    (1ULL << 0)
 #define PTE_WRITABLE   (1ULL << 1)

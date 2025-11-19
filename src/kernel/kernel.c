@@ -64,7 +64,7 @@ void _start(void)
 
     char buf[128]; //for all string operations
 
-    {
+    { // MADE BY @TSARAKI (github)
         // Initialize mem
         physmem_init(memmap_request.response, hhdm_request.response);
         u64 phys_start = paging_init(hhdm_request.response, HEAP_SIZE + GRAPHICS_SIZE);
@@ -104,7 +104,7 @@ void _start(void)
             glres.green_mask_shift = (u8)fb->green_mask_shift;
             glres.blue_mask_size   = (u8)fb->blue_mask_size;
             glres.blue_mask_shift  = (u8)fb->blue_mask_shift;
-        
+
         }
     }
 
@@ -142,7 +142,7 @@ void _start(void)
     int count = module_get_count();
     str_append_uint(buf, count);
     print(buf, GFX_ST_YELLOW);
-    putchar('\n', GFX_ST_WHITE);
+    print("\n", GFX_ST_WHITE);
 
     buf[0] = '\0'; // clear buffer so it can be used again
 
@@ -154,12 +154,13 @@ void _start(void)
     print("[FONT] ", GFX_GRAY_70);
     print("scaled to: ", GFX_ST_WHITE);
     print(buf, GFX_WHITE);
-    putchar('\n', GFX_ST_WHITE);
+    print("\n", GFX_ST_WHITE);
 
     buf[0] = '\0'; // clear buffer so it can be used again
 
     print("[CONSOLE] ", GFX_GRAY_70);
     print("starting console...\n", GFX_ST_WHITE);
+        hcf();
     clear(BOOTSCREEN_COLOR);
     // Initialize console and halt CPU
 

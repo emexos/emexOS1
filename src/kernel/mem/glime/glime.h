@@ -2,7 +2,7 @@
 #define GLIME_H
 
 #include <types.h>
-#include <../mem.h>
+#include "../mem.h"
 
 typedef struct glime {
     glime_response_t glres;
@@ -13,4 +13,3 @@ typedef struct glime {
 glime_t *glime_init(glime_response_t gr, u64 *ptr, u64 size);
 
 #endif
-
