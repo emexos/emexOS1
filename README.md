@@ -12,15 +12,25 @@ For building and compiling emexOS, ensure you have the following installed -
 - [Xorriso](https://www.gnu.org/software/xorriso/) - To create ISO files
 - [Git](https://git-scm.com/) - Used to fetch dependencies
 
+If you use Zig instead of x86_64-gcc cross comilers you can use that too
+- [Zig](https://ziglang.org/) - Zig compiler can fully build os with one command
+
 ## For Nix Users
 If you use [Nix](https://nixos.org/) then you can use the provided flake that includes all the required build dependencies so you can set up a development environment for emexOS out of the box with just a short and simple command.
 
 ## Building and Compiling
 Now that you have all the required build dependencies installed, you can finally build and run emexOS.
+Option A - using gnu-make
 - `make fetchDeps` - Fetches all libraries and such that emexOS depends on. Obviously `git` is used for this operation.
 - `make` - Builds emexOS
 - `make run` - Emulates emexOS using QEMU
 - `make clean` - Cleans up all build outputs
+
+Option B - using zig
+- `zig build` - Fetch, build and run
+- `zig build -Dnofetch` - Build and run
+- `zig build -Dclean` - Remove (cache, output), fetch, build and run
+- `zig build -Dnofetch -Dclean` - Remove (cache, output), build and run
 
 <br/>
 
