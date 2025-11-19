@@ -76,6 +76,12 @@ void timer_init(u32 frequency)
 
     // Enable interrupts to start timer
     __asm__ volatile("sti");
+
+    //TODO:
+    // its not exactly uptime because everything before imer_set_boot_time() doesnt get count
+    // so we could set it to +50 milliseconds or something so its a bit more realistic i think...
+    print("[TIME] ", GFX_GRAY_70);
+    print("Init timer (", GFX_ST_WHITE);
 }
 
 // reg callback
@@ -149,6 +155,8 @@ u64 timer_get_milliseconds(void)
 
 void timer_set_boot_time(void) {
     boot_timestamp = timer_ticks;
+    print("[TIME] ", GFX_GRAY_70);
+    print("started uptime now...\n", GFX_ST_WHITE);
 }
 
 u64 timer_get_uptime_seconds(void)

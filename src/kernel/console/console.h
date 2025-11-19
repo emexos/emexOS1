@@ -10,6 +10,7 @@ extern driver_module console_module;
 
 #define MAX_INPUT_LEN 256
 #define MAX_CMDS 32
+#define MAX_CHAINED_CMDS 8
 
 // function header macro for command declarations it should be easier to port it to future syscalls
 #define FHDR(name) void name(const char* s)
@@ -35,5 +36,8 @@ void shell_print_prompt(void);
 void shell_redraw_input(void);
 
 console_cmd_t* console_find_cmd(const char *name);
+
+int parse_color(const char *color_str, u32 *out_color);
+void parse_and_execute_chained(const char *input);
 
 #endif

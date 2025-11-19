@@ -14,29 +14,17 @@ FHDR(cmd_clear)
 {
     u32 color = CONSOLESCREEN_BG_COLOR;
 
-    // parse color argument if provided
+    /*
     if (*s != '\0') {
-        // simple color name parsing
-        const char *p = s;
-        while (*p == ' ') p++;
-
-        if (*p == 'b' && *(p+1) == 'l' && *(p+2) == 'a' && *(p+3) == 'c' && *(p+4) == 'k') {
-            color = GFX_BLACK;
-        } else if (*p == 'w' && *(p+1) == 'h' && *(p+2) == 'i' && *(p+3) == 't' && *(p+4) == 'e') {
-            color = GFX_WHITE;
-        } else if (*p == 'r' && *(p+1) == 'e' && *(p+2) == 'd') {
-            color = GFX_RED;
-        } else if (*p == 'g' && *(p+1) == 'r' && *(p+2) == 'e' && *(p+3) == 'e' && *(p+4) == 'n') {
-            color = GFX_GREEN;
-        } else if (*p == 'b' && *(p+1) == 'l' && *(p+2) == 'u' && *(p+3) == 'e') {
-            color = GFX_BLUE;
-        } else if (*p == 'c' && *(p+1) == 'y' && *(p+2) == 'a' && *(p+3) == 'n') {
-            color = GFX_CYAN;
-        } else if (*p == 'y' && *(p+1) == 'e' && *(p+2) == 'l' && *(p+3) == 'l' && *(p+4) == 'o' && *(p+5) == 'w') {
-            color = GFX_YELLOW;
-        } else if (*p == 'p' && *(p+1) == 'u' && *(p+2) == 'r' && *(p+3) == 'p' && *(p+4) == 'l' && *(p+5) == 'e') {
-            color = GFX_PURPLE;
+        if (!parse_color(s, &color)) {
+            print("wrong color\n", GFX_RED);
+            return;
         }
+    }
+    */
+
+    if (*s != '\0') {
+        return;
     }
 
     shell_clear_screen(color);
