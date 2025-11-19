@@ -17,54 +17,54 @@ void process_init(void) {
     next_pid = 1;
 }
 
-proc_t *process_create(const char *name, u64 entry) {
-    proc_t *p = (proc_t *)kmalloc(sizeof(proc_t));
-    if (!p) return NULL;
+// proc_t *process_create(const char *name, u64 entry) {
+//     proc_t *p = (proc_t *)kmalloc(sizeof(proc_t));
+//     if (!p) return NULL;
 
-    u64 stk = (u64)kmalloc(STACK_SIZE);
-    if (!stk) {
-        kfree((u64 *)p);
-        return NULL;
-    }
+//     u64 stk = (u64)kmalloc(STACK_SIZE);
+//     if (!stk) {
+//         kfree((u64 *)p);
+//         return NULL;
+//     }
 
-    p->pid = next_pid++;
-    p->state = PROC_READY;
-    p->stack_base = stk;
-    p->stack_ptr = stk + STACK_SIZE;
-    p->entry = entry;
-    p->next = head;
+//     p->pid = next_pid++;
+//     p->state = PROC_READY;
+//     p->stack_base = stk;
+//     p->stack_ptr = stk + STACK_SIZE;
+//     p->entry = entry;
+//     p->next = head;
 
-    int i = 0;
-    while (name[i] && i < 63) {
-        p->name[i] = name[i];
-        i++;
-    }
-    p->name[i] = '\0';
+//     int i = 0;
+//     while (name[i] && i < 63) {
+//         p->name[i] = name[i];
+//         i++;
+//     }
+//     p->name[i] = '\0';
 
-    head = p;
-    return p;
-}
+//     head = p;
+//     return p;
+// }
 
-void process_destroy(proc_t *p) {
-    if (!p) return;
+// void process_destroy(proc_t *p) {
+//     if (!p) return;
 
-    proc_t *cur = head, *prev = NULL;
+//     proc_t *cur = head, *prev = NULL;
 
-    while (cur) {
-        if (cur == p) {
-            if (prev) prev->next = cur->next;
-            else head = cur->next;
+//     while (cur) {
+//         if (cur == p) {
+//             if (prev) prev->next = cur->next;
+//             else head = cur->next;
 
-            if (current == p) current = NULL;
+//             if (current == p) current = NULL;
 
-            kfree((u64 *)p->stack_base);
-            kfree((u64 *)p);
-            return;
-        }
-        prev = cur;
-        cur = cur->next;
-    }
-}
+//             kfree((u64 *)p->stack_base);
+//             kfree((u64 *)p);
+//             return;
+//         }
+//         prev = cur;
+//         cur = cur->next;
+//     }
+// }
 
 proc_t *process_get_current(void) {
     return current;

@@ -17,9 +17,7 @@
 
 // Memory
 #include <klib/memory/main.h>
-#include <kernel/mem/phys/physmem.h>
-#include <kernel/mem/paging/paging.h>
-#include <kernel/mem/kheap/kheap.h>
+#include <kernel/mem/meminclude.h>
 //#include "mem_manager/virtmem.h" //not implemendet
 
 //debug
@@ -41,6 +39,7 @@
 
 void _start(void)
 {
+    // Temporaly before switchin to glime_t
     // emexOS start
     // Ensure that Limine base revision is supported and that we have a framebuffer
     if (framebuffer_request.response == NULL ||
@@ -68,8 +67,45 @@ void _start(void)
     {
         // Initialize mem
         physmem_init(memmap_request.response, hhdm_request.response);
-        paging_init(hhdm_request.response);
-        kheap_init();
+        u64 phys_start = paging_init(hhdm_request.response, HEAP_SIZE + GRAPHICS_SIZE);
+
+        {
+            // kernel lifetime
+            map_region(hhdm_request.response, phys_start, HEAP_START, HEAP_SIZE);
+            klime_t *klime = klime_init((u64 *)HEAP_START, HEAP_SIZE);
+
+        }
+
+        {
+
+            if (!framebuffer_request.response) {
+                panic("Cant initialize glime limine response NULL");
+            }
+
+            if (framebuffer_request.response->framebuffer_count < 1) {
+                panic("Cant initialize glime limine framebuffer_count 0");
+            }
+
+            map_region(hhdm_request.response, phys_start + HEAP_SIZE, GRAPHICS_START, GRAPHICS_SIZE);
+
+            limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
+
+            glime_response_t glres;
+            glres.start_framebuffer = (u64 *)fb->address;
+            glres.width  = (u64)fb->width;
+            glres.height = (u64)fb->height;
+            glres.pitch  = (u64)fb->pitch;
+            glres.bpp    = (u16)fb->bpp;
+
+            glres.memory_model     = (u8)fb->memory_model;
+            glres.red_mask_size    = (u8)fb->red_mask_size;
+            glres.red_mask_shift   = (u8)fb->red_mask_shift;
+            glres.green_mask_size  = (u8)fb->green_mask_size;
+            glres.green_mask_shift = (u8)fb->green_mask_shift;
+            glres.blue_mask_size   = (u8)fb->blue_mask_size;
+            glres.blue_mask_shift  = (u8)fb->blue_mask_shift;
+        
+        }
     }
 
     //actually not needed but maybe later

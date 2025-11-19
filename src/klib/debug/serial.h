@@ -16,6 +16,6 @@ void serial_printf(const char *format, ...);
 
 // allias
 #define printf serial_printf
-
+void printf_debug_u64(const char *info, u64 num);
 
 #endif

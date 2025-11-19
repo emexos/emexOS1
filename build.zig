@@ -36,6 +36,7 @@ pub fn findCFiles(gpa: std.mem.Allocator) ![][]const u8 {
 pub fn findAllDirs(gpa: std.mem.Allocator) ![][]const u8 {
     var ret = try std.ArrayList([]const u8).initCapacity(gpa, 10);
     try ret.append(gpa, ".");
+    try ret.append(gpa, "limine");
     var root = try std.fs.cwd().openDir(".", .{ .iterate = true });
     defer root.close();
 
@@ -52,23 +53,76 @@ pub fn findAllDirs(gpa: std.mem.Allocator) ![][]const u8 {
 }
 
 pub fn build(b: *std.Build) !void {
-    const liminePath = "limine";
-    const liminePathRemove = b.addRemoveDirTree(b.path(liminePath));
+    const clean = b.option(bool, "clean", "removes .zig-cahe and zig-out");
+    const fetchLimine = b.option(bool, "nofetch", "do not fetch limine");
 
-    const limineGitClone = b.addSystemCommand(&.{
-        "git",
-        "clone",
-        "https://codeberg.org/Limine/Limine.git",
-        "--branch=v10.x-binary",
-        "--depth=1",
-        liminePath,
-    });
+    const start = b.step("start", "start");
 
-    limineGitClone.step.dependOn(&liminePathRemove.step);
+    if (clean != null) {
+        const rmCache = b.addRemoveDirTree(b.path(".zig-cache/"));
+        start.dependOn(&rmCache.step);
+        const rmOut = b.addRemoveDirTree(b.path("zig-out/"));
+        start.dependOn(&rmOut.step);
+    }
+
+    if (fetchLimine == null) {
+        const liminePath = "limine";
+        const liminePathRemove = b.addRemoveDirTree(b.path(liminePath));
+
+        const limineGitClone = b.addSystemCommand(&.{
+            "git",
+            "clone",
+            "https://codeberg.org/Limine/Limine.git",
+            "--branch=v10.x-binary",
+            "--depth=1",
+            liminePath,
+        });
+
+        limineGitClone.step.dependOn(&liminePathRemove.step);
+        start.dependOn(&limineGitClone.step);
+    }
 
     const mkdirOut = b.addSystemCommand(&.{ "mkdir", "-p", "zig-out/bin" });
-    mkdirOut.step.dependOn(&limineGitClone.step);
-    b.getInstallStep().dependOn(&mkdirOut.step);
+    mkdirOut.step.dependOn(start);
+
+    const isoPrepareStep = b.step("iso prepare", "iso prepare");
+
+    const isoDir = "zig-out/iso";
+
+    const isoClean = b.addRemoveDirTree(b.path(isoDir));
+    const isoCreatePath = b.addSystemCommand(&.{
+        "mkdir",
+        "-p",
+        isoDir ++ "/boot/limine",
+        isoDir ++ "/EFI/BOOT",
+    });
+
+    const cnfCopy = b.addSystemCommand(&.{ "cp", "limine.conf", isoDir ++ "/boot/limine/" });
+
+    const limineCopy = b.addSystemCommand(&.{
+        "cp",
+        "limine/limine-bios.sys",
+        "limine/limine-bios-cd.bin",
+        "limine/limine-uefi-cd.bin",
+        isoDir ++ "/boot/limine/",
+    });
+
+    const efiCopy = b.addSystemCommand(&.{
+        "sh",
+        "-c",
+        try std.fmt.allocPrint(b.allocator, "\\cp limine/BOOTIA32.EFI {s}/EFI/BOOT\ncp limine/BOOTX64.EFI {s}/EFI/BOOT/", .{ isoDir, isoDir }),
+    });
+
+    isoClean.step.dependOn(start);
+    isoCreatePath.step.dependOn(&isoClean.step);
+
+    limineCopy.step.dependOn(&isoCreatePath.step);
+    cnfCopy.step.dependOn(&isoCreatePath.step);
+    efiCopy.step.dependOn(&isoCreatePath.step);
+
+    isoPrepareStep.dependOn(&limineCopy.step);
+    isoPrepareStep.dependOn(&cnfCopy.step);
+    isoPrepareStep.dependOn(&efiCopy.step);
 
     const target = b.resolveTargetQuery(.{
         .cpu_arch = .x86_64,
@@ -137,6 +191,7 @@ pub fn build(b: *std.Build) !void {
         const asmOutPath = try std.fmt.allocPrint(b.allocator, "zig-out/bin/{s}.o", .{std.fs.path.stem(asmPath)});
         defer b.allocator.free(asmOutPath);
         const asmOutCmd = b.addSystemCommand(&.{ "nasm", "-f", "elf64", asmPath, "-o", asmOutPath });
+        asmOutCmd.step.dependOn(isoPrepareStep);
         asmOutCmd.step.dependOn(&mkdirOut.step);
         asmCompileSteps[idx] = &asmOutCmd.step;
     }
@@ -170,7 +225,7 @@ pub fn build(b: *std.Build) !void {
     }
 
     kernelObj.step.dependOn(asmLoadComplete);
-    b.getInstallStep().dependOn(&kernelObj.step);
+    kernelObj.step.dependOn(isoPrepareStep);
 
     const exe = b.addExecutable(.{
         .name = "kernel.elf",
@@ -195,55 +250,17 @@ pub fn build(b: *std.Build) !void {
     exe.setLinkerScript(b.path("src/kernel/linker.ld"));
 
     b.installArtifact(exe);
-    b.getInstallStep().dependOn(&exe.step);
+    exe.step.dependOn(&kernelObj.step);
 
     const isoBuildStep = b.step("ISO BUILD", "create iso file");
 
-    const isoDir = "zig-out/iso";
     const isoName = "zig-out/emexos.iso";
     const kernelPath = "zig-out/bin/kernel.elf";
 
-    const isoClean = b.addRemoveDirTree(b.path(isoDir));
+    const kernelCopy = b.addSystemCommand(&.{ "cp", kernelPath, isoDir ++ "/boot/" });
+    kernelCopy.step.dependOn(&exe.step);
 
-    const isoCreatePath = b.addSystemCommand(&.{
-        "mkdir",
-        "-p",
-        isoDir ++ "/boot/limine",
-        isoDir ++ "/EFI/BOOT",
-    });
-    isoCreatePath.step.dependOn(&isoClean.step);
-
-    const copyFiles = b.step("COPY FILES", "coping files");
-
-    const isoCopy = b.addSystemCommand(&.{ "cp", kernelPath, isoDir ++ "/boot/" });
-    isoCopy.step.dependOn(&isoCreatePath.step);
-    isoCopy.step.dependOn(&exe.step);
-
-    const cnfCopy = b.addSystemCommand(&.{ "cp", "limine.conf", isoDir ++ "/boot/limine/" });
-    cnfCopy.step.dependOn(&isoCreatePath.step);
-
-    const limineCopy = b.addSystemCommand(&.{
-        "cp",
-        "limine/limine-bios.sys",
-        "limine/limine-bios-cd.bin",
-        "limine/limine-uefi-cd.bin",
-        isoDir ++ "/boot/limine/",
-    });
-    limineCopy.step.dependOn(&isoCreatePath.step);
-    limineCopy.step.dependOn(&limineGitClone.step);
-
-    const efiCopy = b.addSystemCommand(&.{
-        "sh",
-        "-c",
-        try std.fmt.allocPrint(b.allocator, "\\cp limine/BOOTIA32.EFI {s}/EFI/BOOT\ncp limine/BOOTX64.EFI {s}/EFI/BOOT/", .{ isoDir, isoDir }),
-    });
-    efiCopy.step.dependOn(&limineGitClone.step);
-    efiCopy.step.dependOn(&isoCreatePath.step);
-
-    copyFiles.dependOn(&isoCopy.step);
-    copyFiles.dependOn(&cnfCopy.step);
-    copyFiles.dependOn(&limineCopy.step);
-    copyFiles.dependOn(&efiCopy.step);
+    isoBuildStep.dependOn(&kernelCopy.step);
 
     const isoBuild = b.addSystemCommand(&.{
         "xorriso",
@@ -264,11 +281,11 @@ pub fn build(b: *std.Build) !void {
         "-o",
         isoName,
     });
-    isoBuild.step.dependOn(copyFiles);
 
+    isoBuild.step.dependOn(&kernelCopy.step);
     isoBuildStep.dependOn(&isoBuild.step);
 
-    const arch = "x86_64"; // или определите динамически
+    const arch = "x86_64";
     const qemuRun = b.addSystemCommand(&.{
         "qemu-system-" ++ arch,
         "-m",
@@ -280,6 +297,5 @@ pub fn build(b: *std.Build) !void {
     });
     qemuRun.step.dependOn(isoBuildStep);
 
-    b.getInstallStep().dependOn(isoBuildStep);
     b.getInstallStep().dependOn(&qemuRun.step);
 }
