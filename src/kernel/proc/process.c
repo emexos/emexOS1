@@ -1,5 +1,5 @@
 #include "process.h"
-#include <kernel/mem/kheap/kheap.h>
+#include <kernel/mem/heap/heap.h>
 #include <klib/string/string.h>
 #include <theme/stdclrs.h>
 
