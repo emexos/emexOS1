@@ -160,7 +160,7 @@ void _start(void)
 
     print("[CONSOLE] ", GFX_GRAY_70);
     print("starting console...\n", GFX_ST_WHITE);
-        hcf();
+    //    hcf();
     clear(BOOTSCREEN_COLOR);
     // Initialize console and halt CPU
 
