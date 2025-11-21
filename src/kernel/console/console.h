@@ -35,6 +35,14 @@ void shell_clear_screen(u32 color);
 void shell_print_prompt(void);
 void shell_redraw_input(void);
 
+void cursor_(void);
+void cursor_draw(void);
+void cursor_c(void);
+void cursor_redraw(void);
+void cursor_enable(void);
+void cursor_disable(void);
+void cursor_reset_blink(void);
+
 console_cmd_t* console_find_cmd(const char *name);
 
 int parse_color(const char *color_str, u32 *out_color);

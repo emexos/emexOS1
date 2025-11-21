@@ -84,6 +84,10 @@ void parse_and_execute_chained(const char *input) {
 
         if (commands[i][0] != '\0') {
             console_execute(commands[i]);
+            if (i < cmd_count - 1) {
+                print("\n", GFX_WHITE);
+            }
+
         }
     }
 }

@@ -38,7 +38,7 @@ static void console_module_fini(void) {
 driver_module console_module = (driver_module) {
     .name = "console",
     .mount = "/dev/console",
-    .version = VERSION_NUM(0, 1, 1, 0), //should print like [v0.1.0.0]
+    .version = VERSION_NUM(0, 1, 2, 0), //should print like [v0.1.0.0]
     .init = console_module_init,
     .fini = console_module_fini,
     .open = NULL, // later for fs
@@ -71,8 +71,10 @@ void console_init(void)
 
     // Initialize console window
     console_window_init();
+    cursor_();
 
     shell_print_prompt();
+    cursor_draw();
 }
 
 void console_run(void)
@@ -84,6 +86,7 @@ void console_run(void)
 
 void console_handle_key(char c)
 {
+    cursor_c();
     if (c == '\n') {
         // execute command when enter
         putchar('\n', GFX_WHITE);
@@ -110,6 +113,8 @@ void console_handle_key(char c)
             input_buffer[0] = '\0';
         }
 
+        cursor_reset_blink();
+        //cursor_draw();
         shell_print_prompt();
         return;
     }
@@ -117,6 +122,7 @@ void console_handle_key(char c)
     if (c == '\r') {
         putchar('\n', GFX_WHITE);
         input_buffer[input_pos++] = '\n';
+        cursor_draw();
         return;
     }
 
@@ -135,6 +141,8 @@ void console_handle_key(char c)
                 draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_BG_COLOR);
             }
         }
+        cursor_reset_blink();
+        cursor_draw();
         return;
     }
 
@@ -146,6 +154,8 @@ void console_handle_key(char c)
         input_buffer[input_pos] = '\0';
         putchar(c, GFX_WHITE);
     }
+    cursor_reset_blink();
+    cursor_draw();
 }
 
 void console_execute(const char *input)
