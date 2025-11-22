@@ -21,7 +21,9 @@ typedef struct {
 
 void paging_map_page(limine_hhdm_response_t *hpr, u64 virtual_addr, u64 physical_addr, u64 flags);
 void paging_unmap_page(u64 virtual_addr);
-u64 paging_init(limine_hhdm_response_t *hpr, u64 size);
+void paging_init(limine_hhdm_response_t *hpr);
+u64 map_region_alloc(limine_hhdm_response_t *hpr, u64 virt, u64 size);
 void map_region(limine_hhdm_response_t *hpr, u64 phys, u64 virt, u64 size);
+void map_ulime_region(limine_hhdm_response_t *hpr, u64 phys_start, u64 size);
 
 #endif
