@@ -1,7 +1,6 @@
 #include "timer.h"
 #include "irq.h"
 #include <kernel/include/ports.h>
-#include <kernel/proc/scheduler.h>
 #include <theme/stdclrs.h>
 #include <klib/string/string.h>
 #include <klib/string/print.h>
@@ -34,9 +33,9 @@ void timer_handler(cpu_state_t* state)
     //banner_tick();
 
     // call schedule
-    if (sched_is_enabled()) {
-        sched_tick();
-    }
+    // if (sched_is_enabled()) {
+    //     sched_tick();
+    // }
 }
 
 void timer_init(u32 frequency)
