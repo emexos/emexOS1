@@ -34,10 +34,12 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISODIR) -o $@ 2>/dev/null
 	@echo "------------------------"
-	@echo "[OK] $@ created"
+	@echo "[OK]  $@ created"
 
 # Run/Emulate OS
 run: $(ISO)
+	@echo "[QEMU]running $(OS_NAME).iso "
+	@echo
 	@qemu-system-$(ARCH) -m 512 -cdrom $< -serial stdio 2>&1
 
 # Compilation rules
