@@ -4,7 +4,7 @@
 
 gsession_t *gsession_init(glime_t *glime, u8 *name, u64 width) {
     if (!glime) return NULL;
-    
+
     gsession_t *session = (gsession_t *) glime_create(glime, sizeof(gsession_t));
     if (!session) return NULL;
 
@@ -13,7 +13,7 @@ gsession_t *gsession_init(glime_t *glime, u8 *name, u64 width) {
         session->name[seek] = name[seek];
         seek++;
     }
-    session->name[seek] = '\0';    
+    session->name[seek] = '\0';
 
     session->box.x      = 0;
     session->box.y      = 0;
@@ -57,7 +57,7 @@ int gsession_detach(gworkspace_t *gworkspace, gsession_t *gsession) {
     if (!gworkspace || !gsession) return 1;
     u8 *ssname = gsession->name;
     for (int i = 0; i < gworkspace->sessions_total; i++) {
-        gworkspace_t *session = gworkspace->sessions[i];
+        gsession_t *session = gworkspace->sessions[i];
         u8 *ssname_loop = session->name;
         int seek = 0;
         int eq = 1;
@@ -102,7 +102,7 @@ void gsession_clear(gsession_t *gsession, u32 color) {
         u64 screen_y = session_y + dy;
         for (u32 dx = 0; dx < session_width; dx++) {
             u64 screen_x = session_x + dx;
-            
+
             if (screen_x < screen_width && screen_y < screen_height) {
                 u64 screen_index = screen_y * screen_width + screen_x;
                 fb[screen_index] = color;
@@ -122,13 +122,13 @@ void gsession_put_at_string_dummy(gsession_t *gsession, u8 *string, u32 x, u32 y
 
     u64 screen_height = gsession->gworkspace->glime->glres.height;
     u64 screen_width = gsession->gworkspace->glime->glres.width;
-    
+
     int seek = 0;
     int posx = x;
     int posy = y;
 
     u32 *fb = gsession->gworkspace->glime->framebuffer;
-    
+
     while (string[seek] != '\0') {
         const u8 *glyph = font_8x8[(u8)string[seek]];
 
@@ -139,13 +139,13 @@ void gsession_put_at_string_dummy(gsession_t *gsession, u8 *string, u32 x, u32 y
                     // Calculate absolute screen coordinates
                     u64 screen_x = session_x + posx + dx;
                     u64 screen_y = session_y + posy + dy;
-                    
+
                     // Check bounds against session AND screen
-                    if (screen_x < (session_x + session_width) && 
+                    if (screen_x < (session_x + session_width) &&
                         screen_y < (session_y + session_height) &&
-                        screen_x < screen_width && 
+                        screen_x < screen_width &&
                         screen_y < screen_height) {
-                        
+
                         u64 screen_index = screen_y * screen_width + screen_x;
                         fb[screen_index] = color;
                     }
@@ -158,19 +158,18 @@ void gsession_put_at_string_dummy(gsession_t *gsession, u8 *string, u32 x, u32 y
             posy += 10;
         } else {
             posx += 8;
-            
+
             // Word wrap
-            if (posx + 8 >= session_width) {
+            if (posx + 8 >= (int)session_width) {
                 posx = x;
                 posy += 10;
             }
         }
 
-        if (posy + 8 >= session_height) {
+        if (posy + 8 >= (int)session_height) {
             break;
         }
 
         seek++;
     }
 }
-

@@ -2,10 +2,10 @@
 #define ULIME_H
 
 #include <types.h>
-#include <../mem.h>
-#include <../klime/klime.h>
-#include <../glime/glime.h>
-#include <../phys/physmem.h>
+#include "../mem.h"
+#include "../klime/klime.h"
+#include "../glime/glime.h"
+#include "../phys/physmem.h"
 
 
 typedef struct ulime_proc {
@@ -22,7 +22,7 @@ typedef struct ulime_proc {
 
     u64 phys_heap;
     u64 phys_stack;
-    
+
     struct ulime *ulime;
     struct ulime_proc *next;
     struct ulime_proc *prev;
@@ -59,14 +59,14 @@ typedef struct ulime {
 
     syscall_handler_t syscalls[256];
 
-    u64 internal_pool_base;    
-    u64 internal_pool_size;    
-    u64 internal_pool_used;    
+    u64 internal_pool_base;
+    u64 internal_pool_size;
+    u64 internal_pool_used;
 
     // USER memory space management
-    u64 user_space_base;       
-    u64 user_space_size;       
-    u64 user_space_used; 
+    u64 user_space_base;
+    u64 user_space_size;
+    u64 user_space_used;
 
     //ipc
 } ulime_t;
@@ -74,7 +74,7 @@ typedef struct ulime {
 
 
 #define PROC_CREATED    1
-#define PROC_READY      2  
+#define PROC_READY      2
 #define PROC_RUNNING    3
 #define PROC_BLOCKED    4
 #define PROC_ZOMBIE     5

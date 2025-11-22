@@ -2,8 +2,8 @@
 #define GLIME_H
 
 #include <types.h>
-#include <../mem.h>
-#include <../heap/heap.h>
+#include "../mem.h"
+#include "../heap/heap.h"
 
 typedef struct gbox {
     u64 x;
@@ -80,4 +80,3 @@ void gsession_clear(gsession_t *gsession, u32 color);
 void gsession_put_at_string_dummy(gsession_t *gsession, u8 *string, u32 x, u32 y, u32 color);
 
 #endif
-
