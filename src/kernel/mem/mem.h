@@ -16,6 +16,9 @@ typedef struct limine_framebuffer limine_framebuffer_t;
 #define GRAPHICS_START (HEAP_START + HEAP_SIZE) // Start of graphics memory
 #define GRAPHICS_SIZE 1024 * 1024 * 32
 
+#define ULIME_START (GRAPHICS_START + GRAPHICS_SIZE)
+#define ULIME_META_SIZE (1024 * 1024 * 2) //2mb
+
 #define KLIME_SIZE_SLAB   (1024 * 1024 * 8)
 #define KLIME_SIZE_IO     (1024 * 1024 * 4)
 #define KLIME_SIZE_DMA    (1024 * 1024 * 2)
@@ -28,7 +31,8 @@ typedef struct limine_framebuffer limine_framebuffer_t;
 #define KLIME_OFFSET_DMA       KLIME_OFFSET_IO        + KLIME_SIZE_IO
 #define KLIME_OFFSET_HEAP      KLIME_OFFSET_DMA       + KLIME_SIZE_DMA
 
-#define GLIME_SIZE_META (PAGE_SIZE * 32) //256 kb
+#define GLIME_SIZE_META (PAGE_SIZE * 256) //2mb
+#define GLIME_HEAP_SIZE (GRAPHICS_SIZE - GLIME_SIZE_META) 
 
 #define PAGE_SIZE 4096
 #define FRAME_FREE       0x00    // Frame is available

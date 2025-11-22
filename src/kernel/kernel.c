@@ -25,8 +25,6 @@
 
 //process
 #include "exceptions/panic.h"
-#include "proc/process.h"
-#include "proc/scheduler.h"
 
 //exception/timer
 #include <kernel/exceptions/timer.h>
@@ -65,47 +63,112 @@ void _start(void)
     char buf[128]; //for all string operations
 
     { // MADE BY @TSARAKI (github)
+
         // Initialize mem
         physmem_init(memmap_request.response, hhdm_request.response);
-        u64 phys_start = paging_init(hhdm_request.response, HEAP_SIZE + GRAPHICS_SIZE);
+        paging_init(hhdm_request.response);
+
+        // kernel lifetime
+        u64 phys_klime = map_region_alloc(hhdm_request.response, HEAP_START, HEAP_SIZE);
+        klime_t *klime = klime_init((u64 *)HEAP_START, HEAP_SIZE);
+
+        if (!framebuffer_request.response) {
+            panic("Cant initialize glime limine response NULL");
+        }
+
+        if (framebuffer_request.response->framebuffer_count < 1) {
+            panic("Cant initialize glime limine framebuffer_count 0");
+        }
+
+        u64 phys_glime = map_region_alloc(hhdm_request.response, GRAPHICS_START, GRAPHICS_SIZE);
+
+        limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
+
+        glime_response_t glres;
+        glres.start_framebuffer = (u64 *)fb->address;
+        glres.width  = (u64)fb->width;
+        glres.height = (u64)fb->height;
+        glres.pitch  = (u64)fb->pitch;
+    
+        glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
+
 
         {
-            // kernel lifetime
-            map_region(hhdm_request.response, phys_start, HEAP_START, HEAP_SIZE);
-            klime_t *klime = klime_init((u64 *)HEAP_START, HEAP_SIZE);
+            //Should be the initd or getty or first proccess
+
+            u8 *wsname = (u8 *)"root\0";
+            int err1 = gworkspace_init(glime, wsname, 0);
+            if (err1) {
+                printf("workspace root is not initialized");
+                panic( "workspace root is not initialized");
+            }
+
+            u8 *ssname = (u8 *)"0\0";
+            gsession_t *s0 = gsession_init(glime, ssname, 400);
+            if (!s0) {
+                printf("session 0 is not initialized");
+                panic( "session 0 is not initialized");
+            }
+
+            int err2 = gsession_attach(glime, s0, wsname);
+            if (err2) {
+                printf("session 0 is not attached");
+                panic( "session 0 is not attached");
+            }
+
+            gsession_clear(s0, 0x00808080);
+
+            u8 *sfst = (u8 *)"fst\0";
+            gsession_put_at_string_dummy(s0, sfst, 0, 0, 0x00FFFFFF);
+
+            gworkspace_t *w0 = gworkspace_get_name(glime, wsname);
+            if (!w0) {
+                printf("workspace root is not found");
+                panic( "workspace root is not found");
+            }
+
+            // int err3 = gsession_detach(w0, s0);
+            // if (err3) {
+            //     printf("session 0 is not detached");
+            //     panic( "session 0 is not detached");
+            // }
 
         }
 
-        {
+        glime_commit(glime);
 
-            if (!framebuffer_request.response) {
-                panic("Cant initialize glime limine response NULL");
-            }
+        printf("\n\n");
 
-            if (framebuffer_request.response->framebuffer_count < 1) {
-                panic("Cant initialize glime limine framebuffer_count 0");
-            }
-
-            map_region(hhdm_request.response, phys_start + HEAP_SIZE, GRAPHICS_START, GRAPHICS_SIZE);
-
-            limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
-
-            glime_response_t glres;
-            glres.start_framebuffer = (u64 *)fb->address;
-            glres.width  = (u64)fb->width;
-            glres.height = (u64)fb->height;
-            glres.pitch  = (u64)fb->pitch;
-            glres.bpp    = (u16)fb->bpp;
-
-            glres.memory_model     = (u8)fb->memory_model;
-            glres.red_mask_size    = (u8)fb->red_mask_size;
-            glres.red_mask_shift   = (u8)fb->red_mask_shift;
-            glres.green_mask_size  = (u8)fb->green_mask_size;
-            glres.green_mask_shift = (u8)fb->green_mask_shift;
-            glres.blue_mask_size   = (u8)fb->blue_mask_size;
-            glres.blue_mask_shift  = (u8)fb->blue_mask_shift;
-
+        u64 phys_ulime = map_region_alloc(hhdm_request.response, ULIME_START, ULIME_META_SIZE);
+        ulime_t *ulime = ulime_init(hhdm_request.response, klime, glime, phys_ulime);
+        if (!ulime) {
+            printf("Erorr: ulime is not initialized");
+            panic( "Erorr: ulime is not initialized");
         }
+
+        ulime_init_syscalls(ulime);
+
+        u8 *procname = (u8 *)"fstd\0";
+        ulime_proc_t *p1 = ulime_proc_create(ulime, procname, 0x400000);
+        if (p1) {
+            int errp1 = ulime_proc_mmap(ulime, p1);
+            if (errp1) {
+                printf("Erorr: p1 is not mmaped");
+                panic( "Erorr: p1 is not mmaped");
+            }
+        }
+
+        ulime_proc_test_mem(p1);
+
+        ulime_proc_list(ulime);
+        
+        int errpk = ulime_proc_kill(ulime, p1->pid);
+        if (errpk) {
+            printf("Erorr: p1 is not killed");
+            panic( "Erorr: p1 is not killed");
+        }
+
+        ulime_proc_list(ulime);
     }
 
     //actually not needed but maybe later
@@ -129,9 +192,6 @@ void _start(void)
 
     pci_init();
     //pci will get really useful with xhci/other usb
-    // Initialize process manager and scheduler
-    process_init();
-    sched_init();
 
     module_init();
     // Register driver modules

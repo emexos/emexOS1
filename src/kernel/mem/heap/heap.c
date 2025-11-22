@@ -51,7 +51,6 @@ static int heap_merge_free_blocks(heap_block_t *block) {
 }
 
 u64 *malloc(heap_block_t *heap, u64 size) {
-    printf_debug_u64("in malloc heap ptr is ", (u64)heap);
     if (!heap || size == 0) return NULL;
 
     size = (size + 15) & ~15;
@@ -70,7 +69,6 @@ u64 *malloc(heap_block_t *heap, u64 size) {
         current = current->next;
     }
 
-    printf_debug_u64("in malloc best fit ptr is ", (u64)best_fit);
     if (best_fit == NULL) return NULL;
 
     if (best_fit->size >= size + sizeof(heap_block_t) + 16) {
