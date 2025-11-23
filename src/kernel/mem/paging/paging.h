@@ -26,4 +26,7 @@ u64 map_region_alloc(limine_hhdm_response_t *hpr, u64 virt, u64 size);
 void map_region(limine_hhdm_response_t *hpr, u64 phys, u64 virt, u64 size);
 void map_ulime_region(limine_hhdm_response_t *hpr, u64 phys_start, u64 size);
 
+void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr);
+u64 virt_to_phys(limine_hhdm_response_t *hpr, void* virt_addr);
+
 #endif

@@ -14,6 +14,7 @@ typedef struct gbox {
 
 typedef struct gsession {
     struct gworkspace *gworkspace;
+    struct keyboardrb *kbrb;
     u8 name[64];
     gbox_t box;
 } gsession_t;
@@ -33,6 +34,7 @@ typedef struct gworkspace {
     gsession_t **sessions;
     u64 sessions_len;
     u64 sessions_total;
+    u64 session_active;
 
 } gworkspace_t;
 
@@ -43,6 +45,9 @@ typedef struct glime {
     gworkspace_t **workspaces;
     u64 workspaces_len;
     u64 workspaces_total;
+    u64 workspace_active;
+    u64 dirty_boxes_len;
+    gbox_t *dirty_boxes;
 
     //heap
     heap_block_t *start_heap;
@@ -78,5 +83,30 @@ int gsession_reattach(glime_t *glimek, gsession_t *gsession, u8 *workspace_name)
 
 void gsession_clear(gsession_t *gsession, u32 color);
 void gsession_put_at_string_dummy(gsession_t *gsession, u8 *string, u32 x, u32 y, u32 color);
+void gsession_put_at_char_dummy(gsession_t *gsession, u8 c, u32 x, u32 y, u32 color);
+
+typedef struct key_event {
+    u8 scancode;
+    // by bits
+    // ctrl, shift .. reserved
+    u8 modifiers;
+    u8 pressed;
+} key_event_t;
+
+typedef struct keyboardrb {
+    key_event_t *buf;
+    u32 len;      
+    u32 head;      
+    u32 tail;      
+    u32 count;     
+} keyboardrb_t;
+
+
+int keyboard_put(keyboardrb_t *kbrb, key_event_t event);
+int keyboard_next(keyboardrb_t *kbrb, key_event_t *out);
+u8 keyboard_event_to_char(key_event_t event);
+
+keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count);
+void glime_keyboard_handler(glime_t *glime);
 
 #endif
