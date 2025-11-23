@@ -76,10 +76,6 @@ ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point) {
     if (ulime->ptr_proc_list) ulime->ptr_proc_list->prev = proc;
     ulime->ptr_proc_list = proc;
 
-    BOOTUP_PRINTF("Created process %s:\n", proc->name);
-    BOOTUP_PRINTF("  Stack: %lX (%lu KB)\n", proc->stack_base, proc->stack_size / 1024);
-    BOOTUP_PRINTF("  Heap:  %lX (%lu KB)\n", proc->heap_base, proc->heap_size / 1024);
-
     return proc;
 }
 
@@ -88,13 +84,11 @@ int ulime_proc_kill(ulime_t *ulime, u64 pid) {
     ulime_proc_t *proc = ulime->ptr_proc_list;
     while (proc) {
         if (proc->pid == pid) {
-            BOOTUP_PRINTF("Killing process %s (PID %lu)\n", proc->name, pid);
             proc->state = PROC_ZOMBIE;
             return 0;
         }
         proc = proc->next;
     }
-    BOOTUP_PRINTF("Process with PID %lu not found\n", pid);
     return 1;
 }
 
@@ -103,14 +97,12 @@ int ulime_proc_mmap(ulime_t *ulime, ulime_proc_t *proc) {
     u64 phys_stack_pos = physmem_alloc_to(phys_stack_len);
 
     if (!phys_stack_pos) {
-        BOOTUP_PRINTF("Erorr: proc stack pos is not allocated\n");
         return 1;
     }
 
     u64 phys_heap_len  = proc->heap_size / PAGE_SIZE;
     u64 phys_heap_pos  = physmem_alloc_to(phys_heap_len);
     if (!phys_heap_pos) {
-        BOOTUP_PRINTF("Erorr: proc heap pos is not allocated\n");
         return 1;
     }
 
@@ -121,30 +113,10 @@ int ulime_proc_mmap(ulime_t *ulime, ulime_proc_t *proc) {
     map_region(ulime->hpr, phys_stack_pos, proc->stack_base, proc->stack_size);
     map_region(ulime->hpr, phys_heap_pos, proc->heap_base, proc->heap_size);
 
-    BOOTUP_PRINTF("Mapped process %s memory:\n", proc->name);
-    BOOTUP_PRINTF("  Stack: 0x%lX → 0x%lX\n", proc->stack_base, phys_stack_pos);
-    BOOTUP_PRINTF("  Heap:  0x%lX → 0x%lX\n", proc->heap_base, phys_heap_pos);
-
     proc->phys_stack = phys_stack_pos;
     proc->phys_heap = phys_heap_pos;
 
     return 0;
-}
-
-void ulime_proc_test_mem(ulime_proc_t *proc) {
-    BOOTUP_PRINTF("Testing process memory access...\n");
-
-    // Test stack access
-    u32 *stack_test = (u32*)proc->stack_base;
-    *stack_test = 0x12345678;
-    BOOTUP_PRINTF("  Wrote 0x%X to stack at 0x%lX\n", *stack_test, proc->stack_base);
-
-    // Test heap access
-    u32 *heap_test = (u32*)proc->heap_base;
-    *heap_test = 0xABCDEF00;
-    BOOTUP_PRINTF("  Wrote 0x%X to heap at 0x%lX\n", *heap_test, proc->heap_base);
-
-    BOOTUP_PRINTF("Process memory access test passed!\n");
 }
 
 void ulime_schedule(ulime_t *ulime) {
@@ -165,8 +137,6 @@ void ulime_schedule(ulime_t *ulime) {
     // Mark as running
     if (ulime->ptr_proc_curr->state == PROC_READY) {
         ulime->ptr_proc_curr->state = PROC_RUNNING;
-        BOOTUP_PRINTF("Scheduled process: %s (PID %lu)\n",
-               ulime->ptr_proc_curr->name, ulime->ptr_proc_curr->pid);
     }
 }
 

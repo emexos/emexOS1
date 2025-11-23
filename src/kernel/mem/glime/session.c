@@ -20,6 +20,12 @@ gsession_t *gsession_init(glime_t *glime, u8 *name, u64 width) {
     session->box.width  = width;
     session->box.height = glime->glres.height;
 
+    session->kbrb = glime_keyboard_init(glime, 128);
+    if (!session->kbrb) {
+        glime_free(glime, (u64 *)session);
+        return NULL;
+    }
+
     return session;
 }
 
@@ -45,6 +51,8 @@ int gsession_attach(glime_t *glime, gsession_t *gsession, u8 *workspace_name) {
         if (eq) {
             if (ws->sessions_len > ws->sessions_total) return 1;
             ws->sessions[ws->sessions_len] = gsession;
+            ws->session_active = ws->sessions_len;
+            ws->sessions_len++;
             gsession->gworkspace = ws;
             return 0;
         }
@@ -172,4 +180,42 @@ void gsession_put_at_string_dummy(gsession_t *gsession, u8 *string, u32 x, u32 y
 
         seek++;
     }
+}
+
+void gsession_put_at_char_dummy(gsession_t *gsession, u8 c, u32 x, u32 y, u32 color) {
+    if (!gsession ||!gsession->gworkspace || !gsession->gworkspace->glime) return;
+
+    u64 session_x = gsession->box.x;
+    u64 session_y = gsession->box.y;
+    u64 session_width = gsession->box.width;
+    u64 session_height = gsession->box.height;
+
+    u64 screen_height = gsession->gworkspace->glime->glres.height;
+    u64 screen_width = gsession->gworkspace->glime->glres.width;
+
+    u32 *fb = gsession->gworkspace->glime->framebuffer;
+
+    const u8 *glyph = font_8x8[c];
+
+    for (int dy = 0; dy < 8; dy++) {
+        u8 row = glyph[dy];
+        for (int dx = 0; dx < 8; dx++) {
+            if (row & (1 << (7 - dx))) {
+                // Calculate absolute screen coordinates
+                u64 screen_x = session_x + x + dx;
+                u64 screen_y = session_y + y + dy;
+
+                // Check bounds against session AND screen
+                if (screen_x < (session_x + session_width) &&
+                    screen_y < (session_y + session_height) &&
+                    screen_x < screen_width &&
+                    screen_y < screen_height) {
+
+                    u64 screen_index = screen_y * screen_width + screen_x;
+                    fb[screen_index] = color;
+                }
+            }
+        }
+    }
+
 }

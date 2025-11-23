@@ -20,6 +20,7 @@ int gworkspace_init(glime_t *glime, u8 *name, u64 pos) {
     workspace->pos_y = pos;
     workspace->gap_x = 10;
     workspace->sessions_total = GSESSION_LEN_MAX;
+    workspace->session_active = 0;
 
     workspace->sessions = (gsession_t **) glime_alloc(glime, sizeof(gsession_t *), GSESSION_LEN_MAX); 
     if (!workspace->sessions) {
@@ -28,6 +29,7 @@ int gworkspace_init(glime_t *glime, u8 *name, u64 pos) {
 
     workspace->glime = glime;
     glime->workspaces[glime->workspaces_len] = workspace;
+    glime->workspace_active = glime->workspaces_len;
     glime->workspaces_len++;
 
     return 0;
