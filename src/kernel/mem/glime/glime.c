@@ -6,6 +6,7 @@
 #include <klib/debug/serial.h>
 #include <klib/graphics/theme.h>
 #include <theme/doccr.h>
+#include <kernel/include/ports.h>
 
 glime_t *glime_init(glime_response_t *gr, u64 *ptr, u64 size) {
     if (!gr) {
