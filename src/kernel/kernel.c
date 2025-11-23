@@ -100,91 +100,12 @@ void _start(void)
 
         glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
 
-
-        {
-            //Should be the initd or getty or first proccess
-
-            u8 *wsname = (u8 *)"root\0";
-            int err1 = gworkspace_init(glime, wsname, 0);
-            if (err1) {
-                BOOTUP_PRINTF("workspace root is not initialized");
-                panic( "workspace root is not initialized");
-            }
-
-            u8 *ssname = (u8 *)"0\0";
-            gsession_t *s0 = gsession_init(glime, ssname, 400);
-            if (!s0) {
-                BOOTUP_PRINTF("session 0 is not initialized");
-                panic( "session 0 is not initialized");
-            }
-
-            int err2 = gsession_attach(glime, s0, wsname);
-            if (err2) {
-                BOOTUP_PRINTF("session 0 is not attached");
-                panic( "session 0 is not attached");
-            }
-
-            #if BOOTUP_VISUALS == 1
-                gsession_clear(s0, 0x00000000);
-            #else
-                gsession_clear(s0, 0x00808080); // light gray
-            #endif
-
-            #if BOOTUP_VISUALS == 1
-                u8 *sfst = (u8 *)" \0";
-            #else
-                u8 *sfst = (u8 *)"fst\0";
-            #endif
-            gsession_put_at_string_dummy(s0, sfst, 0, 0, 0x00FFFFFF);
-
-            gworkspace_t *w0 = gworkspace_get_name(glime, wsname);
-            if (!w0) {
-                BOOTUP_PRINTF("workspace root is not found");
-                panic( "workspace root is not found");
-            }
-
-            // int err3 = gsession_detach(w0, s0);
-            // if (err3) {
-            //     BOOTUP_PRINTF("session 0 is not detached");
-            //     panic( "session 0 is not detached");
-            // }
-
-        }
-
-        glime_commit(glime);
-
-        BOOTUP_PRINTF("\n\n");
-
         u64 phys_ulime = map_region_alloc(hhdm_request.response, ULIME_START, ULIME_META_SIZE);
         ulime_t *ulime = ulime_init(hhdm_request.response, klime, glime, phys_ulime);
         if (!ulime) {
             BOOTUP_PRINTF("Erorr: ulime is not initialized");
             panic( "Erorr: ulime is not initialized");
         }
-
-        ulime_init_syscalls(ulime);
-
-        u8 *procname = (u8 *)"fstd\0";
-        ulime_proc_t *p1 = ulime_proc_create(ulime, procname, 0x400000);
-        if (p1) {
-            int errp1 = ulime_proc_mmap(ulime, p1);
-            if (errp1) {
-                BOOTUP_PRINTF("Erorr: p1 is not mmaped");
-                panic( "Erorr: p1 is not mmaped");
-            }
-        }
-
-        ulime_proc_test_mem(p1);
-
-        ulime_proc_list(ulime);
-
-        int errpk = ulime_proc_kill(ulime, p1->pid);
-        if (errpk) {
-            BOOTUP_PRINTF("Erorr: p1 is not killed");
-            panic( "Erorr: p1 is not killed");
-        }
-
-        ulime_proc_list(ulime);
     }
 
     //actually not needed but maybe later (e.g. for testing themes)
