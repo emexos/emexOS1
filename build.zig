@@ -25,9 +25,13 @@ pub fn findCFiles(gpa: std.mem.Allocator) ![][]const u8 {
     defer walker.deinit();
 
     while (try walker.next()) |entry| {
-        if (!std.mem.endsWith(u8, entry.path, ".c")) continue;
-        if (std.mem.endsWith(u8, entry.path, "kernel.c")) continue;
-        try ret.append(gpa, try std.fmt.allocPrint(gpa, "src/{s}", .{entry.path}));
+        if (std.mem.endsWith(u8, entry.path, ".c")) {
+            if (std.mem.endsWith(u8, entry.path, "kernel.c")) continue;
+            try ret.append(gpa, try std.fmt.allocPrint(gpa, "src/{s}", .{entry.path}));
+        }
+        if (std.mem.endsWith(u8, entry.path, ".cpp")) {
+            try ret.append(gpa, try std.fmt.allocPrint(gpa, "src/{s}", .{entry.path}));
+        }
     }
 
     return try ret.toOwnedSlice(gpa);
@@ -37,6 +41,7 @@ pub fn findAllDirs(gpa: std.mem.Allocator) ![][]const u8 {
     var ret = try std.ArrayList([]const u8).initCapacity(gpa, 10);
     try ret.append(gpa, ".");
     try ret.append(gpa, "limine");
+    try ret.append(gpa, "shared");
     var root = try std.fs.cwd().openDir(".", .{ .iterate = true });
     defer root.close();
 
