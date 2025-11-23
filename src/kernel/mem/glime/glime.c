@@ -4,21 +4,23 @@
 #include <klib/string/string.h>
 #include <klib/memory/main.h>
 #include <klib/debug/serial.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 glime_t *glime_init(glime_response_t *gr, u64 *ptr, u64 size) {
     if (!gr) {
-        printf("ERROR: Invlalid glime init glime response ptr is null");
+        BOOTUP_PRINTF("ERROR: Invlalid glime init glime response ptr is null");
         panic( "ERROR: Invlalid glime init glime response ptr is null");
     }
 
     if (!ptr) {
-        printf("ERROR: Invlalid glime init ptr to memory is null");
+        BOOTUP_PRINTF("ERROR: Invlalid glime init ptr to memory is null");
         panic( "ERROR: Invlalid glime init ptr to memory is null");
     }
 
     u64 framebuffer_len = sizeof(u32) * gr->width * gr->height;
     if (size < sizeof(heap_block_t) + GLIME_SIZE_META + framebuffer_len) {
-        printf("ERROR: Invlalid glime init size lt needed");
+        BOOTUP_PRINTF("ERROR: Invlalid glime init size lt needed");
         panic( "ERROR: Invlalid glime init size lt needed");
     }
 
@@ -43,15 +45,15 @@ glime_t *glime_init(glime_response_t *gr, u64 *ptr, u64 size) {
     glime->framebuffer_len = framebuffer_len;
     glime->framebuffer = (u32 *)glime_create(glime, framebuffer_len);
     if (!glime->framebuffer) {
-        printf("ERROR: Invlalid glime init framebuffer is not initialized");
+        BOOTUP_PRINTF("ERROR: Invlalid glime init framebuffer is not initialized");
         panic( "ERROR: Invlalid glime init framebuffer is not initialized");
     }
 
-    //@Temp 
+    //@Temp
     u64 workspaces_total = 1;
     glime->workspaces = (gworkspace_t **) glime_alloc(glime, sizeof(gworkspace_t), workspaces_total);
     if (!glime->workspaces) {
-        printf("ERROR: Invlalid glime init workspaces is not initialized");
+        BOOTUP_PRINTF("ERROR: Invlalid glime init workspaces is not initialized");
         panic( "ERROR: Invlalid glime init workspaces is not initialized");
     }
 
@@ -142,4 +144,3 @@ u64 glime_get_used_size(glime_t *glime) {
 u64 glime_get_free_size(glime_t *glime) {
     return glime->total_heap - glime->used_heap;
 }
-

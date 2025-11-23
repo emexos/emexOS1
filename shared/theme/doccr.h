@@ -4,9 +4,21 @@
 //
 
 //bootup
+#define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
+// macros
+#if BOOTUP_VISUALS == 0
+    #define BOOTUP_PRINTF(fmt, ...) printf(fmt, ##__VA_ARGS__)
+    #define BOOTUP_PRINT(msg, col) print(msg, col)
+    #define BOOTUP_PRINT_INT(num, col) printInt(num, col)
+#else
+    #define BOOTUP_PRINTF(fmt, ...) ((void)0)
+    #define BOOTUP_PRINT(msg, col) ((void)0)
+    #define BOOTUP_PRINT_INT(num, col) ((void)0)
+#endif
+//screen:
 #define BOOTSCREEN_BG_COLOR GFX_ST_BLACK
 #define BOOTSCREEN_COLOR GFX_ST_WHITE
-#define LOGO_SCALE 6
+#define LOGO_SCALE 1
 #define BOOTUP_COLOR_THEME STD
 
 //console

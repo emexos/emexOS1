@@ -2,6 +2,8 @@
 #include <kernel/include/ports.h>
 #include <klib/string/string.h>
 #include <theme/stdclrs.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 #define MAX_PCI_DEVICES 32
 
@@ -40,15 +42,15 @@ void pci_init(void) {
 // because in the kernel its used before this causes random character drawing
 
 
-    print("[PCI] ", GFX_GRAY_70);
+    BOOTUP_PRINT("[PCI] ", GFX_GRAY_70);
 
     device_count = 0;
     pci_scan_bus(0);
 
-    print("found: ", GFX_ST_WHITE);
+    BOOTUP_PRINT("found: ", GFX_ST_WHITE);
     str_append_uint(buf, pci_get_device_count());
-    print(buf, GFX_ST_YELLOW);
-    print(" device(s)\n", GFX_ST_WHITE);
+    BOOTUP_PRINT(buf, GFX_ST_YELLOW);
+    BOOTUP_PRINT(" device(s)\n", GFX_ST_WHITE);
 }
 
 int pci_get_device_count(void) {

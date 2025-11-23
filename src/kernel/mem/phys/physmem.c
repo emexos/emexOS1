@@ -3,6 +3,8 @@
 #include <kernel/exceptions/panic.h>
 #include <klib/memory/main.h>
 #include <klib/debug/serial.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 static struct physmem_pageframe *physmem_pageframes = NULL;
 static u64 physmem_total = 0;
