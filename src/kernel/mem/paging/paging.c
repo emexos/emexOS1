@@ -15,6 +15,15 @@ extern u8 _kernel_end[];
 
 static page_table_t *kernel_pml4 = NULL;
 
+inline void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr) {
+    return (void*)(phys_addr + hpr->offset);
+}
+
+// Convert kernel virtual address to physical address using HHDM  
+inline u64 virt_to_phys(limine_hhdm_response_t *hpr, void* virt_addr) {
+    return (u64)virt_addr - hpr->offset;
+}
+
 /// Summary
 /// 2025/11/17 tsaraki
 /// so paging of a 4096 bytes

@@ -60,6 +60,10 @@ glime_t *glime_init(glime_response_t *gr, u64 *ptr, u64 size) {
     glime->workspaces_len = 0;
     glime->workspaces_total = workspaces_total ;
 
+    //@Temp
+    glime->dirty_boxes = (gbox_t *) glime_alloc(glime, sizeof(gbox_t), 256);
+    glime->dirty_boxes_len = 0;
+
     return glime;
 }
 
@@ -93,11 +97,36 @@ glime_t *glime_init(glime_response_t *gr, u64 *ptr, u64 size) {
 //     return 1;
 // }
 
+void glime_dirtybox_append(glime_t *glime, u64 x, u64 y, u64 width, u64 height) {
+    gbox_t db = {
+        .x = x,
+        .y = y,
+        .width = width,
+        .height = height,
+    };
+
+    glime->dirty_boxes[glime->dirty_boxes_len] = db;
+    glime->dirty_boxes_len++;
+}
+
 void glime_commit(glime_t *glime) {
     u32 *fb = (u32 *)glime->glres.start_framebuffer;
 
-    //@TODO: dirty flags
-    memcpy(fb, glime->framebuffer, glime->framebuffer_len);
+    u64 pitch_pixels = glime->glres.pitch / sizeof(u32);
+
+    //clear all
+
+    for (int i = 0; i < glime->dirty_boxes_len; i++) {
+        gbox_t db = glime->dirty_boxes[i];
+        for (int y = 0; y < db.height; y++) {
+            u32 src_offset = (db.y + y) * glime->glres.width + db.x;
+            u32 dst_offset = (db.y + y) * pitch_pixels + db.x;
+            memset(&fb[dst_offset], 0, db.width * sizeof(u32));
+            memcpy(&fb[dst_offset], &glime->framebuffer[src_offset], db.width * sizeof(u32));
+        }
+    }
+
+    glime->dirty_boxes_len = 0;
 }
 
 u64 *glime_create(glime_t *glime, u64 size) {
@@ -143,4 +172,34 @@ u64 glime_get_used_size(glime_t *glime) {
 
 u64 glime_get_free_size(glime_t *glime) {
     return glime->total_heap - glime->used_heap;
+}
+
+// @TODO: should be different loop or fn or else
+void glime_keyboard_handler(glime_t *glime) {
+    u8 last = 0;
+    while (1) {
+        if ((inb(0x64) & 1) == 0) continue;
+        u8 scancode = inb(0x60);
+        if (scancode == last) continue;
+        last = scancode;
+
+        key_event_t event = {
+            .scancode = scancode & 0x7F,
+            .pressed = !(scancode & 0x80),
+            .modifiers = 0,
+        };
+
+        gworkspace_t *ws = glime->workspaces[glime->workspace_active];
+        gsession_t *s = ws->sessions[ws->session_active];
+        keyboard_put(s->kbrb, event);
+        u8 c = keyboard_event_to_char(event);
+        // printf("get char %i\n", c);
+
+        //@TODO: something else
+        gsession_clear(s, 0x00000000);
+        glime_dirtybox_append(glime, s->box.x, s->box.y, 8, 8);
+        gsession_put_at_char_dummy(s, c, 0, 0, 0x00FFFFFF);
+
+        glime_commit(glime);
+    }
 }

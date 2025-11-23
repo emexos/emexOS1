@@ -73,7 +73,7 @@ pub fn build(b: *std.Build) !void {
             "git",
             "clone",
             "https://codeberg.org/Limine/Limine.git",
-            "--branch=v10.x-binary",
+            "--branch=v10.3.0-binary",
             "--depth=1",
             liminePath,
         });
@@ -294,6 +294,7 @@ pub fn build(b: *std.Build) !void {
         isoName,
         "-serial",
         "stdio",
+        "-no-reboot",
     });
     qemuRun.step.dependOn(isoBuildStep);
 
