@@ -1,6 +1,8 @@
 #include "cpu.h"
 #include <klib/string/string.h>
 #include <theme/stdclrs.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 static char cpu_vendor[13] = {0};
 static char cpu_brand[49] = {0};
@@ -14,7 +16,7 @@ static void cpuid(u32 code, u32 *a, u32 *b, u32 *c, u32 *d) {
 }
 
 void cpu_detect(void) {
-    print("[CPU] ", GFX_GRAY_70);
+    BOOTUP_PRINT("[CPU] ", GFX_GRAY_70);
 
     u32 eax, ebx, ecx, edx;
 
@@ -59,9 +61,9 @@ void cpu_detect(void) {
     } else {
         cpu_brand[0] = '\0';
     }
-    print("detected: ", GFX_ST_WHITE);
-    print(cpu_brand, GFX_ST_WHITE);
-    print("\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("detected: ", GFX_ST_WHITE);
+    BOOTUP_PRINT(cpu_brand, GFX_ST_WHITE);
+    BOOTUP_PRINT("\n", GFX_ST_WHITE);
 }
 
 const char* cpu_get_vendor(void) {

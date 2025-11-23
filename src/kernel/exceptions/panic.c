@@ -1,23 +1,26 @@
 #include "panic.h"
 #include <klib/graphics/graphics.h>
 #include <theme/doccr.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 __attribute__((noreturn)) void panic(const char *message)
 {
+    setcontext(THEME_PANIC);
     clear(PANICSCREEN_BG_COLOR);
     // Disable interrupts
     __asm__ volatile("cli");
 
-    print("\n", PANICSCREEN_COLOR);
-    print("!!! --- KERNEL PANIC --- !!!", PANICSCREEN_COLOR_R);
-    print("\n", PANICSCREEN_COLOR);
+    print("\n", white());
+    print("!!! --- KERNEL PANIC --- !!!", red());
+    print("\n", white());
 
     if (message) {
-        print(message, PANICSCREEN_COLOR_R);
-        print("\n", PANICSCREEN_COLOR);
+        print(message, red());
+        print("\n", white());
     }
 
-    print("\nSystem halted.", PANICSCREEN_COLOR);
+    print("\nSystem halted.", white());
 
     // HALT
     while(1) {
@@ -27,20 +30,21 @@ __attribute__((noreturn)) void panic(const char *message)
 
 __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *message)
 {
+    setcontext(THEME_PANIC);
     clear(PANICSCREEN_BG_COLOR);
     // Disable interrupts
     __asm__ volatile("cli");
 
-    print("\n", PANICSCREEN_COLOR);
-    print("!!! PANIC !!!", PANICSCREEN_COLOR_R);
-    print("\n", PANICSCREEN_COLOR);
+    print("\n", white());
+    print("!!! PANIC !!!", red());
+    print("\n", white());
 
     if (message) {
         char buf[128];
         str_copy(buf, "Exception: ");
         str_append(buf, message);
-        print(buf, PANICSCREEN_COLOR_R);
-        print("\n", PANICSCREEN_COLOR);
+        print(buf, red());
+        print("\n", white());
     }
 
     // Print exception details
@@ -49,24 +53,24 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
     str_append_uint(buf, (u32)state->int_no);
     str_append(buf, " ERR: ");
     str_append_uint(buf, (u32)state->err_code);
-    print(buf, PANICSCREEN_COLOR);
-    print("\n", PANICSCREEN_COLOR);
+    print(buf, white());
+    print("\n", white());
 
     // Print RIP
     str_copy(buf, "RIP: 0x");
     str_append_uint(buf, (u32)(state->rip >> 32));
     str_append_uint(buf, (u32)(state->rip & 0xFFFFFFFF));
-    print(buf, PANICSCREEN_COLOR);
-    print("\n", PANICSCREEN_COLOR);
+    print(buf, white());
+    print("\n", white());
 
     // Print RSP
     str_copy(buf, "RSP: 0x");
     str_append_uint(buf, (u32)(state->rsp >> 32));
     str_append_uint(buf, (u32)(state->rsp & 0xFFFFFFFF));
-    print(buf, PANICSCREEN_COLOR);
-    print("\n\n", PANICSCREEN_COLOR);
+    print(buf, white());
+    print("\n\n", white());
 
-    print("System halted.", PANICSCREEN_COLOR);
+    print("System halted.", white());
 
     // HALT
     while(1) {

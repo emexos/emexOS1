@@ -5,7 +5,7 @@
 build/
 
 # Libraries/Dependencies
-include/
+include/limine
 
 .DS_Store
 **/.DS_Store
