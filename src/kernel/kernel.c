@@ -65,7 +65,6 @@ void _start(void)
     printf("==                                          ==\n");
     printf("==============================================\n");
 
-    delay(500);
     clear(bg());
 
     char buf[128]; //for all string operations
@@ -157,7 +156,7 @@ void _start(void)
 
     BOOTUP_PRINT("[CONSOLE] ", GFX_GRAY_70);
     BOOTUP_PRINT("starting console...\n", white());
-        hcf();
+    //    hcf();
     // delay(500); // for testing verbose/silent boot
     clear(bg());
     // Initialize console and halt CPU

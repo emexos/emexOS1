@@ -40,7 +40,14 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 run: $(ISO)
 	@echo "[QEMU]running $(OS_NAME).iso "
 	@echo
-	@qemu-system-$(ARCH) -m 512 -cdrom $< -serial stdio 2>&1
+	@qemu-system-x86_64 \
+		-M q35 \
+		-cpu qemu64 \
+		-m 512 \
+		-drive if=pflash,format=raw,readonly=on,file=/opt/homebrew/Cellar/qemu/10.1.0/share/qemu/edk2-x86_64-code.fd \
+		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
+		-cdrom $< \
+		-serial stdio 2>&1
 
 # Compilation rules
 $(BUILD_DIR)/%.c.o: %.c
