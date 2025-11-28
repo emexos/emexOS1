@@ -2,12 +2,15 @@
 #define PCI_H
 
 #include <types.h>
+#include "device.h"
+#include "config.h"
+#include "express.h"
 
 // all ports
 #define PCI_CONFIG_ADDRESS 0xCF8
 #define PCI_CONFIG_DATA    0xCFC
 
-//TODO:
+/*//TODO:
 // maybe move these ports to include/pci.h
 // but idk if i should do that
 
@@ -19,9 +22,8 @@ typedef struct {
     u8 device;
     u8 function;
 } pci_device_t;
-
+*/
 void pci_init(void);
-u32 pci_read(u8 bus, u8 device, u8 function, u8 offset);
 int pci_get_device_count(void);
 pci_device_t* pci_get_device(int index);
 

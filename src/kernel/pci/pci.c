@@ -1,39 +1,11 @@
 #include "pci.h"
-#include <kernel/include/ports.h>
+#include "device.h"
+#include "config.h"
+#include "express.h"
 #include <klib/string/string.h>
 #include <theme/stdclrs.h>
 #include <klib/graphics/theme.h>
 #include <theme/doccr.h>
-
-#define MAX_PCI_DEVICES 32
-
-static pci_device_t devices[MAX_PCI_DEVICES];
-static int device_count = 0;
-
-u32 pci_read(u8 bus, u8 device, u8 function, u8 offset) {
-    u32 address = (u32)((bus << 16) | (device << 11) |
-                        (function << 8) | (offset & 0xFC) | 0x80000000);
-
-    outl(PCI_CONFIG_ADDRESS, address);
-    return inl(PCI_CONFIG_DATA);
-}
-
-static void pci_scan_bus(u8 bus) {
-    for (u8 device = 0; device < 32; device++) {
-        u32 vendor = pci_read(bus, device, 0, 0);
-        u16 vendor_id = vendor & 0xFFFF;
-        u16 device_id = (vendor >> 16) & 0xFFFF;
-
-        if (vendor_id != 0xFFFF && device_count < MAX_PCI_DEVICES) {
-            devices[device_count].vendor_id = vendor_id;
-            devices[device_count].device_id = device_id;
-            devices[device_count].bus = bus;
-            devices[device_count].device = device;
-            devices[device_count].function = 0;
-            device_count++;
-        }
-    }
-}
 
 void pci_init(void) {
     char buf[64];
@@ -41,25 +13,34 @@ void pci_init(void) {
 // before pci_get_device_count();
 // because in the kernel its used before this causes random character drawing
 
-
     BOOTUP_PRINT("[PCI] ", GFX_GRAY_70);
+    BOOTUP_PRINT("Init PCI/PCIe \n", GFX_ST_WHITE);
 
-    device_count = 0;
-    pci_scan_bus(0);
+    pci_device_init();
 
+
+    int count = pci_device_get_count();
+
+    // count PCIe devices
+    int pcie_count = 0;
+    for (int i = 0; i < count; i++) {
+        pci_device_t *dev = pci_device_get(i);
+        if (dev && pcie_is_device(dev->bus, dev->device, dev->function)) {
+            pcie_count++;
+        }
+    }
+    BOOTUP_PRINT("[PCI] ", GFX_GRAY_70);
     BOOTUP_PRINT("found: ", GFX_ST_WHITE);
-    str_append_uint(buf, pci_get_device_count());
+    str_append_uint(buf, pcie_count);
     BOOTUP_PRINT(buf, GFX_ST_YELLOW);
     BOOTUP_PRINT(" device(s)\n", GFX_ST_WHITE);
+
 }
 
 int pci_get_device_count(void) {
-    return device_count;
+    return pci_device_get_count();
 }
 
 pci_device_t* pci_get_device(int index) {
-    if (index >= 0 && index < device_count) {
-        return &devices[index];
-    }
-    return NULL;
+    return pci_device_get(index);
 }
