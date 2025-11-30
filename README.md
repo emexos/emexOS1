@@ -56,5 +56,6 @@ Now that you have all the required build dependencies installed, you can finally
 |-----------------|-----------------|------------------------------|
 
 ##
- - README.md by Voxi0 & emexSW
+ - README.md by Voxi0 & emexSW & Bi Moz
+ - emexOS project started by emexSW
 ##
