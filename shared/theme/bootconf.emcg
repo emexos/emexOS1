@@ -1,0 +1,76 @@
+include stdio; # printf, print, printInt
+include stdclrs;
+
+#
+# emexOS boot configuration
+# bootconf.emcg (emex config)
+#
+
+# bootup visuals
+BOOTUP_VISUALS 0; # verbose boot == 0, silent boot == 1
+BOOTUP_COLOR_THEME STD
+BOOTSCREEN_BG_COLOR GFX_ST_BLACK
+BOOTSCREEN_COLOR GFX_ST_WHITE
+LOGO_SCALE 1
+
+# macros
+if BOOTUP_VISUALS == 0:
+    BOOTUP_PRINTF(fmt, ...) == printf(fmt, ##__VA_ARGS__);
+    BOOTUP_PRINT(msg, col) == (__c__ #inline c
+    {
+        do {
+            print(msg, col);
+            if (boot_log_fd >= 0) fs_write(boot_log_fd, msg, str_len(msg));
+        } while(0)
+
+    }__c__);
+
+    BOOTUP_PRINT_INT(num, col) == (__c__
+    {
+        do {
+            printInt(num, col);
+            if (boot_log_fd >= 0) {
+                char buf[12];
+                buf[0] = '\0';
+                str_append_uint(buf, (u32)num);
+                fs_write(boot_log_fd, buf, str_len(buf));
+            }
+        } while(0);
+    }__c__);
+
+else:
+    BOOTUP_PRINTF(fmt, ...) == ((void)0);
+
+    BOOTUP_PRINT(msg, col) == (__c__ #inline c
+    {
+        do {
+            printf("%s", msg);
+            if (boot_log_fd >= 0) fs_write(boot_log_fd, msg, str_len(msg));
+        } while(0)
+
+    }__c__);
+
+        BOOTUP_PRINT_INT(num, col) == (__c__
+    {
+        do {
+            printInt(num, col);
+            if (boot_log_fd >= 0) {
+                char buf[12];
+                buf[0] = '\0';
+                str_append_uint(buf, (u32)num);
+                fs_write(boot_log_fd, buf, str_len(buf));
+            }
+        } while(0);
+    }__c__);
+end;
+
+# console
+CONSOLESCREEN_BG_COLOR GFX_BG
+CONSOLESCREEN_COLOR GFX_WHITE
+CONSOLE_COLOR_THEME FLU
+
+# panic screen
+PANICSCREEN_BG_COLOR GFX_ST_BLUE
+PANICSCREEN_COLOR GFX_ST_WHITE
+PANICSCREEN_COLOR_R GFX_ST_RED
+PANIC_COLOR_THEME STD

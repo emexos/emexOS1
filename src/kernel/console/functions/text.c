@@ -85,7 +85,10 @@ FHDR(cmd_help)
         print("  calendar       - show date & time\n", GFX_WHITE);
         print("  uptime         - displays the uptime\n", GFX_WHITE);
         print("  dofetch        - emexOS system fetch\n", GFX_WHITE);
-        print("[SYSTEM]\n", GFX_YELLOW);
+        print("  cat <file>     - show file content\n", GFX_WHITE);
+        print("  shut           - shuts down the system\n", GFX_WHITE);
+        print("  ls <path<      - list directory contents\n", GFX_WHITE);
+        //print("[SYSTEM]\n", GFX_YELLOW);
         print("  meminfo        - heap memory information\n", GFX_WHITE);
         print("  modules        - shows all modules in fs\n", GFX_WHITE);
         print("Type 'help <command>' for details", GFX_GRAY_50);

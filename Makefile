@@ -13,7 +13,7 @@ fetchDeps:
 	@mkdir -p $(INCLUDE_DIR)
 	@echo "[DEPS] Fetching Limine"
 	@rm -rf $(INCLUDE_DIR)/limine
-	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(INCLUDE_DIR)/limine
+	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
 
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
@@ -28,6 +28,8 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@cp $< $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
+	@mkdir -p $(ISODIR)/boot
+	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot boot/limine/limine-uefi-cd.bin \
@@ -44,7 +46,7 @@ run: $(ISO)
 		-M q35 \
 		-cpu qemu64 \
 		-m 512 \
-		-drive if=pflash,format=raw,readonly=on,file=/opt/homebrew/Cellar/qemu/10.1.0/share/qemu/edk2-x86_64-code.fd \
+		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
 		-cdrom $< \
 		-serial stdio 2>&1

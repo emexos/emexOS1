@@ -1,6 +1,5 @@
 #include "graphics.h"
 #include <kernel/module/module.h>
-#include <fonts/font_8x8.h>
 #include <klib/debug/serial.h>
 
 //donnot put static before the uints!

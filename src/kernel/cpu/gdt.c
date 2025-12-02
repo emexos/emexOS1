@@ -46,7 +46,7 @@ static void tss_set_entry(void)
 void gdt_init(void)
 {
     BOOTUP_PRINT("[GDT] ", GFX_GRAY_70);
-    BOOTUP_PRINT("init (Global Descriptor Table)\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("init (Global Descriptor Table)\n", white());
     // Setup GDT pointer
     gdt_ptr.limit = sizeof(gdt) - 1;
     gdt_ptr.base = (u64)&gdt;

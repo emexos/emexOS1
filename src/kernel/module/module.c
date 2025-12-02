@@ -9,7 +9,7 @@ static int module_count = 0;
 
 void module_init(void) {
     BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
-    BOOTUP_PRINT("init module system\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("init module system\n", white());
     for (int i = 0; i < MAX_MODULES; i++) {
         modules[i] = NULL;
     }

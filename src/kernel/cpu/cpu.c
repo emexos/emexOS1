@@ -151,17 +151,21 @@ void cpu_detect(void) {
     cpuid(0x80000008, &eax, &ebx, &ecx, &edx);
     cpu_info.cores = (ecx & 0xFF) + 1;
 
-    BOOTUP_PRINT("detected: ", GFX_ST_WHITE);
-    BOOTUP_PRINT(cpu_info.brand, GFX_ST_WHITE);
-    BOOTUP_PRINT("\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("detected: ", white());
+    BOOTUP_PRINT(cpu_info.brand, white());
+    BOOTUP_PRINT("\n", white());
 
-    BOOTUP_PRINT("  Vendor: ", GFX_ST_WHITE);
-    BOOTUP_PRINT(cpu_info.vendor, GFX_ST_WHITE);
-    BOOTUP_PRINT("\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("  Vendor: ", white());
+    BOOTUP_PRINT(cpu_info.vendor, white());
+    BOOTUP_PRINT("\n", white());
 
-    BOOTUP_PRINT("  Cores: ", GFX_ST_WHITE);
-    BOOTUP_PRINT_INT(cpu_info.cores, GFX_ST_WHITE);
-    BOOTUP_PRINT("\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("  Cores: ", white());
+    BOOTUP_PRINT_INT(cpu_info.cores, white());
+    BOOTUP_PRINT("\n", white());
+
+    BOOTUP_PRINT("  Threads: ", white());
+    BOOTUP_PRINT_INT(cpu_info.threads, white());
+    BOOTUP_PRINT("\n", white());
 }
 
 const char* cpu_get_vendor(void) {

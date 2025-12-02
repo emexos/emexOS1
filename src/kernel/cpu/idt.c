@@ -34,7 +34,7 @@ void idt_load(void)
 void idt_init(void)
 {
     BOOTUP_PRINT("[IDT] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init interrupts\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("Init interrupts\n", white());
     // Clear IDT
     memset(&idt, 0, sizeof(idt));
 
