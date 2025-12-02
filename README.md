@@ -40,7 +40,12 @@ Now that you have all the required build dependencies installed, you can finally
 | echo            | echo text       | text                         |
 | clear           | clear           | [clears screen]              |
 | help <command>  | help echo       | [help menu/specific command] |
-| fsize           | fsize 2         | [font size goes up to 2]     |
+| scale           | scale 3         | [font size from 1 to 4]      |
+| date            | date            | [shows current date]         |
+| calendar        | calendar        | [shows current date & time]  |
+| time            | time            | [shows current time]         |
+| uptime          | uptime          | [shows current uptime]       |
+|-----------------|-----------------|------------------------------|
 
 ### System
 
@@ -51,6 +56,7 @@ Now that you have all the required build dependencies installed, you can finally
 | date            | date            | [shows current date]         |
 
 ##
- - README.md by Voxi0 & emexSW
+ - README.md by Voxi0 & emexSW & Bi Moz
+ - emexOS project started by emexSW
 ##
 

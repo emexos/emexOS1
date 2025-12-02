@@ -15,6 +15,15 @@ extern u8 _kernel_end[];
 
 static page_table_t *kernel_pml4 = NULL;
 
+inline void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr) {
+    return (void*)(phys_addr + hpr->offset);
+}
+
+// Convert kernel virtual address to physical address using HHDM  
+inline u64 virt_to_phys(limine_hhdm_response_t *hpr, void* virt_addr) {
+    return (u64)virt_addr - hpr->offset;
+}
+
 /// Summary
 /// 2025/11/17 tsaraki
 /// so paging of a 4096 bytes
@@ -82,15 +91,19 @@ void paging_map_page(
     asm volatile("invlpg (%0)" : : "r" (virtual_addr) : "memory");
 }
 
-u64 paging_init(limine_hhdm_response_t *hpr, u64 size) {
+void paging_init(limine_hhdm_response_t *hpr) {
     u64 current_cr3;
     asm volatile("mov %%cr3, %0" : "=r" (current_cr3));
 
     kernel_pml4 = (page_table_t*)((current_cr3 & 0x000FFFFFFFFFF000) + hpr->offset);
+}
 
+u64 map_region_alloc(limine_hhdm_response_t *hpr, u64 virt, u64 size) {
     u64 phys_frames = size / PAGE_SIZE;
     u64 phys = physmem_alloc_to(phys_frames);
     if  (!phys) panic("ERROR: Could not allocate physmem in lime request");
+
+    map_region(hpr, phys, virt, size);
 
     return phys;
 }
@@ -106,4 +119,49 @@ void map_region(limine_hhdm_response_t *hpr, u64 phys, u64 virt, u64 size) {
     }
 
     memset((u64 *)virt, 0, size);
+}
+
+int is_page_mapped(limine_hhdm_response_t *hpr, u64 virtual_addr) {
+    u64 pml4_index = (virtual_addr >> 39) & 0x1FF;
+    u64 pdp_index  = (virtual_addr >> 30) & 0x1FF;
+    u64 pd_index   = (virtual_addr >> 21) & 0x1FF;
+    u64 pt_index   = (virtual_addr >> 12) & 0x1FF;
+
+    if (!(kernel_pml4->entries[pml4_index] & PTE_PRESENT)) return 0;
+
+    u64 pdpt_phys = kernel_pml4->entries[pml4_index] & 0x000FFFFFFFFFF000;
+    page_table_t* pdpt = (page_table_t*)(pdpt_phys + hpr->offset);
+
+    if (!(pdpt->entries[pdp_index] & PTE_PRESENT)) return 0;
+
+    u64 pd_phys = pdpt->entries[pdp_index] & 0x000FFFFFFFFFF000;
+    page_table_t* pd = (page_table_t*)(pd_phys + hpr->offset);
+
+    if (!(pd->entries[pd_index] & PTE_PRESENT)) return 0;
+
+    u64 pt_phys = pd->entries[pd_index] & 0x000FFFFFFFFFF000;
+    page_table_t* pt = (page_table_t*)(pt_phys + hpr->offset);
+
+    return (pt->entries[pt_index] & PTE_PRESENT) != 0;
+}
+
+void map_ulime_region(limine_hhdm_response_t *hpr, u64 phys_start, u64 size) {
+    if (ULIME_START % PAGE_SIZE != 0) {
+        panic("ULIME_START not page aligned!");
+    }
+
+    if (phys_start % PAGE_SIZE != 0) {
+        panic("ULime physical start not page aligned!");
+    }
+
+    u64 pages = (size + PAGE_SIZE - 1) / PAGE_SIZE;
+
+    for (u64 i = 0; i < pages; i++) {
+        u64 virt_addr = ULIME_START + (i * PAGE_SIZE);
+        u64 phys_addr = phys_start + (i * PAGE_SIZE);
+
+        if (!is_page_mapped(hpr, virt_addr)) {
+            paging_map_page(hpr, virt_addr, phys_addr, PTE_PRESENT | PTE_WRITABLE);
+        }
+    }
 }

@@ -1,11 +1,12 @@
 #include "timer.h"
 #include "irq.h"
 #include <kernel/include/ports.h>
-#include <kernel/proc/scheduler.h>
 #include <theme/stdclrs.h>
 #include <klib/string/string.h>
 #include <klib/string/print.h>
 #include <drivers/cmos/cmos.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 // using PIT (8254)
 //
@@ -34,9 +35,9 @@ void timer_handler(cpu_state_t* state)
     //banner_tick();
 
     // call schedule
-    if (sched_is_enabled()) {
-        sched_tick();
-    }
+    // if (sched_is_enabled()) {
+    //     sched_tick();
+    // }
 }
 
 void timer_init(u32 frequency)
@@ -80,8 +81,8 @@ void timer_init(u32 frequency)
     //TODO:
     // its not exactly uptime because everything before imer_set_boot_time() doesnt get count
     // so we could set it to +50 milliseconds or something so its a bit more realistic i think...
-    print("[TIME] ", GFX_GRAY_70);
-    print("Init timer (", GFX_ST_WHITE);
+    BOOTUP_PRINT("[TIME] ", GFX_GRAY_70);
+    BOOTUP_PRINT("Init timer (", GFX_ST_WHITE);
 }
 
 // reg callback
@@ -155,8 +156,8 @@ u64 timer_get_milliseconds(void)
 
 void timer_set_boot_time(void) {
     boot_timestamp = timer_ticks;
-    print("[TIME] ", GFX_GRAY_70);
-    print("started uptime now...\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("[TIME] ", GFX_GRAY_70);
+    BOOTUP_PRINT("started uptime now...\n", GFX_ST_WHITE);
 }
 
 u64 timer_get_uptime_seconds(void)
@@ -179,8 +180,8 @@ void timer_print_uptime(void)
     str_append_uint(debug, (u32)boot_timestamp);
     str_append(d, ",diff=");
     str_append_uint(d, (u32)(timer_ticks - boot_timestamp));
-    print(d, GFX_WHITE;
-    print("\n", GFX_WHITE);*/
+    BOOTUP_PRINT(d, GFX_WHITE;
+    BOOTUP_PRINT("\n", GFX_WHITE);*/
 
     u64 uptime = timer_get_uptime_seconds();
 
@@ -198,7 +199,7 @@ void timer_print_uptime(void)
         str_append(buf, " day");
         if (days != 1) str_append(buf, "s");
         str_append(buf, ", ");
-        print(buf, GFX_WHITE);
+        BOOTUP_PRINT(buf, GFX_WHITE);
     }
 
     //TODO:
@@ -211,5 +212,5 @@ void timer_print_uptime(void)
     str_append(buf, ":");
     if (seconds < 10) str_append(buf, "0");
     str_append_uint(buf, (u32)seconds);
-    print(buf, GFX_WHITE);
+    BOOTUP_PRINT(buf, GFX_WHITE);
 }

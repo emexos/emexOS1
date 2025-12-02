@@ -2,6 +2,9 @@
 #include <limine/limine.h>
 #include <kernel/exceptions/panic.h>
 #include <klib/memory/main.h>
+#include <klib/debug/serial.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 static struct physmem_pageframe *physmem_pageframes = NULL;
 static u64 physmem_total = 0;
@@ -199,6 +202,10 @@ void physmem_init(limine_memmap_response_t *mpr, limine_hhdm_response_t *hpr) {
     physmem_addr_mark_used((u64)physmem_pageframe_addr, to_used);
 }
 
+u64 physmem_get_total() {
+    return physmem_total;
+}
+
 /// Summary
 /// 2025/11/17 tsaraki
 /// @Note @Important @Behavior
@@ -213,7 +220,9 @@ u64 physmem_alloc_to(u64 count) { //count is len of frames of size 4096
     u64 start_frame = 0;
     u8  all_free = 0;
 
-    for (u64 frame = 0; frame < physmem_total; frame++) {
+    u64 start_search = 512;
+
+    for (u64 frame = start_search; frame < physmem_total; frame++) {
         if (!bitmap_test(frame)) {
             if (consecutive == 0) {
                 start_frame = frame;

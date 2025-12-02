@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include <kernel/module/module.h>
 #include <fonts/font_8x8.h>
+#include <klib/debug/serial.h>
 
 //donnot put static before the uints!
 u32 *framebuffer = NULL;
@@ -18,18 +19,28 @@ void graphics_init(struct limine_framebuffer *fb)
     fb_width = fb->width;
     fb_height = fb->height;
     fb_pitch = fb->pitch;
-    cursor_y = 20;
+    cursor_y = 0;
+    cursor_x = 0;
     font_scale = 1;
 
     print("Welcome to doccrOS \n", GFX_WHITE);
     print("v0.0.1 (alpha)\n", GFX_WHITE);
 
     print("Graphics\n", GFX_WHITE);
-    char res_buf[64];
-    str_copy(res_buf, "Framebuffer ");
+    char res_buf[128]; //donot set this to 64
+    str_copy(res_buf, "\nFramebuffer ->\n");
+    str_append(res_buf, " \t Width: ");
     str_append_uint(res_buf, fb_width);
-    str_append(res_buf, "x");
+    str_append(res_buf, "\n");
+    str_append(res_buf, " \t Height: ");
     str_append_uint(res_buf, fb_height);
+    str_append(res_buf, "\n");
+    str_append(res_buf, " \t Pitch: ");
+    str_append_uint(res_buf, fb_pitch);
+    str_append(res_buf, "\n");
+    str_append(res_buf, " \t adress: ");
+    str_append_uint(res_buf, (u64) framebuffer);
+    str_append(res_buf, "\n");
     print(res_buf, GFX_WHITE);
 }
 

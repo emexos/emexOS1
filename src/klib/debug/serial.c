@@ -209,13 +209,3 @@ void serial_printf(const char *format, ...) {
     va_end(args);
 
 }
-
-void printf_debug_u64(const char *info, u64 num) {
-    char buf[128];
-    str_copy(buf, info);
-    str_append_uint(buf, (u32)(num >> 32));
-    str_append(buf, ":");
-    str_append_uint(buf, (u32)num);
-    str_append(buf, "\n");
-    serial_printf(buf);
-}

@@ -29,7 +29,6 @@ klime_t *klime_init(u64 *ptr, u64 size) {
     klime->start_heap->used = 0;
 
     slab_init(&klime->slab_allocator, klime->start_slab_meta, klime->start_slab_data);
-    printf_debug_u64("slab allocator ptr is at ", (u64)&klime->slab_allocator);
 
     return klime;
 }

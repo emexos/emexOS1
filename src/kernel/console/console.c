@@ -53,6 +53,7 @@ void console_init(void)
     input_pos = 0;
     input_buffer[0] = '\0';
 
+    sconsole_theme(THEME_FLU);
     clear(CONSOLESCREEN_BG_COLOR);
     //reset_cursor();
     /*
