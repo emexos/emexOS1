@@ -4,6 +4,9 @@
 #include <kernel/include/logo.h>
 #include <klib/graphics/theme.h>
 #include <theme/doccr.h>
+int init_boot_log = -1; // boot logs
+// TODO:
+// add a exact time for start and end, which cpu, how long it booted...
 
 // Drivers
 #include <drivers/ps2/ps2.h>
@@ -32,8 +35,14 @@
 #include <kernel/exceptions/timer.h>
 #include <kernel/exceptions/panic.h>
 
+//vFS & fs
+#include <kernel/file_systems/vfs/vfs.h>
+//extern void fs_system_init(klime_t *klime);
+//extern void fs_create_test_file(void);
+
 // modules
 #include <kernel/module/module.h>
+//extern void fs_register_mods(void);
 
 #include <kernel/pci/pci.h>
 
@@ -56,7 +65,7 @@ void _start(void)
     struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
     graphics_init(fb);
     printf("\ninit graphics, draw logo\n");
-    draw_logo();
+    //draw_logo();
 
     // main kernel
     printf("==============================================\n");
@@ -65,9 +74,17 @@ void _start(void)
     printf("==                                          ==\n");
     printf("==============================================\n");
 
+    #ifdef BOOTUP_VISUALS 1
+        print("\BOOTUP_VISUALS == 1\n", white());
+    #else
+        print("\nBOOTUP_VISUALS == 0\n", white());
+    #endif
+
     clear(bg());
 
-    char buf[128]; //for all string operations
+    char buf[512]; //for all string operations
+
+    klime_t *klime;
 
     { // MADE BY @TSARAKI (github)
 
@@ -105,7 +122,18 @@ void _start(void)
             BOOTUP_PRINTF("Erorr: ulime is not initialized");
             panic( "Erorr: ulime is not initialized");
         }
+        BOOTUP_PRINT("\n", GFX_WHITE);
+        fs_system_init(klime);
+
+        // Write only
+        init_boot_log = fs_open("/tmp/log", O_CREAT | O_WRONLY);
+        if (init_boot_log < 0) {
+            panic("Cannot open /tmp/log");
+        }
+        //BOOTUP_PRINT("\n", GFX_WHITE);
     }
+
+    BOOTUP_PRINT("[LOG] kernel bootup log:\n\n", GFX_WHITE);
 
     //actually not needed but maybe later (e.g. for testing themes)
     //draw_rect(10, 10, fb_width - 20, fb_height - 20, green());
@@ -114,7 +142,7 @@ void _start(void)
     cursor_x = 0;
     cursor_y = 10;
 
-    BOOTUP_PRINTF("\n");
+    //BOOTUP_PRINTF("\n");
 
     // Initialize the CPU
     cpu_detect();
@@ -140,6 +168,13 @@ void _start(void)
     BOOTUP_PRINT(buf, yellow());
     BOOTUP_PRINT("\n", white());
 
+    //scan through recent registered modules
+    // this must happen AFTER module_register() calls
+    fs_register_mods();
+
+    //create test file in /tmp
+    fs_create_test_file();
+
     buf[0] = '\0'; // clear buffer so it can be used again
 
 
@@ -162,10 +197,27 @@ void _start(void)
     // Initialize console and halt CPU
 
     //panic("test");
+    //
+
+    buf[0] = '\0';
+
+
+    // write file
+    /*int wf = fs_open("/tmp/log", O_CREAT | O_WRONLY);
+    fs_write(wf, "test", 4);
+    fs_close(wf);
+    */
 
     BOOTUP_PRINTF("\n");
     BOOTUP_PRINTF("test printf\n");
     BOOTUP_PRINTF("test printf\n");
+
+    if (init_boot_log >= 0) {
+        fs_close(init_boot_log);
+        init_boot_log = -1;
+    }
+    BOOTUP_PRINTF("\n");
+
     console_init();
     keyboard_poll();
 

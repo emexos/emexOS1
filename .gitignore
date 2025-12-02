@@ -11,8 +11,19 @@ include/limine
 **/.DS_Store
 
 src/kernel/pci/
+src/kernel/pci/pci.h
 
-.gitignore
+shared/libc/math/math.h
+#shared/libc/math/math.c
+#shared/libc/math/pi.h
+shared/libc/math/complete_pi.txt
+
+shared/ui/assets/logo_.txt
+
+shared/libc/std/
+
+
+.zig-cache/
 
 disk.img
 

@@ -21,3 +21,9 @@ FHDR(cmd_cal);
 FHDR(cmd_date);
 FHDR(cmd_time);
 FHDR(cmd_uptime);
+
+FHDR(cmd_cat);
+FHDR(cmd_ls);
+
+
+FHDR(cmd_poweroff);

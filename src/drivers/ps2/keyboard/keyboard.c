@@ -95,7 +95,7 @@ static void keyboard_module_fini(void) {
 
 driver_module keyboard_module = (driver_module) {
     .name = "ps2_keyboard",
-    .mount = "/drivers/keyboard",
+    .mount = "/dev/keyboard",
     .version = VERSION_NUM(0, 1, 0, 0),
     .init = keyboard_module_init,
     .fini = keyboard_module_fini,

@@ -1,7 +1,7 @@
 #include "print.h"
 #include <klib/graphics/graphics.h>
 #include <klib/debug/serial.h>
-#include <fonts/font_8x8.h>
+#include <ui/fonts/font_8x8.h>
 
 #include <kernel/console/graph/dos.h>
 

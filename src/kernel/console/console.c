@@ -6,7 +6,7 @@ static int input_pos = 0;
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 11;
+static int cmd_count = 14;
 
 static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -21,6 +21,9 @@ static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_date, "date", "displays current date", "date"),
     CMDENTRY(cmd_uptime, "uptime", "System uptime", "uptime"),
     CMDENTRY(cmd_time, "time", "displays current time", "time"),
+    CMDENTRY(cmd_poweroff, "shut", "shuts down the system", "shut"),
+    CMDENTRY(cmd_cat, "cat", "show file", "cat <file>"),
+    CMDENTRY(cmd_ls, "ls", "list directory contents", "ls [path]"),
 };
 
 //----------------------------------
