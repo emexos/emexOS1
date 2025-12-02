@@ -5,6 +5,8 @@
 #include <klib/memory/main.h>
 #include <kernel/mem/paging/paging.h>
 #include <klib/debug/serial.h>
+#include <klib/graphics/theme.h>
+#include <theme/doccr.h>
 
 static int heap_merge_free_blocks(heap_block_t *block) {
     if (block->magic != BLOCK_MAGIC) return 0;
@@ -15,15 +17,15 @@ static int heap_merge_free_blocks(heap_block_t *block) {
     while (current->next && !current->next->used && current->next->magic == BLOCK_MAGIC) {
 
         heap_block_t *next = current->next;
-    
+
         current->size += sizeof(heap_block_t) + next->size;
         current->next = next->next;
-    
+
         if (current->next) {
             if (current->next->magic == BLOCK_MAGIC) {
                 current->next->prev = current;
             }
-        }        
+        }
 
         ret++;
    }
@@ -32,15 +34,15 @@ static int heap_merge_free_blocks(heap_block_t *block) {
     while (current->prev && !current->prev->used && current->prev->magic == BLOCK_MAGIC) {
 
         heap_block_t *prev = current->prev;
-        
+
         prev->size += sizeof(heap_block_t) + current->size;
         prev->next = current->next;
-        
+
         if (prev->next) {
             if (prev->next->magic == BLOCK_MAGIC) {
                 prev->next->prev = prev;
             }
-        }        
+        }
 
         ret++;
 
@@ -51,7 +53,6 @@ static int heap_merge_free_blocks(heap_block_t *block) {
 }
 
 u64 *malloc(heap_block_t *heap, u64 size) {
-    printf_debug_u64("in malloc heap ptr is ", (u64)heap);
     if (!heap || size == 0) return NULL;
 
     size = (size + 15) & ~15;
@@ -70,7 +71,6 @@ u64 *malloc(heap_block_t *heap, u64 size) {
         current = current->next;
     }
 
-    printf_debug_u64("in malloc best fit ptr is ", (u64)best_fit);
     if (best_fit == NULL) return NULL;
 
     if (best_fit->size >= size + sizeof(heap_block_t) + 16) {
@@ -101,17 +101,17 @@ int free(u64 *ptr) {
   heap_block_t *blk = (heap_block_t *) ((u8 *)ptr - sizeof(heap_block_t));
 
   if (blk->magic != BLOCK_MAGIC) {
-      printf("\n\nERROR: kernel invalid blk! Doube free?\n");
+      BOOTUP_PRINTF("\n\nERROR: kernel invalid blk! Doube free?\n");
       return 0;
   }
 
   if (!blk->used) {
-      printf("\n WARNING: Block already freed\n");
+      BOOTUP_PRINTF("\n WARNING: Block already freed\n");
       return 0;
   }
 
   if (!blk->size > (1ULL < 40)) {
-      printf("\n ERROR: implausible block size\n");
+      BOOTUP_PRINTF("\n ERROR: implausible block size\n");
       return 0;
   }
 
@@ -119,4 +119,3 @@ int free(u64 *ptr) {
 
   return heap_merge_free_blocks(blk);
 }
-
