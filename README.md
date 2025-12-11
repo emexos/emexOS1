@@ -53,9 +53,10 @@ Now that you have all the required build dependencies installed, you can finally
 |-----------------|-----------------|------------------------------|
 | meminfo         | meminfo         | free memory: ...             |
 | dofetch         | dofetch         | [emexOS logo, user, ...]     |
-|-----------------|-----------------|------------------------------|
+| date            | date            | [shows current date]         |
 
 ##
  - README.md by Voxi0 & emexSW & Bi Moz
  - emexOS project started by emexSW
 ##
+
