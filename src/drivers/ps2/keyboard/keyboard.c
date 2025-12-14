@@ -36,51 +36,75 @@ static const unsigned char scancode_to_ascii_shift[128] = {
     [0x37]='*',[0x38]=0,[0x39]=' ',[0x3A]=0
 };
 
+//static int use_usb = 0; // input
+
 void keyboard_init(void) {
+    // first XHCI
+    //if (g_xhci && g_xhci->keyboard_slot) {
+    //    use_usb = 0;
+    //}
+}
+
+/*void keyboard_init(void) {
     //
     // DON'T call keyboard_poll() here!
-}
+    }*/
 
 void keyboard_poll(void) {
     int shift = 0;
     int caps = 0;
 
     while (1) {
-        if ((inb(0x64) & 1) == 0) continue;
-        unsigned char sc = inb(0x60);
-        if (sc == 0) continue;
-
-        // Handle key release
-        if (sc & 0x80) {
-            unsigned char make = sc & 0x7F;
-            if (make == 0x2A || make == 0x36) shift = 0;
-            continue;
-        }
-
-        // Handle special keys
-        if (sc == 0x2A || sc == 0x36) { shift = 1; continue; }
-        if (sc == 0x3A) { caps = !caps; continue; }
-        if (sc == 0x0E) { console_handle_key('\b'); continue; }
-        if (sc == 0x1C) {
-            if (shift) {
-                console_handle_key('\r');
-                continue;
-            }
-            console_handle_key('\n');
-            continue;
-        }
+        //char c = 0;
 
 
-        // Convert scancode to character
-        if (sc < 128) {
-            unsigned char c = shift ? scancode_to_ascii_shift[sc] : scancode_to_ascii[sc];
-            if (c >= 'a' && c <= 'z') {
-                if ((caps && !shift) || (!caps && shift)) {
-                    c = (c - 'a') + 'A';
+        /*if (use_usb && g_xhci) {
+            xhci_keyboard_poll();
+            if (xhci_has_key()) {
+                c = xhci_get_key();
+                if (c) {
+                    console_handle_key(c);
                 }
             }
-            if (c) console_handle_key((char)c);
         }
+
+        if (!use_usb) {*/
+            if ((inb(0x64) & 1) == 0) continue;
+            unsigned char sc = inb(0x60);
+            if (sc == 0) continue;
+
+            // Handle key release
+            if (sc & 0x80) {
+                unsigned char make = sc & 0x7F;
+                if (make == 0x2A || make == 0x36) shift = 0;
+                continue;
+            }
+
+            // Handle special keys
+            if (sc == 0x2A || sc == 0x36) { shift = 1; continue; }
+            if (sc == 0x3A) { caps = !caps; continue; }
+            if (sc == 0x0E) { console_handle_key('\b'); continue; }
+            if (sc == 0x1C) {
+                if (shift) {
+                    console_handle_key('\r');
+                    continue;
+                }
+                console_handle_key('\n');
+                continue;
+            }
+
+
+            // Convert scancode to character
+            if (sc < 128) {
+                unsigned char c = shift ? scancode_to_ascii_shift[sc] : scancode_to_ascii[sc];
+                if (c >= 'a' && c <= 'z') {
+                    if ((caps && !shift) || (!caps && shift)) {
+                        c = (c - 'a') + 'A';
+                    }
+                }
+                if (c) console_handle_key((char)c);
+            }
+            //}
     }
 }
 

@@ -6,6 +6,7 @@
 FHDR(cmd_echo);
 FHDR(cmd_clear);
 FHDR(cmd_help);
+FHDR(cmd_font);
 FHDR(cmd_fsize);
 
 // system.c

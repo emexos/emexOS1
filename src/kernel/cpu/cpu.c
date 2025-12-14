@@ -1,8 +1,8 @@
 #include "cpu.h"
-#include <klib/string/string.h>
-#include <klib/memory/main.h>
+#include <string/string.h>
+#include <memory/main.h>
 #include <theme/stdclrs.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 static cpu_info_t cpu_info;

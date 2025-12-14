@@ -85,7 +85,7 @@ FHDR(cmd_ls) {
             char buf[32];
             str_copy(buf, " | ");
             str_append_uint(buf, (u32)child->size);
-            str_append(buf, " b");
+            str_append(buf, " bytes");
             print(buf, GFX_GRAY_50);
         }
 

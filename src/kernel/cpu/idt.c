@@ -1,10 +1,10 @@
 #include "idt.h"
 #include <kernel/exceptions/isr.h>
 #include <kernel/exceptions/irq.h>
-#include <klib/memory/main.h>
-#include <klib/string/string.h>
+#include <memory/main.h>
+#include <string/string.h>
 #include <theme/stdclrs.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 static idt_entry_t idt[IDT_ENTRIES];

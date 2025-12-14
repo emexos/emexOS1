@@ -1,5 +1,5 @@
 #include "serial.h"
-#include <klib/string/string.h>
+#include <string/string.h>
 #include <kernel/include/ports.h>
 #include <stdarg.h> // for va_...
 

@@ -5,8 +5,8 @@
 #include <limine/limine.h>
 #include <theme/doccr.h>
 #include <theme/stdclrs.h>
-#include <klib/string/print.h>
-#include <klib/string/string.h>
+#include <kernel/graph/theme.h>
+#include <string/string.h>
 
 extern u32 *framebuffer;
 extern u32 fb_width;

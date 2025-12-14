@@ -1,7 +1,8 @@
 #include "vfs.h"
-#include <klib/memory/main.h>
-#include <klib/string/string.h>
+#include <memory/main.h>
+#include <string/string.h>
 #include <kernel/mem/klime/klime.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 // global state
@@ -66,9 +67,9 @@ int fs_register(fs_type *type) {
     types[type_cnt++] = type;
 
     BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("registered: ", GFX_ST_WHITE);
-    BOOTUP_PRINT(type->name, GFX_ST_YELLOW);
-    BOOTUP_PRINT("\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("registered: ", white());
+    BOOTUP_PRINT(type->name, white());
+    BOOTUP_PRINT("\n", white());
     return 0;
 }
 
@@ -111,11 +112,11 @@ int fs_mount(const char *src, const char *tgt, const char *type_name) {
     mnt->active = 1;
 
     BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("mount ", GFX_ST_WHITE);
-    BOOTUP_PRINT(type_name, GFX_ST_YELLOW);
-    BOOTUP_PRINT(" to ", GFX_ST_WHITE);
-    BOOTUP_PRINT(tgt, GFX_ST_CYAN);
-    BOOTUP_PRINT("\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("mount ", white());
+    BOOTUP_PRINT(type_name, white());
+    BOOTUP_PRINT(" to ", white());
+    BOOTUP_PRINT(tgt, white());
+    BOOTUP_PRINT("\n", white());
 
     return 0;
 }
@@ -203,7 +204,7 @@ int fs_addchild(fs_node *parent, fs_node *child) {
 //
 void fs_init(void) {
     BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("init generic VFS\n", GFX_ST_WHITE);
+    BOOTUP_PRINT("init generic VFS\n", white());
 
     for (int i = 0; i < FS_MAX_MNTS; i++) mnts[i].active = 0;
     for (int i = 0; i < FS_MAX_FDS; i++) fds[i] = NULL;

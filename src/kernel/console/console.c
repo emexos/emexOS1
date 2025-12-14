@@ -6,7 +6,7 @@ static int input_pos = 0;
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 14;
+static int cmd_count = 15;
 
 static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -24,6 +24,7 @@ static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_poweroff, "shut", "shuts down the system", "shut"),
     CMDENTRY(cmd_cat, "cat", "show file", "cat <file>"),
     CMDENTRY(cmd_ls, "ls", "list directory contents", "ls [path]"),
+    CMDENTRY(cmd_font, "font", "change console font", "font [0-1]"),
 };
 
 //----------------------------------
@@ -57,6 +58,7 @@ void console_init(void)
     input_buffer[0] = '\0';
 
     sconsole_theme(THEME_FLU);
+    f_setcontext(FONT_8X8);
     clear(CONSOLESCREEN_BG_COLOR);
     //reset_cursor();
     /*

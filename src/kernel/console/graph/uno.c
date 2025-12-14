@@ -1,7 +1,7 @@
 #include "uno.h"
-#include <klib/graphics/graphics.h>
+#include <kernel/graph/graphics.h>
 #include <drivers/cmos/cmos.h>
-#include <klib/string/string.h>
+#include <string/string.h>
 #include <kernel/exceptions/timer.h>
 
 static u32 banner_y = 0;

@@ -2,9 +2,9 @@
 #include "device.h"
 #include "config.h"
 #include "express.h"
-#include <klib/string/string.h>
+#include <string/string.h>
 #include <theme/stdclrs.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 void pci_init(void) {

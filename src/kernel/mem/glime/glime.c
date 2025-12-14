@@ -1,10 +1,10 @@
 #include "glime.h"
 #include <kernel/exceptions/panic.h>
 #include "../heap/heap.h"
-#include <klib/string/string.h>
-#include <klib/memory/main.h>
-#include <klib/debug/serial.h>
-#include <klib/graphics/theme.h>
+#include <string/string.h>
+#include <memory/main.h>
+#include <kernel/communication/serial.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 #include <kernel/include/ports.h>
 

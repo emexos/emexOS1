@@ -2,10 +2,9 @@
 #include "irq.h"
 #include <kernel/include/ports.h>
 #include <theme/stdclrs.h>
-#include <klib/string/string.h>
-#include <klib/string/print.h>
+#include <string/string.h>
 #include <drivers/cmos/cmos.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 // using PIT (8254)

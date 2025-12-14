@@ -1,7 +1,7 @@
 #include "panic.h"
-#include <klib/graphics/graphics.h>
+#include <kernel/graph/graphics.h>
 #include <theme/doccr.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 __attribute__((noreturn)) void panic(const char *message)
