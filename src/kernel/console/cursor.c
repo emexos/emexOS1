@@ -1,5 +1,4 @@
 #include "console.h"
-#include <klib/graphics/graphics.h>
 #include <kernel/exceptions/timer.h>
 
 static int cursor_visible = 1;

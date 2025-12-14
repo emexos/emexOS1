@@ -1,6 +1,6 @@
 #include "../vfs.h"
-#include <klib/memory/main.h>
-#include <klib/string/string.h>
+#include <memory/main.h>
+#include <string/string.h>
 #include <kernel/mem/klime/klime.h>
 
 static int tmpfs_open(fs_node *node, fs_file *file) {

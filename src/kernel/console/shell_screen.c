@@ -21,6 +21,9 @@ void shell_print_prompt(void)
     //
 
     string("\n", GFX_WHITE);
+    string(PC_NAME, GFX_WHITE);
+    string("@", GFX_WHITE);
+    string(USER_NAME, GFX_WHITE);
     string("\x01 ", GFX_YELLOW);
 }
 

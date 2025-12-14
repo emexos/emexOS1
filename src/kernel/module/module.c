@@ -1,7 +1,7 @@
 #include "module.h"
-#include <klib/string/string.h>
+#include <string/string.h>
 #include <theme/stdclrs.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 static driver_module *modules[MAX_MODULES];

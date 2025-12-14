@@ -1,8 +1,8 @@
 #include "gdt.h"
-#include <klib/memory/main.h>
-#include <klib/string/string.h>
+#include <memory/main.h>
+#include <string/string.h>
 #include <theme/stdclrs.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 static gdt_entry_t gdt[GDT_ENTRIES];

@@ -1,5 +1,4 @@
-#ifndef FONT_H
-#define FONT_H
+#pragma once
 
 #include <types.h>
 //https://github.com/SloopyCode/BitFonts
@@ -148,5 +147,3 @@ static const u8 font_8x8[132][8] = {
     [0x83] = { 0x00,0x00,0x38,0x44,0x40,0x38,0x40,0x7C}, // ß
 
 };
-
-#endif

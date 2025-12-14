@@ -1,6 +1,6 @@
 #include "cmos.h"
 #include <kernel/include/ports.h>
-#include <klib/graphics/graphics.h>
+#include <kernel/graph/graphics.h>
 
 /*
  * ----------------------------------------------------------------------------------

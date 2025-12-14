@@ -1,6 +1,6 @@
 #include "graphics.h"
 #include <kernel/module/module.h>
-#include <klib/debug/serial.h>
+#include <kernel/communication/serial.h>
 
 //donnot put static before the uints!
 u32 *framebuffer = NULL;
@@ -9,23 +9,24 @@ u32 fb_height = 0;
 u32 fb_pitch = 0;
 u32 cursor_x = 16; // 8 = space-character means 8+ text
 u32 cursor_y = 16;
-u32 font_scale = 1; //for console scaling
+u32 font_scale = 0; //for console scaling
 
 
 void graphics_init(struct limine_framebuffer *fb)
 {
-    framebuffer = (u32 *)fb->address;
+    printf("\n");
+    framebuffer = (u32 *)fb->address;;
     fb_width = fb->width;
     fb_height = fb->height;
     fb_pitch = fb->pitch;
     cursor_y = 0;
     cursor_x = 0;
-    font_scale = 1;
+    font_scale = 0;
 
-    print("Welcome to doccrOS \n", GFX_WHITE);
-    print("v0.0.1 (alpha)\n", GFX_WHITE);
+    printbs("Welcome to doccrOS \n", GFX_WHITE);
+    printbs("v0.0.1 (alpha)\n", GFX_WHITE);
 
-    print("Graphics\n", GFX_WHITE);
+    printbs("Graphics\n", GFX_WHITE);
     char res_buf[128]; //donot set this to 64
     str_copy(res_buf, "\nFramebuffer ->\n");
     str_append(res_buf, " \t Width: ");
@@ -40,7 +41,7 @@ void graphics_init(struct limine_framebuffer *fb)
     str_append(res_buf, " \t adress: ");
     str_append_uint(res_buf, (u64) framebuffer);
     str_append(res_buf, "\n");
-    print(res_buf, GFX_WHITE);
+    printbs(res_buf, GFX_WHITE);
 }
 
 void clear(u32 color)

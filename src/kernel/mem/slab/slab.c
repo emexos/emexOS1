@@ -1,9 +1,9 @@
 #include "slab.h"
-#include <klib/debug/serial.h>
+#include <kernel/communication/serial.h>
 #include <kernel/exceptions/panic.h>
-#include <klib/memory/main.h>
+#include <memory/main.h>
 
-void slab_init(slab_allocator_t *ptr_slab, u64 *ptr_slab_meta, u64 *ptr_slab_data) {  
+void slab_init(slab_allocator_t *ptr_slab, u64 *ptr_slab_meta, u64 *ptr_slab_data) {
   if (!ptr_slab) {
       panic("\nInvalid ptr slab\n");
   }

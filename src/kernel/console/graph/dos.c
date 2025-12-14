@@ -1,6 +1,6 @@
 #include "dos.h"
 #include "uno.h"
-#include <klib/graphics/graphics.h>
+#include <kernel/graph/graphics.h>
 
 void console_window_init(void) {
     cursor_x = CONSOLE_PADDING_X;

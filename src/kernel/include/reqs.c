@@ -30,3 +30,11 @@ volatile struct limine_hhdm_request hhdm_request = {
     .revision = 0,
     .response = NULL
 };
+
+// module request (for logo.bin)
+__attribute__((used, section(".requests")))
+volatile struct limine_module_request module_request = {
+    .id = LIMINE_MODULE_REQUEST_ID,
+    .revision = 0,
+    .response = NULL
+};

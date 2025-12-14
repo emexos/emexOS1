@@ -1,10 +1,10 @@
 #include "ulime.h"
-#include <klib/debug/serial.h>
+#include <kernel/communication/serial.h>
 #include <kernel/exceptions/panic.h>
-#include <klib/memory/main.h>
-#include <klib/string/string.h>
+#include <memory/main.h>
+#include <string/string.h>
 #include <kernel/mem/paging/paging.h>
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, glime_t *glime, u64 uphys_start) {

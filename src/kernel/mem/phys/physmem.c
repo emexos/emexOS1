@@ -1,9 +1,9 @@
 #include "physmem.h"
 #include <limine/limine.h>
 #include <kernel/exceptions/panic.h>
-#include <klib/memory/main.h>
-#include <klib/debug/serial.h>
-#include <klib/graphics/theme.h>
+#include <memory/main.h>
+#include <kernel/communication/serial.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 static struct physmem_pageframe *physmem_pageframes = NULL;

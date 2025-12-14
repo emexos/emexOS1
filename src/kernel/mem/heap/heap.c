@@ -2,10 +2,10 @@
 #include "../phys/physmem.h"
 #include <limine/limine.h>
 #include <kernel/exceptions/panic.h>
-#include <klib/memory/main.h>
+#include <memory/main.h>
 #include <kernel/mem/paging/paging.h>
-#include <klib/debug/serial.h>
-#include <klib/graphics/theme.h>
+#include <kernel/communication/serial.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
 static int heap_merge_free_blocks(heap_block_t *block) {

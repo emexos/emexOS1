@@ -1,13 +1,14 @@
 #include "print.h"
-#include <klib/graphics/graphics.h>
-#include <klib/debug/serial.h>
-#include <ui/fonts/font_8x8.h>
+#include <kernel/graph/graphics.h>
+#include <kernel/graph/fm.h>
+#include <kernel/communication/serial.h>
+//#include <ui/fonts/font_8x8.h>
 
 #include <kernel/console/graph/dos.h>
 
 static void putchar_at(char c, u32 x, u32 y, u32 color)
 {
-    const u8 *glyph = font_8x8[(u8)c];
+    const u8 *glyph = fm_get_glyph((u8)c);
 
     for (int dy = 0; dy < 8; dy++)
     {

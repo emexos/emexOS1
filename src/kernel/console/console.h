@@ -1,11 +1,13 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-#include <klib/graphics/graphics.h>
+#include <kernel/graph/graphics.h>
+#include <kernel/graph/fm.h>
 #include "graph/uno.h"
 #include "graph/dos.h"
-#include <klib/graphics/theme.h>
+#include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+#include <config/user.h>
 
 #include <kernel/module/module.h>
 extern driver_module console_module;

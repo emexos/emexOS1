@@ -1,11 +1,11 @@
 include common.mk
 
 # Find all C, C++ and Assembly files
-SRCS = $(shell find $(SRC_DIR) -name "*.c" -or -name "*.cpp" -or -name "*.asm")
+SRCS = $(shell find $(SRC_DIR) shared -name "*.c" -or -name "*.cpp" -or -name "*.asm")
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
 .PHONY: all fetchDeps run clean
-all: $(ISO)
+all: assets $(ISO)
 
 # Fetch dependencies/libraries
 fetchDeps:
@@ -28,8 +28,17 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@cp $< $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
+
 	@mkdir -p $(ISODIR)/boot
+	@mkdir -p $(ISODIR)/boot/ui
+	@mkdir -p $(ISODIR)/boot/ui/fonts
+	@mkdir -p $(ISODIR)/boot/ui/assets
+	@mkdir -p $(ISODIR)/boot/modules
+
 	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
+	@cp shared/ui/fonts/gohu-uni-14.pcf $(ISODIR)/boot/ui/fonts/
+	@cp shared/ui/assets/logo.bin $(ISODIR)/boot/ui/assets/
+
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
 		--efi-boot boot/limine/limine-uefi-cd.bin \
@@ -49,8 +58,13 @@ run: $(ISO)
 		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
 		-cdrom $< \
-		-serial stdio 2>&1
+		-serial stdio 2>&1 \
+		-no-reboot \
+		-no-shutdown
 
+run_usb: $(ISO)
+	@chmod +x run_xhci.sh
+	./run_xhci.sh
 # Compilation rules
 $(BUILD_DIR)/%.c.o: %.c
 	@mkdir -p $(dir $@)

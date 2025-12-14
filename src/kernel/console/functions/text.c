@@ -71,6 +71,34 @@ FHDR(cmd_fsize)
     cursor_y = banner_get_height();
 }
 
+FHDR(cmd_font) {
+    if (*s == '\0') {
+        print("Current font: ", GFX_WHITE);
+        print(fm_get_font_name(), GFX_CYAN);
+        print("\n  0 == DOS (8x8)\n", GFX_WHITE);
+        print(  "  1 == thin(8x8)\n", GFX_WHITE);
+        return;
+    }
+
+    // Parse font number
+    const char *p = s;
+    while (*p == ' ') p++;
+
+    int font_num = 0;
+    while (*p >= '0' && *p <= '9') {
+        font_num = font_num * 10 + (*p - '0');
+        p++;
+    }
+
+    if (f_setcontext((font_type_t)font_num) == 0) {
+        clear(CONSOLESCREEN_BG_COLOR);
+        banner_force_update();
+        print("\n", GFX_GREEN);
+    } else {
+        print("use: font <number>", GFX_RED);
+    }
+}
+
 FHDR(cmd_help)
 {
     if (*s == '\0') {
@@ -80,14 +108,15 @@ FHDR(cmd_help)
         print("  clear [color]  - clear screen\n", GFX_WHITE);
         print("  help [command] - displays this list\n", GFX_WHITE);
         print("  scale [1-4]    - change screen size\n", GFX_WHITE);
+        print("  font [0-1]     - switch fonts\n", GFX_WHITE);
         print("  date           - show current date\n", GFX_WHITE);
         print("  time           - show current time\n", GFX_WHITE);
         print("  calendar       - show date & time\n", GFX_WHITE);
         print("  uptime         - displays the uptime\n", GFX_WHITE);
         print("  dofetch        - emexOS system fetch\n", GFX_WHITE);
         print("  cat <file>     - show file content\n", GFX_WHITE);
+        print("  ls <path>      - list directory contents\n", GFX_WHITE);
         print("  shut           - shuts down the system\n", GFX_WHITE);
-        print("  ls <path<      - list directory contents\n", GFX_WHITE);
         //print("[SYSTEM]\n", GFX_YELLOW);
         print("  meminfo        - heap memory information\n", GFX_WHITE);
         print("  modules        - shows all modules in fs\n", GFX_WHITE);

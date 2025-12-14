@@ -4,8 +4,8 @@
 #include "../paging/paging.h"
 #include <kernel/exceptions/panic.h>
 
-#include <klib/memory/main.h>
-#include <klib/debug/serial.h>
+#include <memory/main.h>
+#include <kernel/communication/serial.h>
 
 klime_t *klime_init(u64 *ptr, u64 size) {
     if (!ptr || size < sizeof(heap_block_t)) {

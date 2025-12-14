@@ -22,7 +22,11 @@ LDFLAGS ?= -nostdlib -static -no-pie -z text -z max-page-size=0x1000
 ASFLAGS ?= -f elf64
 
 # Directories and files
+SYSCALL_SRCS = src/kernel/syscalls/syscalls.c \
+               src/kernel/syscalls/syscall_entry.asm
 SRC_DIR := src
+USERSPACE_DIR = src/userspace
+USERSPACE_BUILD = build/userspace
 BUILD_DIR := build
 INCLUDE_DIR := include
 ISODIR := $(BUILD_DIR)/isodir

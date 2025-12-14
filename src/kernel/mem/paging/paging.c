@@ -4,11 +4,11 @@
 #include "../mem.h"
 #include "../phys/physmem.h"
 #include <kernel/exceptions/panic.h>
-#include <klib/memory/main.h>
+#include <memory/main.h>
 
-#include <klib/string/string.h>
+#include <string/string.h>
 #include <theme/stdclrs.h>
-#include <klib/debug/serial.h>
+#include <kernel/communication/serial.h>
 
 extern u8 _kernel_start[];
 extern u8 _kernel_end[];
@@ -19,7 +19,7 @@ inline void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr) {
     return (void*)(phys_addr + hpr->offset);
 }
 
-// Convert kernel virtual address to physical address using HHDM  
+// Convert kernel virtual address to physical address using HHDM
 inline u64 virt_to_phys(limine_hhdm_response_t *hpr, void* virt_addr) {
     return (u64)virt_addr - hpr->offset;
 }

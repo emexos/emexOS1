@@ -1,5 +1,5 @@
 #include <kernel/console/console.h>
-#include <klib/memory/main.h>
+#include <memory/main.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/module/module.h>
 #include <kernel/exceptions/timer.h>
@@ -113,7 +113,7 @@ FHDR(cmd_sysinfo)
     (void)s; // unused parameter
 
     print("                  \n", GFX_GREEN);
-    print(" ###########;m;    user@emexos\n", GFX_GREEN);
+    print(" ###########;m;    ", GFX_GREEN); print(PC_NAME, GFX_GREEN); print("@", GFX_GREEN); print(USER_NAME, GFX_GREEN); print("\n", GFX_GREEN);
     print(" # #########;m;    \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN); //15 characters
     print(" # #;m;            Kernel: ", GFX_GREEN); print("emexOS [64] v2.1\n", GFX_WHITE);
     print(" # #;m;            Resolution: ", GFX_GREEN); print_res();
