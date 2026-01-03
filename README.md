@@ -45,7 +45,6 @@ Now that you have all the required build dependencies installed, you can finally
 | calendar        | calendar        | [shows current date & time]  |
 | time            | time            | [shows current time]         |
 | uptime          | uptime          | [shows current uptime]       |
-|-----------------|-----------------|------------------------------|
 
 ### System
 
@@ -55,7 +54,14 @@ Now that you have all the required build dependencies installed, you can finally
 | dofetch         | dofetch         | [emexOS logo, user, ...]     |
 | date            | date            | [shows current date]         |
 
-##
+---
+
+## License:
+- GNU GPLv3
+- Attribution required (see ATTRIBUTION.md)
+
+
+## Writer
  - README.md by Voxi0 & emexSW & Bi Moz
  - emexOS project started by emexSW
 ##
