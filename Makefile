@@ -36,7 +36,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@mkdir -p $(ISODIR)/boot/modules
 
 	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
-	@cp shared/ui/fonts/gohu-uni-14.pcf $(ISODIR)/boot/ui/fonts/
+	#@cp shared/ui/fonts/gohu-uni-14.pcf $(ISODIR)/boot/ui/fonts/
 	@cp shared/ui/assets/logo.bin $(ISODIR)/boot/ui/assets/
 
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
