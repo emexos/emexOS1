@@ -53,11 +53,11 @@ int limine_module_load(const char *source, const char *dest) {
     struct limine_module_response *response =
         (struct limine_module_response *)module_request.response;
 
-    // Search for module by filename
+    // searches for module by filename
     for (u64 i = 0; i < response->module_count; i++) {
         struct limine_file *module = response->modules[i];
 
-        // Extract filename from path
+        // extracts filename from path
         const char *filename = module->path;
         const char *last_slash = filename;
         for (const char *p = filename; *p; p++) {
@@ -65,7 +65,7 @@ int limine_module_load(const char *source, const char *dest) {
         }
         filename = last_slash;
 
-        // Check if this is our module
+        //if this is our module
         if (str_equals(filename, source)) {
             BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
             BOOTUP_PRINT("Loading ", white());
@@ -73,11 +73,10 @@ int limine_module_load(const char *source, const char *dest) {
             BOOTUP_PRINT(" -> ", white());
             BOOTUP_PRINT(dest, white());
 
-            // Create directories if needed
+            // it now creates all neccessary dirs automatically so you don't need to do that yourself
             char dir_path[256];
             str_copy(dir_path, dest);
 
-            // Find last slash to get directory
             int last_slash_pos = -1;
             for (int j = 0; dir_path[j]; j++) {
                 if (dir_path[j] == '/') last_slash_pos = j;
@@ -85,18 +84,17 @@ int limine_module_load(const char *source, const char *dest) {
 
             if (last_slash_pos > 0) {
                 dir_path[last_slash_pos] = '\0';
-                // Try to create directory (will fail if exists, that's ok)
+                // trys to create directory (will fail if exists, that's ok)
                 fs_mkdir(dir_path);
             }
 
-            // Open/create destination file
             int fd = fs_open(dest, O_CREAT | O_WRONLY);
             if (fd < 0) {
                 BOOTUP_PRINT(" FAILED\n", red());
                 return -1;
             }
 
-            // Write module data
+            // writes the data
             ssize_t written = fs_write(fd, (void*)module->address, module->size);
             fs_close(fd);
 

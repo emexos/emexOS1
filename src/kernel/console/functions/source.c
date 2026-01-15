@@ -2,20 +2,19 @@
 #include <kernel/console/console.h>
 
 FHDR(cmd_source) {
+
+    // reloads the shell
+
     if (!s || *s == '\0') {
         print("usage: source <file>\n", GFX_RED);
         return;
     }
 
-    // Check if sourcing console
     if (str_equals(s, "console") || str_equals(s, "console/")) {
-        // Reload user config
         user_config_reload();
 
-        // Redraw banner
         banner_force_update();
 
-        // Clear and reset
         clear(CONSOLESCREEN_BG_COLOR);
         banner_draw();
         console_window_init();

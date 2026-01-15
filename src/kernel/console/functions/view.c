@@ -16,17 +16,15 @@ FHDR(cmd_view) {
 
     //clear(CONSOLESCREEN_BG_COLOR);
 
-    // Center image
+    // centers image
     u32 x = (get_fb_width() - img.width) / 2;
     u32 y = (get_fb_height() - img.height) / 2;
 
     bmp_draw(&img, x, y);
      banner_draw();
 
-    // Show message
     //print("\nPress any key to continue...\n", GFX_GRAY_50);
 
-    // Wait for key
     while (1) {
         if (keyboard_has_key()) {
             key_event_t event;
