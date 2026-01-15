@@ -1,0 +1,3 @@
+keyboard: path("/drivers/keyboard");
+cmos: path("/drivers/cmos");
+mouse: path("/drivers/mouse");

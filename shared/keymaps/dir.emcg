@@ -1,0 +1,3 @@
+DE: path("/emr/config/keyboard/DE.map");
+PL: path("/emr/config/keyboard/PL.map");
+US: path("/emr/config/keyboard/US.map");
