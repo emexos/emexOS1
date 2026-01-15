@@ -44,10 +44,10 @@ int bmp_load(const char *path, bmp_image_t *img) {
     img->width = info.width;
     img->height = info.height > 0 ? info.height : -info.height;
 
-    // Bytes pro Pixel (3 für 24-bit)
+    // bytes per Pixal (3 für 24-bit)
     u32 bytes_per_pixel = info.bits_per_pixel / 8;
 
-    // Row size MUSS auf 4 Bytes aligned sein
+    // Row size  needs to be 4 bytes
     u32 row_size = ((info.width * bytes_per_pixel + 3) & ~3);
     u32 data_size = row_size * img->height;
 
@@ -64,7 +64,7 @@ int bmp_load(const char *path, bmp_image_t *img) {
         return -1;
     }
 
-    // Zum Pixel-Offset springen
+    // jmp to Pixel-Offset
     u32 current_pos = sizeof(bmp_header_t) + sizeof(bmp_info_t);
     if (header.offset > current_pos) {
         u8 dummy;
@@ -83,12 +83,12 @@ int bmp_load(const char *path, bmp_image_t *img) {
         u8 *row = buffer + (src_y * row_size);
 
         for (i32 x = 0; x < img->width; x++) {
-            // 24-bit BMP: BGR format
+            // 24-Bit BMP: B-G-R format
             u8 b = row[x * bytes_per_pixel + 0];
             u8 g = row[x * bytes_per_pixel + 1];
             u8 r = row[x * bytes_per_pixel + 2];
 
-            // Zu ARGB konvertieren
+            // convert to ARGB
             img->data[y * img->width + x] = 0xFF000000 | (r << 16) | (g << 8) | b;
         }
     }

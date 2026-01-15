@@ -12,15 +12,11 @@ FHDR(cmd_cd) {
 
     char new_path[MAX_PATH_LEN];
 
-    // Handle absolute vs relative paths
     if (s[0] == '/') {
-        // Absolute path
         str_copy(new_path, s);
     } else {
-        // Relative path
         str_copy(new_path, cwd);
 
-        // Add slash if cwd doesn't end with one
         if (cwd[str_len(cwd) - 1] != '/') {
             str_append(new_path, "/");
         }
@@ -28,16 +24,12 @@ FHDR(cmd_cd) {
         str_append(new_path, s);
     }
 
-    // Handle ".." (parent directory)
     if (str_equals(s, "..")) {
-        // Remove trailing slash if present
         int len = str_len(cwd);
         if (len > 1 && cwd[len - 1] == '/') {
             cwd[len - 1] = '\0';
             len--;
         }
-
-        // Find last slash
         for (int i = len - 1; i >= 0; i--) {
             if (cwd[i] == '/') {
                 if (i == 0) {
@@ -51,7 +43,7 @@ FHDR(cmd_cd) {
         return;
     }
 
-    // Verify the directory exists
+    // if directory exists
     fs_node *dir = fs_resolve(new_path);
     if (!dir) {
         print("error: directory not found\n", GFX_RED);
@@ -63,10 +55,10 @@ FHDR(cmd_cd) {
         return;
     }
 
-    // Update cwd
+    // updates cwd
     str_copy(cwd, new_path);
 
-    // Ensure cwd ends with / (except for root)
+    // when cwd ends with / (except for the root)
     int len = str_len(cwd);
     if (len > 1 && cwd[len - 1] != '/') {
         str_append(cwd, "/");

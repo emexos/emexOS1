@@ -3,10 +3,12 @@
 
 static char input_buffer[MAX_INPUT_LEN];
 static int input_pos = 0;
+char cwd[MAX_PATH_LEN] = "/";
+//int is_login_active = 0;
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 15;
+static int cmd_count = 26;
 
 static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -21,10 +23,21 @@ static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_date, "date", "displays current date", "date"),
     CMDENTRY(cmd_uptime, "uptime", "System uptime", "uptime"),
     CMDENTRY(cmd_time, "time", "displays current time", "time"),
-    CMDENTRY(cmd_poweroff, "shut", "shuts down the system", "shut"),
+    CMDENTRY(cmd_poweroff, "poweroff", "Power off the system", "poweroff"),
+    CMDENTRY(cmd_reboot, "reboot", "Reboot the system", "reboot"),
+    CMDENTRY(cmd_shutdown, "shutdown", "Shutdown the system", "shutdown"),
     CMDENTRY(cmd_cat, "cat", "show file", "cat <file>"),
     CMDENTRY(cmd_ls, "ls", "list directory contents", "ls [path]"),
+    CMDENTRY(cmd_cd, "cd", "Change directory", "cd [path]"),
+    CMDENTRY(cmd_tree, "tree", "shows every folder, file * content", "tree"),
+    CMDENTRY(cmd_mkdir, "mkdir", "create directory", "mkdir <path>"),
     CMDENTRY(cmd_font, "font", "change console font", "font [0-1]"),
+    CMDENTRY(cmd_keymap, "keymap", "change keyboard layout", "keymap [US|DE]"),
+    CMDENTRY(cmd_whoami, "whoami", "display current user", "whoami"),
+    CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
+    CMDENTRY(cmd_edit, "edit", "edit file interactively", "edit <file>"),
+    CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
+    CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
 };
 
 //----------------------------------
@@ -52,6 +65,8 @@ driver_module console_module = (driver_module) {
 
 //---------------------------------
 
+
+//extern void prompt_config_init();
 void console_init(void)
 {
     input_pos = 0;
@@ -73,6 +88,22 @@ void console_init(void)
     cursor_x = 0;
     cursor_y = 0;
 
+    //is_login_active = 1;
+    //if (!login_authenticate()) {
+        // Login failed - should never reach here due to lock
+        //panic("Login authentication failed");
+        //}
+    //is_login_active = 0;
+
+
+    //create config files for console:
+    /*fs_mkdir("/.config/ekmsh");
+    fs_mkdir("/.config/ekmsh/promts");
+    fs_open("/.config/ekmsh/promts/promt.conf", O_CREAT | O_WRONLY);*/
+
+    prompt_config_init();
+
+    clear(CONSOLESCREEN_BG_COLOR);
     banner_init();
 
     // Initialize console window
@@ -80,7 +111,11 @@ void console_init(void)
     cursor_();
 
     shell_print_prompt();
+
+    console_execute("view /images/logo.bmp");
     cursor_draw();
+
+    console_run();
 }
 
 void console_run(void)
@@ -88,6 +123,34 @@ void console_run(void)
     // main console loop will be called from keyboard handler
     // this function exists for future expansion like syscalls maybe for a app like a code editor which needs a console
     // actually idk why i created this xd
+    while (1) {
+        if (keyboard_has_key()) {
+            key_event_t event;
+            if (keyboard_get_event(&event)) {
+                if (event.pressed) {
+                    console_handle_key_event(&event);
+                }
+            }
+        }
+        // Let CPU rest
+        __asm__ volatile("hlt");
+    }
+}
+
+void console_handle_key_event(key_event_t *event) {
+    cursor_c();
+
+    // Handle Ctrl+S (save in edit mode)
+    if ((event->modifiers & KEY_CTRL_MASK) && (event->keycode == 's' || event->keycode == 'S')) {
+        // This will be handled by edit command
+        return;
+    }
+
+    char c = (char)(event->keycode & 0xFF);
+    console_handle_key(c);
+
+    cursor_reset_blink();
+    cursor_draw();
 }
 
 void console_handle_key(char c)
@@ -109,11 +172,15 @@ void console_handle_key(char c)
                 }
             }
 
+            // prints every command to the console
+            printf("%s\n", input_buffer);
+
             if (has_chain) {
                 parse_and_execute_chained(input_buffer);
             } else {
                 console_execute(input_buffer);
             }
+
 
             input_pos = 0;
             input_buffer[0] = '\0';
@@ -198,8 +265,13 @@ void console_execute(const char *input)
         cmd->func(args);
 
         banner_force_update();
+
+        // for PC_NAME and USER_NAME
+        user_config_reload();
     } else {
-        print("> Unknown command, Type 'help' for available commands...", GFX_RED);
+        print(CONSOLE_NAME, WRONG_COMMAND_CL);
+        print(": command not found:", WRONG_COMMAND_CL);
+        print(cmd_name, WRONG_COMMAND_CL);
     }
 }
 

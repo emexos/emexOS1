@@ -9,6 +9,8 @@
 #include <theme/doccr.h>
 #include <config/user.h>
 
+#include <string/string.h>
+
 #include <kernel/module/module.h>
 extern driver_module console_module;
 
