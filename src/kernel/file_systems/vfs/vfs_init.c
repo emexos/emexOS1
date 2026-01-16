@@ -1,5 +1,5 @@
 #include "init.h"
-char *logpath = "/tmp/log";
+char *logpath = "/emr/logs/log1.txt";
 int init_boot_log = -1;
 #include "vfs.h"
 #include <kernel/mem/klime/klime.h>
@@ -144,6 +144,15 @@ void fs_system_init(void *klime)
     fs_mkdir(DEV_DIRECTORY);
     fs_mkdir(TMP_DIRECTORY);
     fs_mkdir(BOOT_DIRECTORY);
+    //emx system requirement paths
+    fs_mkdir(EMX_DIRECTORY); // /emr
+    fs_mkdir(EMLOG_DIRECTORY);
+    fs_mkdir(EMAST_DIRECTORY);
+    fs_mkdir(EMCFG_DIRECTORY);
+    fs_mkdir(KEYMP_DIRECTORY);
+
+    fs_mkdir(CONF_DIRECTORY);
+
     init_boot_log = fs_open(logpath, O_CREAT | O_WRONLY);
     BOOTUP_PRINTF("[FS] wrote %s \n", logpath);
     if (init_boot_log < 0) {

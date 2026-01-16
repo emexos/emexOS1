@@ -1,8 +1,7 @@
-# ===== shared/keymaps/DE.kmap =====
-# German Keyboard Layout (QWERTZ)
-# Format: 0xSCANCODE = 'normal' 'shift'
+# German layout (QWERTZ)
+# use: 0xSCANCODE = 'normal' 'shift'
 
-# Numbers
+# first column
 0x02 = '1' '!'
 0x03 = '2' '"'
 0x04 = '3' '#'
@@ -16,7 +15,7 @@
 0x0C = '\x83' '?'
 0x0D = '\'' '`'
 
-# Letters - Top row (QWERTZ)
+# second column
 0x10 = 'q' 'Q'
 0x11 = 'w' 'W'
 0x12 = 'e' 'E'
@@ -30,7 +29,7 @@
 0x1A = '\x82' '\x82'
 0x1B = '+' '*'
 
-# Letters - Home row
+# third column
 0x1E = 'a' 'A'
 0x1F = 's' 'S'
 0x20 = 'd' 'D'
@@ -44,7 +43,7 @@
 0x28 = '\x80' '\x80'
 0x29 = '<' '>'
 
-# Letters - Bottom row
+# fourth column
 0x2B = '#' '\''
 0x2C = 'y' 'Y'
 0x2D = 'x' 'X'
@@ -57,7 +56,7 @@
 0x34 = '.' ':'
 0x35 = '-' '_'
 
-# Special keys
+# special keys
 0x0E = '\b' '\b'
 0x0F = '\t' '\t'
 0x1C = '\n' '\n'

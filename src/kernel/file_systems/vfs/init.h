@@ -2,14 +2,31 @@
 extern char *logpath;
 extern int init_boot_log;
 
-#define ROOTFS "tmpfs"
+#define ROOTFS TMPFS // for now, soon its fat32/ext2
 #define ROOT_MOUNT_DEFAULT "/"
+
+#define EXT2FS "ext2"
+#define EXT2_DIRECTORY  "/"
+
+#define TMPFS "tmpfs"
 #define TMP_DIRECTORY  "/tmp"
+
 
 #define DEVFS "devfs"
 #define DEV_MOUNT_DEFAULT "/dev"
 #define DEV_DIRECTORY  "/dev"
 #define _DEV  "/dev/"
+#define MOUNT_DEV "/dev/hda"
+
+#define EMX_DIRECTORY "/emr" // == emex system resources
+#define _EMX "/emr/" // mount point (/disk)
+#define EMCFG_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/config" // == system configs
+#define EMAST_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/assets"
+#define EMLOG_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/logs"
+#define KEYMP_DIRECTORY /*" /emr "*/EMCFG_DIRECTORY "/keymaps"
+
+
+#define CONF_DIRECTORY /* root/ */ "/.config" // == app configs
 
 
 #define BOOT_DIRECTORY "/boot"

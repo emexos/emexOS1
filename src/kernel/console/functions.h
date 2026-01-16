@@ -23,8 +23,29 @@ FHDR(cmd_date);
 FHDR(cmd_time);
 FHDR(cmd_uptime);
 
+// File System
+FHDR(cmd_tree);
 FHDR(cmd_cat);
 FHDR(cmd_ls);
+FHDR(cmd_cd);
+FHDR(cmd_mkdir);
+FHDR(cmd_edit);
+FHDR(cmd_touch);
 
+// whoami.c
+FHDR(cmd_whoami);
 
+// source.c
+FHDR(cmd_source);
+
+// keymap.c
+FHDR(cmd_keymap);
+
+// poweroff.c
 FHDR(cmd_poweroff);
+FHDR(cmd_reboot);
+FHDR(cmd_shutdown);
+
+
+// view.c
+FHDR(cmd_view);

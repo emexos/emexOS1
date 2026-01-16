@@ -113,6 +113,9 @@ void console_init(void)
     shell_print_prompt();
 
     console_execute("view /images/logo.bmp");
+
+    console_execute("tree");
+
     cursor_draw();
 
     console_run();

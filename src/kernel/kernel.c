@@ -95,7 +95,7 @@ void _start(void)
     fm_init();
     clear(bg());
 
-    #ifdef BOOTUP_VISUALS 1
+    #ifdef BOOTUP_VISUALS == 1
         print("BOOTUP_VISUALS == 1\n", white());
     #else
         print("BOOTUP_VISUALS == 0\n", white());
