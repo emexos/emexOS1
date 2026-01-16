@@ -1,12 +1,41 @@
 #include "console.h"
 #include "graph/uno.h"
 #include "graph/dos.h"
+#include <kernel/data/conf.h>
 
 void shell_clear_screen(u32 color)
 {
 
     console_window_clear(color);
 }
+
+static conf_entry_t prompt_conf[16];
+static int prompt_conf_count = 0;
+
+void shell_load_prompt_config(void) {
+    prompt_conf_count = conf_load("/.config/ekmsh/prompts/prompt.conf",
+                                   prompt_conf, 16);
+}
+
+extern char cwd[];
+
+/*void shell_print_prompt(void)
+{
+
+    string("\n", GFX_WHITE);
+    string(user_config_get_pc_name(), GFX_WHITE);
+    string("@", GFX_WHITE);
+    string(user_config_get_user_name(), GFX_WHITE);
+    //string("\x01 ", GFX_YELLOW);
+    string(":", GFX_WHITE);
+    if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
+        char prompt_cwd[MAX_PATH_LEN];
+        str_copy(prompt_cwd, cwd);
+        prompt_cwd[str_len(cwd) - 1] = '\0';
+        string(prompt_cwd, GFX_WHITE);
+    }
+    string("# ", GFX_BLUE);
+}*/
 
 void shell_print_prompt(void)
 {
@@ -20,11 +49,55 @@ void shell_print_prompt(void)
      */
     //
 
+    if (prompt_conf_count <= 0) {
+        shell_load_prompt_config();
+    }
+
+    const char *format = conf_get(prompt_conf, prompt_conf_count, "format");
+
+    if (!format) {
+        string("\n", GFX_WHITE);
+        string(user_config_get_pc_name(), GFX_WHITE);
+        string("@", GFX_WHITE);
+        string(user_config_get_user_name(), GFX_WHITE);
+        string(":", GFX_WHITE);
+
+        if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
+            char prompt_cwd[MAX_PATH_LEN];
+            str_copy(prompt_cwd, cwd);
+            prompt_cwd[str_len(cwd) - 1] = '\0';
+            string(prompt_cwd, GFX_WHITE);
+        } else {
+            string(cwd, GFX_WHITE);
+        }
+
+        string("# ", GFX_BLUE);
+        return;
+    }
+
     string("\n", GFX_WHITE);
-    string(PC_NAME, GFX_WHITE);
-    string("@", GFX_WHITE);
-    string(USER_NAME, GFX_WHITE);
-    string("\x01 ", GFX_YELLOW);
+
+    for (const char *p = format; *p; p++) {
+        if (*p == '%') {
+            p++;
+            if (*p == 'u') string(user_config_get_user_name(), GFX_WHITE);
+            else if (*p == 'h') string(user_config_get_pc_name(), GFX_WHITE);
+            else if (*p == 'w') {
+                if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
+                    char prompt_cwd[MAX_PATH_LEN];
+                    str_copy(prompt_cwd, cwd);
+                    prompt_cwd[str_len(cwd) - 1] = '\0';
+                    string(prompt_cwd, GFX_WHITE);
+                } else {
+                    string(cwd, GFX_WHITE);
+                }
+            }
+            else if (*p == '%') string("%", GFX_WHITE);
+        } else {
+            char c[2] = {*p, '\0'};
+            string(c, GFX_WHITE);
+        }
+    }
 }
 
 void shell_redraw_input(void)

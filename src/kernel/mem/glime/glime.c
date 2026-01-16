@@ -184,7 +184,7 @@ void glime_keyboard_handler(glime_t *glime) {
         if (scancode == last) continue;
         last = scancode;
 
-        key_event_t event = {
+        glime_key_event_t event = {
             .scancode = scancode & 0x7F,
             .pressed = !(scancode & 0x80),
             .modifiers = 0,

@@ -91,22 +91,22 @@ typedef struct key_event {
     // ctrl, shift .. reserved
     u8 modifiers;
     u8 pressed;
-} key_event_t;
+} glime_key_event_t;
 
 typedef struct keyboardrb {
-    key_event_t *buf;
-    u32 len;      
-    u32 head;      
-    u32 tail;      
-    u32 count;     
-} keyboardrb_t;
+    glime_key_event_t *buf;
+    u32 len;
+    u32 head;
+    u32 tail;
+    u32 count;
+} glime_keyboardrb_t;
 
 
-int keyboard_put(keyboardrb_t *kbrb, key_event_t event);
-int keyboard_next(keyboardrb_t *kbrb, key_event_t *out);
-u8 keyboard_event_to_char(key_event_t event);
+int keyboard_put(glime_keyboardrb_t *kbrb, glime_key_event_t event);
+int keyboard_next(glime_keyboardrb_t *kbrb, glime_key_event_t *out);
+u8 keyboard_event_to_char(glime_key_event_t event);
 
-keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count);
+glime_keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count);
 void glime_keyboard_handler(glime_t *glime);
 
 #endif

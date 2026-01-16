@@ -32,20 +32,20 @@ static const unsigned char scancode_to_ascii_shift[128] = {
     [0x37]='*',[0x38]=0,[0x39]=' ',[0x3A]=0
 };
 
-keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count)  {
+glime_keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count)  {
     if (!glime || count == 0) return NULL;
 
     //@TODO: slab_alloc
-    keyboardrb_t *kbrb = (keyboardrb_t *) glime_create(glime, sizeof(keyboardrb_t));
+    glime_keyboardrb_t *kbrb = (glime_keyboardrb_t *) glime_create(glime, sizeof(glime_keyboardrb_t));
     if (!kbrb) return NULL;
 
-    kbrb->buf = (key_event_t *) glime_alloc(glime, sizeof(key_event_t), count);
+    kbrb->buf = (glime_key_event_t *) glime_alloc(glime, sizeof(glime_key_event_t), count);
     if (!kbrb->buf) {
         glime_free(glime, (u64 *) kbrb);
         return NULL;
     }
-    
-    kbrb->len = count; 
+
+    kbrb->len = count;
     kbrb->head = 0;
     kbrb->tail = 0;
     kbrb->count = 0;
@@ -53,7 +53,7 @@ keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count)  {
     return kbrb;
 }
 
-int keyboard_put(keyboardrb_t *kbrb, key_event_t event) {
+int keyboard_put(glime_keyboardrb_t *kbrb, glime_key_event_t event) {
     if (kbrb->count >= kbrb->len) {
         return 1;
     }
@@ -61,11 +61,11 @@ int keyboard_put(keyboardrb_t *kbrb, key_event_t event) {
     kbrb->buf[kbrb->head] = event;
     kbrb->head = (kbrb->head + 1) % kbrb->len;
     kbrb->count++;
-  
+
     return 0;
 }
 
-int keyboard_next(keyboardrb_t *kbrb, key_event_t *out) {
+int keyboard_next(glime_keyboardrb_t *kbrb, glime_key_event_t *out) {
     if (kbrb->count = 0) return 1;
 
     *out = kbrb->buf[kbrb->tail];
@@ -75,7 +75,6 @@ int keyboard_next(keyboardrb_t *kbrb, key_event_t *out) {
     return 0;
 }
 
-u8 keyboard_event_to_char(key_event_t event) {
+u8 keyboard_event_to_char(glime_key_event_t event) {
     return scancode_to_ascii[event.scancode];
 }
-
