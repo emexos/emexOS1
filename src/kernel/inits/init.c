@@ -28,6 +28,9 @@ void keymaps_load(void)
 }
 
 void logos_load(void) {
-    limine_module_load("logo.bin", "/boot/ui/assets/logo.bin");
+    limine_module_load("logo.bin", "/boot/ui/assets/bootlogo.bin");
     limine_module_load("logo.bmp", "/images/logo.bmp");
+    //limine_module_load("console_icon.bmp", "/images/iconsole.bmp");
+    //limine_module_load("desktop_icon.bmp", "/images/idesktop.bmp");
+    limine_module_load("background.bmp", "/images/bg.bmp");
 }

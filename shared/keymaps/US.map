@@ -1,8 +1,4 @@
-# ===== shared/keymaps/US.kmap =====
-# US Keyboard Layout (QWERTY)
-# Format: 0xSCANCODE = 'normal' 'shift'
-
-# first column
+# first line
 0x02 = '1' '!'
 0x03 = '2' '@'
 0x04 = '3' '#'
@@ -16,7 +12,7 @@
 0x0C = '-' '_'
 0x0D = '=' '+'
 
-# second column
+# second line
 0x10 = 'q' 'Q'
 0x11 = 'w' 'W'
 0x12 = 'e' 'E'
@@ -30,7 +26,7 @@
 0x1A = '[' '{'
 0x1B = ']' '}'
 
-# third column
+# third line
 0x1E = 'a' 'A'
 0x1F = 's' 'S'
 0x20 = 'd' 'D'
@@ -44,7 +40,7 @@
 0x28 = '\'' '"'
 0x29 = '`' '~'
 
-# fourth column
+# fourth line
 0x2C = 'z' 'Z'
 0x2D = 'x' 'X'
 0x2E = 'c' 'C'
@@ -55,6 +51,8 @@
 0x33 = ',' '<'
 0x34 = '.' '>'
 0x35 = '/' '?'
+
+
 
 # special keys
 0x0E = '\b' '\b'

@@ -31,8 +31,8 @@ typedef struct ulime_proc {
 //@TODO: move someone else
 #define SYS_EXIT    0
 #define SYS_WRITE   1
-#define SYS_READ    2
-#define SYS_GETPID  3
+//#define SYS_READ    2
+//#define SYS_GETPID  3
 
 typedef u64 (*syscall_handler_t)(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3);
 

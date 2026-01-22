@@ -11,6 +11,13 @@ include/limine
 .DS_Store
 **/.DS_Store
 
+tools/old
+tools/png
+tools/bmp
+
+dsk/hdd0
+
+src/kernel/console/functions/edit.c
 
 #shared/libc/math/math.c
 #shared/libc/math/pi.h
@@ -27,7 +34,7 @@ tools/converter.py
 
 .zig-cache/
 
-disk.img
+#dsk/disk.img
 
 test
 

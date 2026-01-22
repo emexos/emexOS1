@@ -7,36 +7,35 @@
 #include <kernel/file_systems/vfs/vfs.h>
 #include <config/files.h>
 
-// Parse .kmap (emex keymap) file format
+// Parse .map (emex keymap) file format
 static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
     if (!data || !km || size == 0) return -1;
 
-    // Initialize keymap to zero
+    // start to zero
     memset(km, 0, sizeof(keymap_t));
 
     const char *line = data;
     const char *end = data + size;
 
     while (line < end) {
-        // Skip whitespace
+        // skip space
         while (line < end && (*line == ' ' || *line == '\t' || *line == '\r')) line++;
 
         if (line >= end) break;
 
         if (*line == '#' || *line == '\n') {
-            // Skip comments and empty lines
+            // skip comments and empty lines
             while (line < end && *line != '\n') line++;
             if (line < end && *line == '\n') line++;
             continue;
         }
 
-        // Parse "0xSC = 'c' 'C'" format
+        // parse  in "0xSC = 'c' 'C'" format
         if (line + 2 < end && line[0] == '0' && line[1] == 'x') {
-            // Parse scancode
             u8 scancode = 0;
             line += 2;
 
-            // Parse hex value (2 digits)
+            // (2 digits)
             for (int i = 0; i < 2 && line < end; i++) {
                 scancode <<= 4;
                 if (*line >= '0' && *line <= '9') {
@@ -49,14 +48,11 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
                 line++;
             }
 
-            // Skip to '='
-            while (line < end && *line != '=') line++;
+            while (line < end && *line != '=') line++; // =
             if (line < end && *line == '=') line++;
+            while (line < end && (*line == ' ' || *line == '\t')) line++; // space
 
-            // Skip whitespace
-            while (line < end && (*line == ' ' || *line == '\t')) line++;
-
-            // Parse normal character (between single quotes)
+            // parse normal, between single quotes
             if (line < end && *line == '\'') {
                 line++;
                 if (line < end) {
@@ -84,7 +80,7 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
                                         line++;
                                     }
                                     km->normal[scancode] = hex;
-                                    line--; // Adjust for the loop increment
+                                    line--; // increment
                                 }
                                 break;
                             default: km->normal[scancode] = *line; break;
@@ -94,15 +90,15 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
                         km->normal[scancode] = *line++;
                     }
 
-                    // Skip closing quote
+                    // skip closing quote
                     if (line < end && *line == '\'') line++;
                 }
             }
 
-            // Skip whitespace
+            // skip whitespace
             while (line < end && (*line == ' ' || *line == '\t')) line++;
 
-            // Parse shift character
+            //p arse shift character
             if (line < end && *line == '\'') {
                 line++;
                 if (line < end) {
@@ -129,7 +125,7 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
                                         line++;
                                     }
                                     km->shift[scancode] = hex;
-                                    line--; // Adjust for the loop increment
+                                    line--; // increment
                                 }
                                 break;
                             default: km->shift[scancode] = *line; break;
@@ -144,7 +140,7 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
             }
         }
 
-        // Skip to next line
+        // skip to nect line
         while (line < end && *line != '\n') line++;
         if (line < end && *line == '\n') line++;
     }
@@ -163,16 +159,16 @@ int keymap_load_from_module(const char *name, keymap_t *km) {
     struct limine_module_response *response =
         (struct limine_module_response *)module_request.response;
 
-    // Build expected filename
+    // Builds the expected filename
     char expected_name[64];
     str_copy(expected_name, name);
     str_append(expected_name, KEYMAP_FORMAT);
 
-    // Search for keymap module
+    // search for keymap module
     for (u64 i = 0; i < response->module_count; i++) {
         struct limine_file *module = response->modules[i];
 
-        // Extract filename from path
+        //Extract filename from path
         const char *filename = module->path;
         const char *last_slash = filename;
         for (const char *p = filename; *p; p++) {
@@ -180,7 +176,7 @@ int keymap_load_from_module(const char *name, keymap_t *km) {
         }
         filename = last_slash;
 
-        // Check if this is our keymap
+        // checks if this is our keymap
         if (str_equals(filename, expected_name)) {
             printf("[KEYMAP] Loading %s from module (%lu bytes)\n",
                    filename, module->size);
@@ -205,7 +201,7 @@ int keymap_modules_init(void) {
 
     printf("[KEYMAP] Found %lu Limine modules\n", response->module_count);
 
-    // List all keymap modules
+    // lists all keymap modules
     int keymap_count = 0;
     for (u64 i = 0; i < response->module_count; i++) {
         struct limine_file *module = response->modules[i];
@@ -217,7 +213,7 @@ int keymap_modules_init(void) {
         }
         filename = last_slash;
 
-        // Check if this is a keymap file
+        // check if this is a keymap file
         if (str_contains(filename, KEYMAP_FORMAT)) {
             printf("[KEYMAP] Available: %s\n", filename);
             keymap_count++;

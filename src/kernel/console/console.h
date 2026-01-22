@@ -42,6 +42,9 @@ typedef struct {
 #define CMDENTRY(func, name, desc, usage) { func, name, desc, usage }
 
 extern char cwd[];
+//for help.c
+extern console_cmd_t commands[];
+extern int cmd_count;
 
 void console_init(void);
 void console_run(void);

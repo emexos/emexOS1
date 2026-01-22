@@ -3,7 +3,7 @@
 #include <drivers/ps2/keyboard/keyboard.h>
 
 FHDR(cmd_view) {
-    /*if (!s || *s == '\0') {
+    if (!s || *s == '\0') {
         print("usage: view <image.bmp>\n", GFX_RED);
         return;
     }
@@ -37,5 +37,5 @@ FHDR(cmd_view) {
 
     bmp_free(&img);
     //clear(CONSOLESCREEN_BG_COLOR);
-    banner_draw();*/
+    banner_draw();
 }

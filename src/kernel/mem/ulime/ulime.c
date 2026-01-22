@@ -206,4 +206,6 @@ void ulime_init_syscalls(ulime_t *ulime) {
 
     ulime->syscalls[SYS_EXIT]   = sys_exit;
     ulime->syscalls[SYS_WRITE]  = sys_write;
+    //ulime->syscalls[SYS_READ]   = sys_read;
+    //ulime->syscalls[SYS_GETPID] = sys_getpid;
 }

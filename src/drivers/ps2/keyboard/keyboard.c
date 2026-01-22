@@ -85,7 +85,6 @@ void keyboard_init(void) {
     key_buffer.write_pos = 0;
     key_buffer.count = 0;
 
-    // Register IRQ1 handler for keyboard
     irq_register_handler(1, keyboard_irq_handler);
 }
 
@@ -109,9 +108,10 @@ char keyboard_get_key(void) {
     return (char)(event.keycode & 0xFF);
 }
 
-// Dummy function for compatibility
+
+
 void keyboard_poll(void) {
-    // Keyboard now works via IRQ, this is just for compatibility
+    // for compatibility reasons
     while(1) {
         __asm__ volatile("hlt");
     }

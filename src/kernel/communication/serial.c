@@ -18,8 +18,17 @@ int serial_ready(void) {
 }
 
 void serial_putchar(char c) {
-    while (!serial_ready());
-    outb(COM1, c);
+    int timeout = 100000;
+    while (!serial_ready() && timeout > 0) {
+        timeout--;
+    }
+    if (timeout > 0) {
+        outb(COM1, c);
+
+        for (volatile int i = 0; i < 10; i++) {
+            __asm__ volatile("nop");
+        }
+    }
 }
 
 void serial_puts(const char *str) {
@@ -130,6 +139,25 @@ void serial_printf(const char *format, ...) {
         if (*format == '%') {
             format++;
 
+            // skip flags
+            while (*format == '0' || *format == '-' || *format == '+' ||
+                    *format == ' ' || *format == '#') {
+                format++;
+            }
+
+            // skip width
+            while (*format >= '0' && *format <= '9') {
+                format++;
+            }
+
+            // skip precision
+            if (*format == '.') {
+                format++;
+                while (*format >= '0' && *format <= '9') {
+                    format++;
+                }
+            }
+
             // check for length modifiers
             int is_long = 0;
             int is_long_long = 0;
@@ -181,8 +209,12 @@ void serial_printf(const char *format, ...) {
                     break;
 
                 case 's':  // string
-                    serial_puts(va_arg(args, const char*));
+                {
+                    const char *s = va_arg(args, const char*);
+                    if (s) serial_puts(s);
+                    else serial_puts("(null)");
                     break;
+                }
 
                 case 'c':  // char
                     serial_putchar((char)va_arg(args, int));

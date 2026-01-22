@@ -8,9 +8,9 @@ char cwd[MAX_PATH_LEN] = "/";
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-static int cmd_count = 26;
+int cmd_count = 26;
 
-static console_cmd_t commands[MAX_CMDS] = {
+console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
     CMDENTRY(cmd_clear, "clear", "clears the screen", "clear [color]"),
     CMDENTRY(cmd_help, "help", "displays all available commands", "help [command]"),
@@ -35,9 +35,9 @@ static console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_keymap, "keymap", "change keyboard layout", "keymap [US|DE]"),
     CMDENTRY(cmd_whoami, "whoami", "display current user", "whoami"),
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
-    CMDENTRY(cmd_edit, "edit", "edit file interactively", "edit <file>"),
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
     CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
+    //CMDENTRY(cmd_edit, "edit", "simple text editor", "edit <file>"),
 };
 
 //----------------------------------
@@ -71,10 +71,25 @@ void console_init(void)
 {
     input_pos = 0;
     input_buffer[0] = '\0';
+    char buf[32];
 
-    sconsole_theme(THEME_FLU);
+    print("[CONSOLE] ", GFX_GRAY_70);
+    print("starting console...\n", white());
+
+    //sconsole_theme(THEME_FLU);
     f_setcontext(FONT_8X8);
     clear(CONSOLESCREEN_BG_COLOR);
+
+    print("[FM] ", GFX_GRAY_70);
+    print("scaling font...\n", white());
+    font_scale = 2;
+    str_append_uint(buf, font_scale);
+    print("[FM] ", GFX_GRAY_70);
+    print("font scaled to: ", white());
+    print(buf, white());
+    print("\n", white());
+
+    buf[0] = '\0'; //reset
     //reset_cursor();
     /*
     //module_register_driver(&console_module);
@@ -112,10 +127,7 @@ void console_init(void)
 
     shell_print_prompt();
 
-    console_execute("view /images/logo.bmp");
-
-    console_execute("tree");
-
+    //console_execute("view /images/logo.bmp");
     cursor_draw();
 
     console_run();

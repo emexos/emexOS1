@@ -40,8 +40,14 @@ SECTIONS
     } :data
 
     .bss : {
-        *(.bss .bss.*)
-        *(COMMON)
+            *(.bss .bss.*)
+            *(COMMON)
+
+            /* Syscall kernel stack */
+            . = ALIGN(16);
+            syscall_stack_bottom = .;
+            . += 0x4000;  /* 16KB stack */
+            syscall_stack_top = .;
     } :data
 
     /DISCARD/ : {

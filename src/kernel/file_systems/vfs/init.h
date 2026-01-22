@@ -2,10 +2,15 @@
 extern char *logpath;
 extern int init_boot_log;
 
+#define DISK_NAME "hdd0"
+
 #define ROOTFS TMPFS // for now, soon its fat32/ext2
 #define ROOT_MOUNT_DEFAULT "/"
 
-#define EXT2FS "ext2"
+#define FAT32 "fat32"
+#define FAT32_DIRECTORY  "/"
+
+#define EXT2 "ext2"
 #define EXT2_DIRECTORY  "/"
 
 #define TMPFS "tmpfs"
@@ -34,4 +39,4 @@ extern int init_boot_log;
 #define AST_DIRECTORY "/assets"
 
 #define LOGO_DIRECTORY BOOT_DIRECTORY UI_DIRECTORY AST_DIRECTORY
-#define LOGO_NAME LOGO_DIRECTORY "/logo.bin"
+#define LOGO_NAME LOGO_DIRECTORY "/bootlogo.bin"

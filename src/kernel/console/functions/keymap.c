@@ -7,10 +7,11 @@ FHDR(cmd_keymap) {
         print("you use keymap: ", GFX_WHITE);
         print(keymap_get_current_name(), GFX_WHITE);
         print("\nuse: keymap <name>\n", GFX_WHITE);
+        print("\nnote that only DE & US are correctly supported by now.\n", GFX_WHITE);
         return;
     }
 
-    // Parse keymap name
+    // parse keymap name
     const char *p = s;
     while (*p == ' ') p++;
 
@@ -21,10 +22,10 @@ FHDR(cmd_keymap) {
     }
     keymap_name[i] = '\0';
 
-    // Convert to uppercase
+    // convert to uppercase
     str_to_upper(keymap_name);
 
-    // Try to set the keymap
+    // trys to set the keymap
     if (keymap_set(keymap_name) != 0) {
         print("error: keymap '", GFX_RED);
         print(keymap_name, GFX_RED);

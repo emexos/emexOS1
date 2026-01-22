@@ -34,10 +34,23 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@mkdir -p $(ISODIR)/boot/ui/fonts
 	@mkdir -p $(ISODIR)/boot/ui/assets
 	@mkdir -p $(ISODIR)/boot/modules
+	@mkdir -p $(ISODIR)/boot/keymaps
+	@mkdir -p $(ISODIR)/boot/images
 
+	@echo "[MOD] copying configs..."
 	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
-	#@cp shared/ui/fonts/gohu-uni-14.pcf $(ISODIR)/boot/ui/fonts/
-	@cp shared/ui/assets/logo.bin $(ISODIR)/boot/ui/assets/
+
+	@echo "[MOD] copying assets..."
+	@cp shared/ui/assets/bootlogo.bin $(ISODIR)/boot/ui/assets/
+	@cp shared/images/logo.bmp $(ISODIR)/boot/images/
+	@cp shared/images/desktop_icon.bmp $(ISODIR)/boot/images/
+	@cp shared/images/console_icon.bmp $(ISODIR)/boot/images/
+	@cp shared/images/background.bmp $(ISODIR)/boot/images/
+
+	@echo "[MOD] copying keymaps..."
+	@cp shared/keymaps/US.map $(ISODIR)/boot/keymaps/
+	@cp shared/keymaps/DE.map $(ISODIR)/boot/keymaps/
+	@cp shared/keymaps/PL.map $(ISODIR)/boot/keymaps/
 
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
@@ -52,15 +65,16 @@ run: $(ISO)
 	@echo "[QEMU]running $(OS_NAME).iso "
 	@echo
 	@qemu-system-x86_64 \
-		-M q35 \
+		-M pc \
 		-cpu qemu64 \
 		-m 512 \
 		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
+		-drive file=dsk/disk.img,format=raw,if=ide,index=0 \
 		-cdrom $< \
 		-serial stdio 2>&1 \
-		-no-reboot \
-		-no-shutdown
+		#-no-reboot \
+		#-no-shutdown
 
 run_usb: $(ISO)
 	@chmod +x run_xhci.sh

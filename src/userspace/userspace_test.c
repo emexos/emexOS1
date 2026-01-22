@@ -7,7 +7,7 @@ void _start() { // or main
     print("hello from userspace"); // syscall(CONSOLE_WRITE, STDOUT...);
     //                         ^ when no color then write white
 
-    exit(); // syscall(SYS_EXIT, 0);
+    exit(0); // syscall(SYS_EXIT, 0);
 }
 
 */

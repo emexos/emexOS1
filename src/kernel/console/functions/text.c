@@ -73,10 +73,6 @@ FHDR(cmd_fsize)
 
 FHDR(cmd_font) {
     if (*s == '\0') {
-        print("Current font: ", GFX_WHITE);
-        print(fm_get_font_name(), GFX_CYAN);
-        print("\n  0 == DOS (8x8)\n", GFX_WHITE);
-        print(  "  1 == thin(8x8)\n", GFX_WHITE);
         return;
     }
 
@@ -99,7 +95,7 @@ FHDR(cmd_font) {
     }
 }
 
-FHDR(cmd_help)
+/*FHDR(cmd_help)
 {
     if (*s == '\0') {
         // show all commands
@@ -143,3 +139,4 @@ FHDR(cmd_help)
         }
     }
 }
+*/

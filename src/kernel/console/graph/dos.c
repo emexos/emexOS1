@@ -37,34 +37,33 @@ u32 console_window_get_max_y(void) {
 void console_window_check_scroll(void)
 {
     u32 char_height = 8 * font_scale;
+    u32 line_height = char_height + 2 * font_scale;
     u32 fb_h = get_fb_height();
     u32 banner_h = banner_get_height();
 
-    // check if cursor is at bottom
-    if (cursor_y + char_height >= fb_h) {
-        u32 line_height = char_height + 2 * font_scale;
-
-        // scroll only console area
+    // check if cursor is out of screen
+    if (cursor_y + char_height > fb_h) {
         u32 fb_w = get_fb_width();
         u32 pitch_dwords = get_fb_pitch() / 4;
         u32 *fb = get_framebuffer();
 
-        // move content up
+        // move content up by line_height
         for (u32 y = banner_h + line_height; y < fb_h; y++) {
             for (u32 x = 0; x < fb_w; x++) {
                 fb[(y - line_height) * pitch_dwords + x] = fb[y * pitch_dwords + x];
             }
         }
 
-        // cls top line
+        // cls bottom line
         for (u32 y = fb_h - line_height; y < fb_h; y++) {
             for (u32 x = 0; x < fb_w; x++) {
                 fb[y * pitch_dwords + x] = CONSOLESCREEN_BG_COLOR;
             }
         }
 
-        //adjust cursor
-        cursor_y = fb_h - char_height - 10;
+        // move cursor up
+        cursor_y -= line_height;
+
         if (cursor_y < banner_h) {
             cursor_y = banner_h;
         }

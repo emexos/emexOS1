@@ -49,8 +49,9 @@ void setcontext(ThemeContext context);
 ThemeContext getcontext();
 
 void sbootup_theme(ThemeType type);
-void sconsole_theme(ThemeType type);
+//void sconsole_theme(ThemeType type);
 void spanic_theme(ThemeType type);
+void reload_console_theme(void);
 
 u32 get_color(ThemeColor color);
 

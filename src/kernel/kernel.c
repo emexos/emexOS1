@@ -12,6 +12,9 @@
 // TODO:
 // add a exact time for start and end, which cpu, how long it booted...
 
+// pictures
+#include <kernel/images/bmp.h>
+
 // Drivers
 #include <drivers/ps2/ps2.h>
 //#include <drivers/usb/xhci.h>
@@ -48,59 +51,70 @@
 #include <kernel/file_systems/vfs/init.h>
 //extern void fs_system_init(klime_t *klime);
 //extern void fs_create_test_file(void);
+#include <kernel/file_systems/fat32/fat32.h> // finally fat32!
 
-// modules
+// disk drivers
 #include <kernel/module/module.h>
 //extern void fs_register_mods(void);
+#include <drivers/storage/ata/disk.h>
+// limine modules
+#include <kernel/modules/limine.h>
+#include <kernel/inits/init.h>
 
+//PCIe
 #include <kernel/pci/pci.h>
 
 
 // usermode stuff
-//#include <kernel/usermode/syscall.h>
-//#include <kernel/usermode/usermode.h>
+//#include <kernel/syscalls/syscall.h>
+//#include <kernel/userspace/userspace.h>
 //extern void userspace_test_init(ulime_t *ulime);
 
 void _start(void)
 {
-    theme_init();
-    setcontext(THEME_BOOTUP); // gets loaded over sbootup_theme until, sbootup == FLU
-    sbootup_theme(THEME_STD);
-    sconsole_theme(THEME_FLU);
-    spanic_theme(THEME_STD);
-    //font_manager_init();
-    //font_manager_set_context(FONT_CONTEXT_BOOT);
+    { // Initializing Boot screen
+        theme_init();
+        setcontext(THEME_BOOTUP); // gets loaded over sbootup_theme until, sbootup == FLU
+        sbootup_theme(THEME_STD);
+        //sconsole_theme(THEME_FLU);
+        spanic_theme(THEME_STD);
 
-    // Temporaly before switchin to glime_t
-    // emexOS start
-    // Ensure that Limine base revision is supported and that we have a framebuffer
-    if (framebuffer_request.response == NULL ||
-        framebuffer_request.response->framebuffer_count < 1) {
-            printf("no response");
-        hcf();
+        //f_setcontext(FONT_8X8_DOS);  // already set as default
+
+        // Temporaly before switchin to glime_t
+        // emexOS start
+        // Ensure that Limine base revision is supported and that we have a framebuffer
+        if (framebuffer_request.response == NULL ||
+            framebuffer_request.response->framebuffer_count < 1) {
+                printf("no response");
+            hcf(); // enable text mode
+        }
+
+        // Initialize framebuffer graphics
+        struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
+        graphics_init(fb);
+        printf("\ninit graphics, draw logo\n");
+        //draw_logo();
+
+        // main kernel
+        printf("==============================================\n");
+        printf("==                  emexOS                  ==\n");
+        printf("==    the OS which does what you tell it    ==\n");
+        printf("==============================================\n");
+
+        fm_init();
+        clear(bg());
+
+        #ifdef BOOTUP_VISUALS == 1
+            print("BOOTUP_VISUALS == 1\n", white());
+        #else
+            print("BOOTUP_VISUALS == 0\n", white());
+        #endif
+
+        //actually not needed but maybe later (e.g. for testing themes)
+        //draw_rect(10, 10, fb_width - 20, fb_height - 20, blue());
+
     }
-
-    // Initialize framebuffer graphics
-    struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
-    graphics_init(fb);
-    printf("\ninit graphics, draw logo\n");
-    //draw_logo();
-
-    // main kernel
-    printf("==============================================\n");
-    printf("==                  emexOS                  ==\n");
-    printf("==    the OS which does what you tell it    ==\n");
-    printf("==============================================\n");
-
-    fm_init();
-    clear(bg());
-
-    #ifdef BOOTUP_VISUALS == 1
-        print("BOOTUP_VISUALS == 1\n", white());
-    #else
-        print("BOOTUP_VISUALS == 0\n", white());
-    #endif
-
 
     char buf[512]; //for all string operations
 
@@ -143,38 +157,37 @@ void _start(void)
             panic( "Erorr: ulime is not initialized");
         }
 
+        // Initialize the CPU
+        cpu_detect();
+        gdt_init();
+        idt_init();
+        u32 freq = 1000;
+        timer_init(freq);
+        BOOTUP_PRINT_INT(freq, white());
+        BOOTUP_PRINT(" 1ms tick)\n", white());
+        timer_set_boot_time(); //for uptime command
+
+        pci_init();
+        //pci will get really useful with xhci/other usb
+
+
+        ata_init();
+        //fat32_init();
         fs_system_init(klime);
 
         //BOOTUP_PRINT("\n", GFX_WHITE);
     }
 
-    //f_setcontext(FONT_8X8_DOS);
-    // already set as default
-
-   // BOOTUP_PRINT("[LOG] kernel bootup log:\n\n", GFX_WHITE);
-
-    //actually not needed but maybe later (e.g. for testing themes)
-    //draw_rect(10, 10, fb_width - 20, fb_height - 20, green());
-
+    // Initialize Limine modules
+    limine_modules_init();
+    keymaps_load();
+    logos_load();
     logo_init();
     draw_logo();
     cursor_x = 0;
     cursor_y = 10;
 
     //BOOTUP_PRINTF("\n");
-
-    // Initialize the CPU
-    cpu_detect();
-    gdt_init();
-    idt_init();
-    u32 freq = 1000;
-    timer_init(freq);
-    BOOTUP_PRINT_INT(freq, white());
-    BOOTUP_PRINT(" 1ms tick)\n", white());
-    timer_set_boot_time(); //for uptime command
-
-    pci_init();
-    //pci will get really useful with xhci/other usb
 
     module_init();
     // Register driver modules
@@ -195,21 +208,6 @@ void _start(void)
     fs_create_test_file();
 
     buf[0] = '\0'; // clear buffer so it can be used again
-
-
-    BOOTUP_PRINT("[FM] ", GFX_GRAY_70);
-    BOOTUP_PRINT("scaling font...\n", white());
-    font_scale = 2;
-    str_append_uint(buf, font_scale);
-    BOOTUP_PRINT("[FM] ", GFX_GRAY_70);
-    BOOTUP_PRINT("font scaled to: ", white());
-    BOOTUP_PRINT(buf, white());
-    BOOTUP_PRINT("\n", white());
-
-    buf[0] = '\0'; // clear buffer so it can be used again
-
-    BOOTUP_PRINT("[CONSOLE] ", GFX_GRAY_70);
-    BOOTUP_PRINT("starting console...\n", white());
     //    hcf();
     // delay(500); // for testing verbose/silent boot
 
@@ -219,8 +217,6 @@ void _start(void)
     fs_close(wf);
     */
 
-    buf[0] = '\0'; // LAST CLEAR
-
     if (init_boot_log >= 0) {
         fs_close(init_boot_log);
         init_boot_log = -1;
@@ -229,13 +225,13 @@ void _start(void)
 
     //hcf();
 
+    user_config_init();
+
     console_init();
     keyboard_poll();
 
     //should not reach here
     //font_manager_set_context(FONT_CONTEXT_PANIC);
-    BOOTUP_PRINT("[KERNEL] ", GFX_RED);
-    BOOTUP_PRINT("RETURNED FROM USERMODE!   SHUT DOWN...\n", GFX_RED);
     #ifdef USE_HCF
         hcf();
     #else

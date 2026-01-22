@@ -4,9 +4,10 @@
 #include <types.h>
 
 typedef struct {
-    u8 normal[128];  // Normal key mapping
-    u8 shift[128];   // Shift key mapping
+    u8 normal[128];  // normal key mapping
+    u8 shift[128];   // shift key mapping
 } keymap_t;
+
 
 int keymap_init(void);
 const keymap_t* keymap_get_current(void);

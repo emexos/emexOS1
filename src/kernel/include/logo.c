@@ -8,6 +8,7 @@
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 #include <kernel/mem/klime/klime.h>
+#include <kernel/images/bmp.h>
 
 // input data from logo
 u8 *logo_data = NULL;
@@ -17,7 +18,13 @@ u32 logo_height = LOGO_HEIGHT;
 void logo_init(void) {
     BOOTUP_PRINT("[LOGO] ", GFX_GRAY_70);
 
-    logo_load_from_fs("/boot/ui/assets/logo.bin");
+    logo_load_from_fs("/boot/ui/assets/bootlogo.bin");
+
+    //bmp_load("/images/logo.bmp", bmp_image_t *img);
+
+    //bmp_draw(&img, x, y);
+
+    //bmp_free(&img);
 }
 
 int logo_load_from_fs(const char *path)

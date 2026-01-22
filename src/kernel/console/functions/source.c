@@ -13,6 +13,9 @@ FHDR(cmd_source) {
     if (str_equals(s, "console") || str_equals(s, "console/")) {
         user_config_reload();
 
+        reload_console_theme();
+
+        // Redraw banner
         banner_force_update();
 
         clear(CONSOLESCREEN_BG_COLOR);

@@ -1,4 +1,7 @@
 #include "theme.h"
+#include <kernel/file_systems/vfs/vfs.h>
+#include <kernel/data/conf.h>
+#include <string/string.h>
 
 
 // if fs is implemented these colors should be loaded from a stdclrs.toml file or any kind of format
@@ -29,14 +32,79 @@ static const ThemeColors FLU_THEME = {
 
 // for different contexts
 static const ThemeColors* bootup_theme = &STD_THEME;
-static const ThemeColors* console_theme = &FLU_THEME;
+static ThemeColors console_theme_colors;
 static const ThemeColors* panic_theme = &STD_THEME;
 static ThemeContext current_context = THEME_BOOTUP;
-void theme_init() { current_context= THEME_BOOTUP; }
+static int console_theme_loaded = 0;
 
+static u32 parse_color_value(const char *value) {
+    if (!value) return 0xFFFFFFFF;
+
+    // skip "0x" or "#" prefix
+    if (value[0] == '0' && value[1] == 'x') value += 2;
+    else if (value[0] == '#') value += 1;
+
+    u32 color = 0;
+    for (int i = 0; i < 8 && value[i]; i++) {
+        color <<= 4;
+        if (value[i] >= '0' && value[i] <= '9') {
+            color |= (value[i] - '0');
+        } else if (value[i] >= 'A' && value[i] <= 'F') {
+            color |= (value[i] - 'A' + 10);
+        } else if (value[i] >= 'a' && value[i] <= 'f') {
+            color |= (value[i] - 'a' + 10);
+        }
+    }
+    return color;
+}
+
+static void load_console_theme_from_config(void) {
+    conf_entry_t entries[16];
+    int count = conf_load("/.config/ekmsh/theme.cfg", entries, 16);
+
+    if (count <= 0) {
+        // uses FLU theme for default
+        console_theme_colors = FLU_THEME;
+        console_theme_loaded = 1;
+        return;
+    }
+
+    // parses each color
+    const char *black = conf_get(entries, count, "BLACK");
+    const char *bg = conf_get(entries, count, "BG");
+    const char *red = conf_get(entries, count, "RED");
+    const char *green = conf_get(entries, count, "GREEN");
+    const char *yellow = conf_get(entries, count, "YELLOW");
+    const char *blue = conf_get(entries, count, "BLUE");
+    const char *purple = conf_get(entries, count, "PURPLE");
+    const char *cyan = conf_get(entries, count, "CYAN");
+    const char *white = conf_get(entries, count, "WHITE");
+
+    console_theme_colors.BLACK = parse_color_value(black ? black : "0xFF111111");
+    console_theme_colors.BG = parse_color_value(bg ? bg : "0xFF1F1F1F");
+    console_theme_colors.RED = parse_color_value(red ? red : "0xFF9E6E6E");
+    console_theme_colors.GREEN = parse_color_value(green ? green : "0xFF7A8A7A");
+    console_theme_colors.YELLOW = parse_color_value(yellow ? yellow : "0xFFB8A788");
+    console_theme_colors.BLUE = parse_color_value(blue ? blue : "0xFF6E7F8E");
+    console_theme_colors.PURPLE = parse_color_value(purple ? purple : "0xFF857A8E");
+    console_theme_colors.CYAN = parse_color_value(cyan ? cyan : "0xFF7A8E8E");
+    console_theme_colors.WHITE = parse_color_value(white ? white : "0xFFD8D8D8");
+
+    console_theme_loaded = 1;
+}
+
+void theme_init() {
+    current_context = THEME_BOOTUP;
+    console_theme_loaded = 0;
+}
 
 void setcontext(ThemeContext context) {
     current_context = context;
+
+    // loads console theme on first use
+    if (context == THEME_CONSOLE && !console_theme_loaded) {
+        load_console_theme_from_config();
+    }
 }
 
 ThemeContext getcontext() { return current_context; }
@@ -45,12 +113,17 @@ void sbootup_theme(ThemeType type) {
     bootup_theme = (type == THEME_STD) ? &STD_THEME : &FLU_THEME;
 }
 
-void sconsole_theme(ThemeType type) {
+/*void sconsole_theme(ThemeType type) {
     console_theme = (type == THEME_STD) ? &STD_THEME : &FLU_THEME;
-}
+}*/
 
 void spanic_theme(ThemeType type) {
     panic_theme = (type == THEME_STD) ? &STD_THEME : &FLU_THEME;
+}
+
+void reload_console_theme(void) {
+    console_theme_loaded = 0;
+    load_console_theme_from_config();
 }
 
 u32 get_color(ThemeColor color) {
@@ -61,7 +134,11 @@ u32 get_color(ThemeColor color) {
             active_theme = bootup_theme;
             break;
         case THEME_CONSOLE:
-            active_theme = console_theme;
+            //active_theme = console_theme;
+            if (!console_theme_loaded) {
+                load_console_theme_from_config();
+            }
+            active_theme = &console_theme_colors;
             break;
         case THEME_PANIC:
             active_theme = panic_theme;

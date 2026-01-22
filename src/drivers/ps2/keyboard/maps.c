@@ -11,18 +11,25 @@ static char current_keymap_name[16] = "US";
 
 int keymap_init(void) {
     printf("[KEYMAP] Initializing keymap system...\n");
-
     keymap_modules_init();
 
+    // loads default (US)
     if (keymap_load_from_module("US", &current_keymap) == 0) {
         str_copy(current_keymap_name, "US");
         printf("[KEYMAP] Loaded default: US\n");
         return 0;
     }
 
+    // If US not found, try DE
     if (keymap_load_from_module("DE", &current_keymap) == 0) {
         str_copy(current_keymap_name, "DE");
         printf("[KEYMAP] Loaded default: DE\n");
+        return 0;
+    }
+
+    if (keymap_load_from_module("PL", &current_keymap) == 0) {
+        str_copy(current_keymap_name, "PL");
+        printf("[KEYMAP] Loaded default: PL\n");
         return 0;
     }
 

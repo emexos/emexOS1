@@ -5,9 +5,11 @@
 // text.c
 FHDR(cmd_echo);
 FHDR(cmd_clear);
-FHDR(cmd_help);
 FHDR(cmd_font);
 FHDR(cmd_fsize);
+
+// help.c
+FHDR(cmd_help);
 
 // system.c
 FHDR(cmd_modules);
@@ -29,7 +31,7 @@ FHDR(cmd_cat);
 FHDR(cmd_ls);
 FHDR(cmd_cd);
 FHDR(cmd_mkdir);
-FHDR(cmd_edit);
+//FHDR(cmd_edit);
 FHDR(cmd_touch);
 
 // whoami.c

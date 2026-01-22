@@ -1,3 +1,5 @@
-#define OS_DEFNAME "emexOS [64] "
-#define OS_DEFRELEASE "v0.2"
-#define OS_DEFRELEASE_NAME " >Disk & File update< "
+#pragma once
+
+#define OS_DEFNAME "emexOS [x64] "
+#define OS_DEFRELEASE "v0.3"
+#define OS_DEFRELEASE_NAME " v26J2 "
