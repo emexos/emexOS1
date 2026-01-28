@@ -17,6 +17,7 @@ tools/png
 tools/bmp
 
 dsk/hdd0
+dsk/disk.img
 
 src/kernel/console/functions/edit.c
 
