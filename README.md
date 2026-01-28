@@ -31,6 +31,13 @@ Now that you have all the required build dependencies installed, you can finally
 - `zig build -Dclean` - Remove (cache, output), fetch, build and run.
 - `zig build -Dnofetch -Dclean` - Remove (cache, output), build and run.
 
+## Running 
+to run emexOS on QEMU use `make run` 
+on real hardware make sure your device does not have any existing data on the disk, emexOS will delete it without asking! (soon there will be a menu which asks you)
+
+## Console
+After the bootup emexOS will ask you about a password to login. the password is "emex", but you can change that in shared/config/user.h
+
 ## Commands
 
 ### Common
@@ -65,4 +72,3 @@ Now that you have all the required build dependencies installed, you can finally
  - README.md by Voxi0 & emexSW & Bi Moz
  - emexOS project started by emexSW
 ##
-

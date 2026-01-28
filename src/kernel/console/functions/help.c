@@ -1,5 +1,9 @@
 #include <kernel/console/console.h>
 
+#define GEN "[GENERIC]"
+#define FS "[FILESYSTEM]"
+#define GUI "[GRAPHICS]"
+
 FHDR(cmd_help)
 {
     extern console_cmd_t commands[];

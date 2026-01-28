@@ -23,7 +23,7 @@ FHDR(cmd_source) {
         console_window_init();
 
         print("Console reloaded\n", GFX_GREEN);
-        shell_print_prompt();
+        //shell_print_prompt();
         return;
     }
 

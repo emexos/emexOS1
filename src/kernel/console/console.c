@@ -37,7 +37,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
     CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
-    //CMDENTRY(cmd_edit, "edit", "simple text editor", "edit <file>"),
+    CMDENTRY(cmd_edit, "edit", "simple text editor", "edit <file>"),
 };
 
 //----------------------------------
@@ -88,6 +88,10 @@ void console_init(void)
     print("font scaled to: ", white());
     print(buf, white());
     print("\n", white());
+
+    if (!login_authenticate()) {
+        console_execute("shutdown");
+    }
 
     buf[0] = '\0'; //reset
     //reset_cursor();
@@ -152,10 +156,74 @@ void console_run(void)
     }
 }
 
+static void console_redraw_input_line(void) {
+    u32 saved_y = cursor_y;
+    u32 char_width = 8 * font_scale;
+    u32 start_x = cursor_x;
+    u32 clear_width = get_fb_width() - cursor_x;
+
+    draw_rect(cursor_x, cursor_y, clear_width, 8 * font_scale, CONSOLESCREEN_BG_COLOR);
+    for (int i = input_pos; input_buffer[i] != '\0'; i++) {
+        putchar(input_buffer[i], GFX_WHITE);
+    }
+
+    cursor_x = start_x;
+    cursor_y = saved_y;
+    cursor_draw();
+}
+
 void console_handle_key_event(key_event_t *event) {
     cursor_c();
 
-    // Handle Ctrl+S (save in edit mode)
+    // Arrow keys
+    if (event->keycode == KEY_ARROW_LEFT) {
+        if (input_pos > 0) {
+            input_pos--;
+            u32 char_width = 8 * font_scale;
+            cursor_x -= char_width;
+            cursor_draw();
+        }
+        return;
+    }
+
+    if (event->keycode == KEY_ARROW_RIGHT) {
+        if (input_pos < str_len(input_buffer)) {
+            input_pos++;
+            u32 char_width = 8 * font_scale;
+            cursor_x += char_width;
+            cursor_draw();
+        }
+        return;
+    }
+
+    if (event->keycode == KEY_HOME) {
+        u32 char_width = 8 * font_scale;
+        cursor_x -= input_pos * char_width;
+        input_pos = 0;
+        cursor_draw();
+        return;
+    }
+
+    if (event->keycode == KEY_END) {
+        int len = str_len(input_buffer);
+        u32 char_width = 8 * font_scale;
+        cursor_x += (len - input_pos) * char_width;
+        input_pos = len;
+        cursor_draw();
+        return;
+    }
+
+    if (event->keycode == KEY_DELETE) {
+        int len = str_len(input_buffer);
+        if (input_pos < len) {
+            for (int i = input_pos; i < len; i++) {
+                input_buffer[i] = input_buffer[i + 1];
+            }
+            console_redraw_input_line();
+        }
+        return;
+    }
+
     if ((event->modifiers & KEY_CTRL_MASK) && (event->keycode == 's' || event->keycode == 'S')) {
         // This will be handled by edit command
         return;
@@ -175,12 +243,13 @@ void console_handle_key(char c)
         // execute command when enter
         putchar('\n', GFX_WHITE);
 
-        if (input_pos > 0) {
-            input_buffer[input_pos] = '\0';
+        if (input_pos > 0 || str_len(input_buffer) > 0) {
+            input_buffer[str_len(input_buffer)] = '\0';
 
             // check for && and use chained execution
             int has_chain = 0;
-            for (int i = 0; i < input_pos - 1; i++) {
+            int len = str_len(input_buffer);
+            for (int i = 0; i < len - 1; i++) {
                 if (input_buffer[i] == '&' && input_buffer[i+1] == '&') {
                     has_chain = 1;
                     break;
@@ -216,18 +285,24 @@ void console_handle_key(char c)
 
     if (c == '\b') {
         if (input_pos > 0) {
+            int len = str_len(input_buffer);
+            for (int i = input_pos - 1; i < len; i++) {
+                input_buffer[i] = input_buffer[i + 1];
+            }
             input_pos--;
-            input_buffer[input_pos] = '\0';
+            //input_buffer[input_pos] = '\0';
 
             // just move the cursor back then print space, draw rext, and move back again
             u32 char_width = 8 * font_scale;
-            if (cursor_x >= char_width) {
+            /*if (cursor_x >= char_width) {
                 cursor_x -= char_width;
                 putchar(' ', GFX_WHITE);
                 cursor_x -= char_width;
 
                 draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_BG_COLOR);
-            }
+                }*/
+            cursor_x -= char_width;
+            console_redraw_input_line();
         }
         cursor_reset_blink();
         cursor_draw();
@@ -238,9 +313,27 @@ void console_handle_key(char c)
 
     // add character to buffer
     if (input_pos < MAX_INPUT_LEN - 1) {
-        input_buffer[input_pos++] = c;
-        input_buffer[input_pos] = '\0';
+        int len = str_len(input_buffer);
+
+        for (int i = len; i > input_pos; i--) {
+            input_buffer[i] = input_buffer[i - 1];
+        }
+
+        input_buffer[input_pos] = c;
+        input_buffer[len + 1] = '\0';
+
         putchar(c, GFX_WHITE);
+        input_pos++;
+
+        if (input_buffer[input_pos] != '\0') {
+            u32 old_x = cursor_x;
+            u32 old_y = cursor_y;
+            for (int i = input_pos; input_buffer[i] != '\0'; i++) {
+                putchar(input_buffer[i], GFX_WHITE);
+            }
+            cursor_x = old_x;
+            cursor_y = old_y;
+        }
     }
     cursor_reset_blink();
     cursor_draw();

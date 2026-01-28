@@ -52,11 +52,18 @@
 //extern void fs_system_init(klime_t *klime);
 //extern void fs_create_test_file(void);
 #include <kernel/file_systems/fat32/fat32.h> // finally fat32!
+// interface
+#include <kernel/interface/partition.h>
+#include <kernel/interface/mbr.h>
+#include <config/disk.h>
+
 
 // disk drivers
 #include <kernel/module/module.h>
 //extern void fs_register_mods(void);
 #include <drivers/storage/ata/disk.h>
+
+
 // limine modules
 #include <kernel/modules/limine.h>
 #include <kernel/inits/init.h>
@@ -105,7 +112,7 @@ void _start(void)
         fm_init();
         clear(bg());
 
-        #ifdef BOOTUP_VISUALS == 1
+        #if BOOTUP_VISUALS == 1
             print("BOOTUP_VISUALS == 1\n", white());
         #else
             print("BOOTUP_VISUALS == 0\n", white());
@@ -172,7 +179,49 @@ void _start(void)
 
 
         ata_init();
-        //fat32_init();
+        {
+            // Initialize partition system
+            int part_result = partition_init();
+
+            if (part_result != 0 || partition_needs_format()) {
+                BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+
+                #if OVERWRITEALL == 1
+                    BOOTUP_PRINT("Auto-formatting disk (OVERWRITEALL=1)...\n", yellow());
+
+                    // Format disk with MBR
+                    if (partition_format_disk_fat32() == 0) {
+                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                        BOOTUP_PRINT("Creating FAT32 filesystem...\n", white());
+
+                        // NEEDS TO BE THE SAME AS partition_sectors = total_sectors - start_lba - 2048;
+                        //
+                        // OTHERWISE THIS COULD WRITE ABOVE THE PART.
+                        if (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0) {
+                            BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                            BOOTUP_PRINT("Disk formatted successfully!\n", green());
+
+                            // Re-scan partitions after formatting
+                            partition_init();
+                        } else {
+                            BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                            BOOTUP_PRINT("FAT32 format failed\n", red());
+                        }
+                    } else {
+                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                        BOOTUP_PRINT("MBR creation failed\n", red());
+                    }
+                #else
+                    BOOTUP_PRINT("Disk needs formatting\n", yellow());
+                    BOOTUP_PRINT("Set OVERWRITEALL=1 in shared/config/disk.h to auto-format\n", white());
+                #endif
+            }
+
+            // Initialize FAT32 (after formatting if needed)
+            BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+            BOOTUP_PRINT("Mounting FAT32 filesystem...\n", white());
+            fat32_init();
+        }
         fs_system_init(klime);
 
         //BOOTUP_PRINT("\n", GFX_WHITE);
@@ -232,7 +281,7 @@ void _start(void)
 
     //should not reach here
     //font_manager_set_context(FONT_CONTEXT_PANIC);
-    #ifdef USE_HCF
+    #if USE_HCF == 1
         hcf();
     #else
         panic("USE_HCF; FAILED --> USING PANIC");

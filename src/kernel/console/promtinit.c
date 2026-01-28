@@ -12,7 +12,8 @@ void prompt_config_init(void) {
         const char *default_config =
             "# currently there is no color support for the prompt, but soon!\n"
             "# %u = username,\n# %h = hostname,\n# %w = curent directory\n"
-            "format: %u@%h:%w# \n";
+            "[%u@%h:%w]# \n"
+        ;
 
         fs_write(fd, default_config, str_len(default_config));
         fs_close(fd);
@@ -25,16 +26,29 @@ void prompt_config_init(void) {
             "# use: 0xAARRGGBB\n"
             "\n"
             "BLACK: 0xFF111111\n"
-            "Bd: 0xFF1F1F1F\n"
+            "BG: 0xFF1F1F1F\n"
             "RED: 0xFF9E6E6E\n"
             "GREEN: 0xFF7A8A7A\n"
             "YELLOW: 0xFFB8A788\n"
             "BLUE: 0xFF6E7F8E\n"
             "PURPLE: 0xFF857A8E\n"
             "CYAN: 0xFF7A8E8E\n"
-            "WHITE: 0xFFD8D8D8\n";
+            "WHITE: 0xFFD8D8D8\n"
+        ;
 
         fs_write(fd, default_theme, str_len(default_theme));
+        fs_close(fd);
+    }
+    fd = fs_open("/.config/ekmsh/con.cfg", O_CREAT | O_WRONLY); // get read by graph/theme
+    if (fd >= 0) {
+        const char *Cconfiguration =
+            "CONSOLE_PROG: \"ekmsh\"\n"
+            "CONSOLE_NAME: \"console\"\n"
+            "\n"
+            "CONSOLE_VERS: \"1.2\" # new with login\n"
+        ;
+
+        fs_write(fd, Cconfiguration, str_len(Cconfiguration));
         fs_close(fd);
     }
 }

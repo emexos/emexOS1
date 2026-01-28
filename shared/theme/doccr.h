@@ -3,6 +3,7 @@
 #include <kernel/file_systems/vfs/vfs.h> // fs_write & fs_open
 #include <kernel/communication/serial.h>
 #include <string/string.h>
+#include <config/system.h>
 
 // FONT_8X8_DOS
 // FONT_8X8_NORMAL
@@ -17,7 +18,6 @@
 //bootup
 extern int init_boot_log;
 #define BOOTUP_FONT FONT_8X8_DOS
-#define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
 // macros
 #if BOOTUP_VISUALS == 0
     #define BOOTUP_PRINTF(fmt, ...) printf(fmt, ##__VA_ARGS__)
@@ -45,7 +45,10 @@ extern int init_boot_log;
             if (init_boot_log >= 0) fs_write(init_boot_log, msg, str_len(msg)); \
         } while(0)
     //--------------------------------------
+
+
 #else
+
     #define BOOTUP_PRINTF(fmt, ...) ((void)0)
     //--------------------------------------
     #define BOOTUP_PRINT(msg, col) \
@@ -71,6 +74,8 @@ extern int init_boot_log;
             if (init_boot_log >= 0) fs_write(init_boot_log, msg, str_len(msg)); \
         } while(0)
     //--------------------------------------
+
+
 #endif
 
 

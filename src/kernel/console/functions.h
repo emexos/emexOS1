@@ -31,8 +31,10 @@ FHDR(cmd_cat);
 FHDR(cmd_ls);
 FHDR(cmd_cd);
 FHDR(cmd_mkdir);
-//FHDR(cmd_edit);
 FHDR(cmd_touch);
+
+//edit.c
+FHDR(cmd_edit);
 
 // whoami.c
 FHDR(cmd_whoami);

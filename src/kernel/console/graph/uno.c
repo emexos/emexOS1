@@ -2,7 +2,10 @@
 #include <kernel/graph/graphics.h>
 #include <drivers/cmos/cmos.h>
 #include <string/string.h>
+#include <config/system.h>
 #include <kernel/exceptions/timer.h>
+
+#include <kernel/console/console.h>
 
 static u32 banner_y = 0;
 static u32 banner_y_s = BANNER_Y_SPACING;
@@ -42,11 +45,10 @@ void banner_draw(void)
 
     // use current screen_scale for banner
 
-    // left = "emexOS"
     cursor_x = 4;
     cursor_y = banner_y + banner_y_s;
 
-    const char *os_name = "emexOS";
+    const char *os_name = OS_DEFNAME;
     for (int i = 0; os_name[i]; i++) {
         putchar(os_name[i], BANNER_TEXT_COLOR);
     }
@@ -54,7 +56,7 @@ void banner_draw(void)
     // centered = "console"
     // TODO:
     // should be called after the current app
-    const char *center_text = "console";
+    const char *center_text = CONSOLE_APP_NAME;
     int text_width = str_len(center_text) * (8 * font_scale + font_scale);
     cursor_x = (fb_w - text_width) / 2;
     cursor_y = banner_y + banner_y_s;

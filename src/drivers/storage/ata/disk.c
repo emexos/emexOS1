@@ -464,15 +464,21 @@ int ATAget_device_count(void) {
 
 
 static int ATAmodule_init(void) {
-    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init ATA driver\n", white());
-
     ATAdetect_devices();
     return 0;
 }
 
 // pub:
 void ata_init(void) {
+    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
+    BOOTUP_PRINT("Init ATA driver\n", white());
+
+    // Initialize PCI IDE controller FIRST
+    if (pci_find_ide_controller() == 0) {
+        BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
+        BOOTUP_PRINT("Warning: No PCI IDE controller found, using legacy ports\n", GFX_YELLOW);
+    }
+
     ATAmodule_init();
 }
 

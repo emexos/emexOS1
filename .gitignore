@@ -3,6 +3,7 @@
 
 # Build output
 build/
+!build/src/kernel/console/functions/edit.c.o
 
 # Libraries/Dependencies
 include/limine
@@ -18,6 +19,9 @@ tools/bmp
 dsk/hdd0
 
 src/kernel/console/functions/edit.c
+
+tmp/
+
 
 #shared/libc/math/math.c
 #shared/libc/math/pi.h

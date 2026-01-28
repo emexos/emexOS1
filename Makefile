@@ -90,6 +90,20 @@ $(BUILD_DIR)/%.asm.o: %.asm
 	@mkdir -p $(dir $@)
 	$(VAS) $(ASFLAGS) $< -o $@
 
+disk:
+	@echo "[DISK] Creating disk image..."
+	@chmod +x tools/createfs.sh
+	@./tools/createfs.sh
+
+# Clean disk
+clean_disk:
+	@rm -f dsk/disk.img
+	@echo "[OK] Disk image removed"
+
+# Rebuild disk
+rebuild_disk: clean_disk disk
+
+.PHONY: disk clean_disk rebuild_disk
 # Clean all build output
 clean:
 	@echo "[CLR] Cleaning..."

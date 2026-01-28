@@ -12,7 +12,7 @@
 #include <theme/doccr.h>
 #include <config/user.h>
 #include <config/system.h>
-//#include "login.h"
+#include "login/login.h"
 #include <config/user_config.h>
 
 #include <string/string.h>
@@ -25,6 +25,7 @@ extern driver_module console_module;
 #define MAX_CMDS 32
 #define MAX_CHAINED_CMDS 8
 
+#define CONSOLE_APP_NAME "console"
 #define CONSOLE_NAME "ekmsh" // emex-kernelmode-shell
 #define WRONG_COMMAND_CL GFX_RED
 

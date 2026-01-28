@@ -5,11 +5,12 @@
 typedef enum {
     FONT_8X8_DOS = 0,
     FONT_8X8 = 1,
-    FONT_COUNT = 2
+    FONT_8X16 = 2,
+    FONT_COUNT = 3
 } font_type_t;
 typedef struct {
     const char *name;
-    const u8 (*data)[132][8];
+    const void *data;
     u32 char_width;
     u32 char_height;
 } font_t;

@@ -1,0 +1,45 @@
+#!/bin/bash
+
+FOLDER="dsk/hdd0"
+VOLUME_LABEL="EMEXOS"
+IMAGE=dsk/disk.img
+
+if ! command -v "mcopy" >/dev/null 2>&1; then
+    echo "Error: this script depends on mtools. Please install it" >&2
+    exit 1
+fi
+
+if ! command -v "mkfs.fat" >/dev/null 2>&1; then
+    echo "Error: this script depends on dosfstools. Please install it" >&2
+    exit 1
+fi
+
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  SIZE_KB=$(du -sk "$FOLDER" | cut -f1)
+else
+  SIZE_KB=$(du -s -B1 "$FOLDER" | awk '{print int($1/1024)}')
+fi
+
+power_of_two() {
+    local n=$1
+    local p=1
+    while (( p < n )); do
+        (( p *= 2 ))
+    done
+    echo $p
+}
+
+SIZE_MB=$(( (SIZE_KB * 12 / 10 + 1023) / 1024 ))
+
+SIZE_MB=$(power_of_two "$SIZE_MB")
+
+if ((SIZE_MB < 64)); then
+    SIZE_MB=64
+fi
+
+dd if=/dev/zero of=$IMAGE bs=1M count=$SIZE_MB
+
+mkfs.fat -F 32 -n "$VOLUME_LABEL" $IMAGE
+
+mcopy -i $IMAGE -s "$FOLDER"/* ::
