@@ -13,7 +13,7 @@ static conf_entry_t prompt_conf[16];
 static int prompt_conf_count = 0;
 
 void shell_load_prompt_config(void) {
-    prompt_conf_count = conf_load("/.config/ekmsh/prompts/prompt.conf",
+    prompt_conf_count = conf_load("/.config/ekmsh/prompt.cfg",
                                    prompt_conf, 16);
 }
 
@@ -56,11 +56,12 @@ void shell_print_prompt(void)
     const char *format = conf_get(prompt_conf, prompt_conf_count, "format");
 
     if (!format) {
-        string("\n", GFX_WHITE);
+        printf("using standard");
+        string("\n[", GFX_WHITE);
         string(user_config_get_pc_name(), GFX_WHITE);
         string("@", GFX_WHITE);
         string(user_config_get_user_name(), GFX_WHITE);
-        string(":", GFX_WHITE);
+        string("]", GFX_WHITE);
 
         if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
             char prompt_cwd[MAX_PATH_LEN];

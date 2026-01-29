@@ -177,6 +177,7 @@ void _start(void)
         pci_init();
         //pci will get really useful with xhci/other usb
 
+        fs_system_init(klime);
 
         ata_init();
         {
@@ -187,42 +188,40 @@ void _start(void)
                 BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
 
                 #if OVERWRITEALL == 1
-                    BOOTUP_PRINT("Auto-formatting disk (OVERWRITEALL=1)...\n", yellow());
-
-                    // Format disk with MBR
-                    if (partition_format_disk_fat32() == 0) {
+                    BOOTUP_PRINT("(OVERWRITEALL=1)...\n", yellow());
+                    if
+                        (partition_format_disk_fat32() == 0)
+                    {
                         BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
                         BOOTUP_PRINT("Creating FAT32 filesystem...\n", white());
-
-                        // NEEDS TO BE THE SAME AS partition_sectors = total_sectors - start_lba - 2048;
-                        //
-                        // OTHERWISE THIS COULD WRITE ABOVE THE PART.
-                        if (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0) {
+                        if
+                            (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0)
+                        {
                             BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
                             BOOTUP_PRINT("Disk formatted successfully!\n", green());
-
-                            // Re-scan partitions after formatting
                             partition_init();
-                        } else {
+                        }  else
+                        {
                             BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
                             BOOTUP_PRINT("FAT32 format failed\n", red());
                         }
-                    } else {
+                    } else
+                    {
                         BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
                         BOOTUP_PRINT("MBR creation failed\n", red());
                     }
                 #else
                     BOOTUP_PRINT("Disk needs formatting\n", yellow());
-                    BOOTUP_PRINT("Set OVERWRITEALL=1 in shared/config/disk.h to auto-format\n", white());
+                    BOOTUP_PRINT("set \"OVERWRITEALL=0\" to \"1\" in shared/config/disk.h\n", white());
                 #endif
             }
 
-            // Initialize FAT32 (after formatting if needed)
+            //fs_system_init(klime);
+
             BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
             BOOTUP_PRINT("Mounting FAT32 filesystem...\n", white());
             fat32_init();
         }
-        fs_system_init(klime);
 
         //BOOTUP_PRINT("\n", GFX_WHITE);
     }

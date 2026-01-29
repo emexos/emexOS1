@@ -15,6 +15,11 @@ fetchDeps:
 	@rm -rf $(INCLUDE_DIR)/limine
 	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
 
+
+disk:
+	@mkdir /dsk
+	@chmod +x tools/createfs.sh
+	@./tools/createfs.sh
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 	$(VLD) $(LDFLAGS) -T $< $(OBJS) -o $@
@@ -46,6 +51,8 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@cp shared/images/desktop_icon.bmp $(ISODIR)/boot/images/
 	@cp shared/images/console_icon.bmp $(ISODIR)/boot/images/
 	@cp shared/images/background.bmp $(ISODIR)/boot/images/
+
+	@cp shared/images/bg.jpg $(ISODIR)/boot/
 
 	@echo "[MOD] copying keymaps..."
 	@cp shared/keymaps/US.map $(ISODIR)/boot/keymaps/
@@ -89,21 +96,6 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 $(BUILD_DIR)/%.asm.o: %.asm
 	@mkdir -p $(dir $@)
 	$(VAS) $(ASFLAGS) $< -o $@
-
-disk:
-	@echo "[DISK] Creating disk image..."
-	@chmod +x tools/createfs.sh
-	@./tools/createfs.sh
-
-# Clean disk
-clean_disk:
-	@rm -f dsk/disk.img
-	@echo "[OK] Disk image removed"
-
-# Rebuild disk
-rebuild_disk: clean_disk disk
-
-.PHONY: disk clean_disk rebuild_disk
 # Clean all build output
 clean:
 	@echo "[CLR] Cleaning..."

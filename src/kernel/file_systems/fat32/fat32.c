@@ -44,7 +44,8 @@ typedef struct fat_BS
     uint8_t volume_label[11];
     uint8_t fat_type_label[8];
 
-    uint8_t Filler[422];
+    uint8_t boot_code[420];
+    uint16_t bootable_signature;
 
 }__attribute__((packed)) fat_BS_t;
 
@@ -82,11 +83,17 @@ void fat32_init(void)
 {
     printf("[FAT32] Initializing FAT32 driver\n");
 
+    if (!fs_klime) {
+        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+        BOOTUP_PRINT("fs_klime not found\n", red());
+        return;
+    }
+
     // Get first ATA device
     disk_device = ATAget_device(0);
     if (!disk_device) {
         BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("No ATA device found\n", red());
+        BOOTUP_PRINT("no ATA device found\n", red());
         return;
     }
 
@@ -118,7 +125,6 @@ void fat32_init(void)
         return;
     }
 
-    // use partition start LBA
     partition_start_lba = fat32_part->start_lba;
 
     BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
@@ -132,21 +138,31 @@ void fat32_init(void)
         return;
     }
 
-    /*BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
     BOOTUP_PRINT("boot signature: 0x", white());
-    BOOTUP_PRINT_INT(((u8*)&bootSector)[510], white());
-    BOOTUP_PRINT_INT(((u8*)&bootSector)[511], white());
+    char hex[] = "0123456789ABCDEF";
+    char buf[3] = {0};
+    u8 *bs_bytes = (u8*)&bootSector;
+    buf[0] = hex[(bs_bytes[510] >> 4) & 0xF];
+    buf[1] = hex[bs_bytes[510] & 0xF];
+    BOOTUP_PRINT(buf, white());
+    buf[0] = hex[(bs_bytes[511] >> 4) & 0xF];
+    buf[1] = hex[bs_bytes[511] & 0xF];
+    BOOTUP_PRINT(buf, white());
     BOOTUP_PRINT("\n", white());
 
     BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("FS Type: ", white());
-    char fs_type[9];
-    memcpy(fs_type, bootSector.fat_type_label, 8);
-    fs_type[8] = '\0';
-    BOOTUP_PRINT(fs_type, white());
-    BOOTUP_PRINT("\n", white());
-
-    */
+    BOOTUP_PRINT("FSType at offset 0x52: '", white());
+    for (int i = 0; i < 8; i++) {
+        char c = bootSector.fat_type_label[i];
+        if (c >= 32 && c < 127) {
+            char cbuf[2] = {c, 0};
+            BOOTUP_PRINT(cbuf, white());
+        } else {
+            BOOTUP_PRINT("?", white());
+        }
+    }
+    BOOTUP_PRINT("'\n", white());
 
     // verify FAT32
     if (memcmp(bootSector.fat_type_label, "FAT32   ", 8) != 0) {
@@ -156,8 +172,8 @@ void fat32_init(void)
         for (int i = 0; i < 8; i++) {
             char c = bootSector.fat_type_label[i];
             if (c >= 32 && c < 127) {
-                char buf[2] = {c, 0};
-                BOOTUP_PRINT(buf, white());
+                char cbuf[2] = {c, 0};
+                BOOTUP_PRINT(cbuf, white());
             } else {
                 BOOTUP_PRINT("?", white());
             }
@@ -287,9 +303,7 @@ fat_dir_entry_t* fat32_lookup_in_dir(uint32_t first_cluster, char* name)
     uint32_t current_cluster = first_cluster;
 
     do
-
     {
-        // Read cluster
         u32 lba = cluster_to_Lba(current_cluster);
         for (u32 i = 0; i < bootSector.sectors_per_cluster; i++) {
             ATAread_sectors(disk_device, lba + i, 1,
@@ -400,15 +414,12 @@ file_t* fat32_open(const char* path)
 {
     if (!fat32_initialized) return NULL;
 
-
-
     fat_dir_entry_t* entry;
     char* name;
 
     char parsed_path[256];
     str_copy(parsed_path, path);
 
-    // searching in the root dir first
     name = parsed_path;
     while (*name == '/') name++;
 
@@ -501,4 +512,20 @@ void fat32_close(file_t* file)
         }
         klime_free((klime_t*)fs_klime, (u64*)file);
     }
+}
+
+int fat32_test_write(void) {
+    if (!fat32_initialized) {
+        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+        BOOTUP_PRINT("cannot test write\n", red());
+        return -1;
+    }
+
+    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+    BOOTUP_PRINT("test\n", white());
+
+
+    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+    BOOTUP_PRINT("finish\n", green());
+    return 0;
 }

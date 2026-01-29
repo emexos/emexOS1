@@ -3,6 +3,7 @@
 #define GEN "[GENERIC]"
 #define FS "[FILESYSTEM]"
 #define GUI "[GRAPHICS]"
+#define PADDING 12
 
 FHDR(cmd_help)
 {
@@ -19,7 +20,7 @@ FHDR(cmd_help)
             str_append(buf, commands[i].name);
 
             int name_len = str_len(commands[i].name);
-            int padding = 15 - name_len;
+            int padding = PADDING - name_len;
             for (int p = 0; p < padding && p < 14; p++) {
                 str_append(buf, " ");
             }

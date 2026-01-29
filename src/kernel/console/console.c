@@ -8,7 +8,7 @@ char cwd[MAX_PATH_LEN] = "/";
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-int cmd_count = 26;
+int cmd_count = 25;
 
 console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -37,7 +37,6 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
     CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
-    CMDENTRY(cmd_edit, "edit", "simple text editor", "edit <file>"),
 };
 
 //----------------------------------
