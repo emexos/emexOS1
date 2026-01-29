@@ -44,6 +44,8 @@ console_cmd_t commands[MAX_CMDS] = {
 //module---------------------------
 static int console_module_init(void) {
     // console already initialized in main
+    BOOTUP_PRINT("[CONSOLE] ", GFX_GRAY_70);
+    BOOTUP_PRINT("Load CONSOLE module...\n", white());
     return 0;
 }
 

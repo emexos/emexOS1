@@ -2,6 +2,8 @@
 #include "maps.h"
 #include <kernel/include/ports.h>
 #include <kernel/exceptions/irq.h>
+#include <theme/doccr.h>
+#include <kernel/graph/theme.h>
 
 static key_buffer_t key_buffer = {0};
 static int shift = 0;
@@ -182,6 +184,8 @@ void keyboard_poll(void) {
 }
 
 static int keyboard_module_init(void) {
+    BOOTUP_PRINT("[KEYBOARD] ", GFX_GRAY_70);
+    BOOTUP_PRINT("Load Keyboard module...\n", white());
     keyboard_init();
     return 0;
 }

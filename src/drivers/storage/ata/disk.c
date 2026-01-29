@@ -132,7 +132,7 @@ int ATAidentify(ATAdevice_t *dev, ATAidentify_t *identify)
         // ATAPI device
         dev->type = (lba_mid == 0x14 && lba_high == 0xEB) ?
                     ATA_DEVICE_PATAPI : ATA_DEVICE_SATAPI;
-        BOOTUP_PRINT("    ATAPI device detected (not supported)\n", GFX_YELLOW);
+        BOOTUP_PRINT("    ATAPI devices are not supported\n", GFX_YELLOW);
         return -2; // not supported yet
     }
 
@@ -252,43 +252,43 @@ int ATAdetect_devices(void)
     u16 secondary_ctrl = pci_ide_get_secondary_ctrl();
 
     // primary
-    BOOTUP_PRINT("  Checking Primary Master... ", GFX_GRAY_50);
+    BOOTUP_PRINT("      Checking Primary Master... ", GFX_GRAY_50);
     if (ATAdetect_device(primary_base, primary_ctrl, 0) == 0) {
-        BOOTUP_PRINT("Found: ", white());
+        BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, GFX_CYAN);
         BOOTUP_PRINT("\n", white());
     } else {
-        BOOTUP_PRINT("None\n", GFX_GRAY_50);
+        BOOTUP_PRINT(" -> None\n", GFX_GRAY_50);
     }
 
     // primary slave
-    BOOTUP_PRINT("  Checking Primary Slave... ", GFX_GRAY_50);
+    BOOTUP_PRINT("      Checking Primary Slave... ", GFX_GRAY_50);
     if (ATAdetect_device(primary_base, primary_ctrl, 1) == 0) {
-        BOOTUP_PRINT("Found: ", white());
+        BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, GFX_CYAN);
         BOOTUP_PRINT("\n", white());
     } else {
-        BOOTUP_PRINT("None\n", GFX_GRAY_50);
+        BOOTUP_PRINT(" -> None\n", GFX_GRAY_50);
     }
 
     // secondary master
-    BOOTUP_PRINT("  Checking Secondary Master... ", GFX_GRAY_50);
+    BOOTUP_PRINT("      Checking Secondary Master... ", GFX_GRAY_50);
     if (ATAdetect_device(secondary_base, secondary_ctrl, 0) == 0) {
-        BOOTUP_PRINT("Found: ", white());
+        BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, GFX_CYAN);
         BOOTUP_PRINT("\n", white());
     } else {
-        BOOTUP_PRINT("None\n", GFX_GRAY_50);
+        BOOTUP_PRINT(" -> None\n", GFX_GRAY_50);
     }
 
     // secondary slave
-    BOOTUP_PRINT("  Checking Secondary Slave... ", GFX_GRAY_50);
+    BOOTUP_PRINT("      Checking Secondary Slave... ", GFX_GRAY_50);
     if (ATAdetect_device(secondary_base, secondary_ctrl, 1) == 0) {
-        BOOTUP_PRINT("Found: ", white());
+        BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, GFX_CYAN);
         BOOTUP_PRINT("\n", white());
     } else {
-        BOOTUP_PRINT("None\n", GFX_GRAY_50);
+        BOOTUP_PRINT(" -> None\n", GFX_GRAY_50);
     }
 
     char buf[64];
@@ -464,7 +464,10 @@ int ATAget_device_count(void) {
 
 
 static int ATAmodule_init(void) {
-    ATAdetect_devices();
+    //ATAdetect_devices();
+    // already done
+    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
+    BOOTUP_PRINT("Load ATA module...\n", white());
     return 0;
 }
 

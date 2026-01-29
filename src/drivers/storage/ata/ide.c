@@ -138,22 +138,22 @@ int pci_find_ide_controller(void) {
                     BOOTUP_PRINT(buf, GFX_CYAN);
 
                     // print all BARs
-                    str_copy(buf, "  BAR0 (Primary CMD):   0x");
+                    str_copy(buf, "          BAR0 (Primary CMD):   0x");
                     str_append_uint(buf, ide_controller.bar0);
                     str_append(buf, "\n");
                     BOOTUP_PRINT(buf, white());
 
-                    str_copy(buf, "  BAR1 (Primary CTRL):  0x");
+                    str_copy(buf, "          BAR1 (Primary CTRL):  0x");
                     str_append_uint(buf, ide_controller.bar1);
                     str_append(buf, "\n");
                     BOOTUP_PRINT(buf, white());
 
-                    str_copy(buf, "  BAR2 (Secondary CMD): 0x");
+                    str_copy(buf, "          BAR2 (Secondary CMD): 0x");
                     str_append_uint(buf, ide_controller.bar2);
                     str_append(buf, "\n");
                     BOOTUP_PRINT(buf, white());
 
-                    str_copy(buf, "  BAR3 (Secondary CTRL):0x");
+                    str_copy(buf, "          BAR3 (Secondary CTRL):0x");
                     str_append_uint(buf, ide_controller.bar3);
                     str_append(buf, "\n");
                     BOOTUP_PRINT(buf, white());

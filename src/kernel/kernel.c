@@ -239,13 +239,16 @@ void _start(void)
     module_init();
     // Register driver modules
     BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init regs: ", white());
+    BOOTUP_PRINT("Init regs: \n", white());
     module_register(&console_module);
     module_register(&keyboard_module);
+    module_register(&ata_module);
+    BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
+    BOOTUP_PRINT("found ", white());
     int count = module_get_count();
     str_append_uint(buf, count);
     BOOTUP_PRINT(buf, yellow());
-    BOOTUP_PRINT("\n", white());
+    BOOTUP_PRINT(" module(s)\n", white());
 
     //scan through recent registered modules
     // this must happen AFTER module_register() calls
