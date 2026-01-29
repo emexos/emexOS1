@@ -1,6 +1,6 @@
 #include "init.h"
-char *logpath = "/emr/logs/log1.txt";
 int init_boot_log = -1;
+char *logpath = "/emr/logs/log1.txt";
 #include "vfs.h"
 #include <kernel/mem/klime/klime.h>
 #include <kernel/include/reqs.h>

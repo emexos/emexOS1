@@ -111,6 +111,9 @@ void _start(void)
 
         fm_init();
         clear(bg());
+        cursor_x = 0;
+        cursor_y = 0;
+        font_scale = 1; // Setze scale für bootup
 
         #if BOOTUP_VISUALS == 1
             print("BOOTUP_VISUALS == 1\n", white());
@@ -232,10 +235,6 @@ void _start(void)
     logos_load();
     logo_init();
     draw_logo();
-    cursor_x = 0;
-    cursor_y = 10;
-
-    //BOOTUP_PRINTF("\n");
 
     module_init();
     // Register driver modules
@@ -269,12 +268,8 @@ void _start(void)
         fs_close(init_boot_log);
         init_boot_log = -1;
     }
-    BOOTUP_PRINTF("\n");
-
-    //hcf();
 
     user_config_init();
-
     console_init();
     keyboard_poll();
 

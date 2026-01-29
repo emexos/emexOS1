@@ -40,3 +40,9 @@ extern int init_boot_log;
 
 #define LOGO_DIRECTORY BOOT_DIRECTORY UI_DIRECTORY AST_DIRECTORY
 #define LOGO_NAME LOGO_DIRECTORY "/bootlogo.bin"
+
+
+static inline void init_early_boot_log(void) {
+    extern int init_boot_log;
+    init_boot_log = -1; // Noch nicht bereit
+}
