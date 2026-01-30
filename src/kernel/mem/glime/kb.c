@@ -66,7 +66,7 @@ int keyboard_put(glime_keyboardrb_t *kbrb, glime_key_event_t event) {
 }
 
 int keyboard_next(glime_keyboardrb_t *kbrb, glime_key_event_t *out) {
-    if (kbrb->count = 0) return 1;
+    if (kbrb->count == 0) return 1;
 
     *out = kbrb->buf[kbrb->tail];
     kbrb->tail = (kbrb->tail + 1) % kbrb->len;

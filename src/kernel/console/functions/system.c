@@ -13,7 +13,7 @@ FHDR(cmd_modules)
     int count = module_get_count();
 
     if (count == 0) {
-        print("No modules loaded\n", GFX_RED);
+        print("No modules loaded\n", GFX_WHITE);
         return;
     }
 
@@ -26,7 +26,7 @@ FHDR(cmd_modules)
             //print(mod->name, GFX_GREEN);
 
             //print(" -> ", GFX_WHITE);
-            print(mod->mount, GFX_CYAN);
+            print(mod->mount, GFX_WHITE);
 
             //i simplified the module printing because its uneccesary
 

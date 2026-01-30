@@ -150,6 +150,7 @@ void fs_system_init(void *klime)
     fs_mkdir(EMAST_DIRECTORY);
     fs_mkdir(EMCFG_DIRECTORY);
     fs_mkdir(KEYMP_DIRECTORY);
+    fs_mkdir(EMDRV_DIRECTORY);
 
     fs_mkdir(CONF_DIRECTORY);
 

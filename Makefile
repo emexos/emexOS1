@@ -5,16 +5,16 @@ SRCS = $(shell find $(SRC_DIR) shared -name "*.c" -or -name "*.cpp" -or -name "*
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
 .PHONY: all fetchDeps run clean
-all: assets $(ISO)
+all: $(ISO)
 
 # Fetch dependencies/libraries
 fetchDeps:
 	@echo "[DEPS] Fetching dependencies/libraries"
 	@mkdir -p $(INCLUDE_DIR)
+	#@mkdir -p $(BUILD_DIR)/src/kernel/console/functions
 	@echo "[DEPS] Fetching Limine"
 	@rm -rf $(INCLUDE_DIR)/limine
 	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
-
 
 disk:
 	@mkdir /dsk

@@ -51,17 +51,23 @@
 #include <kernel/file_systems/vfs/init.h>
 //extern void fs_system_init(klime_t *klime);
 //extern void fs_create_test_file(void);
+
+#if ENABLE_FAT32
 #include <kernel/file_systems/fat32/fat32.h> // finally fat32!
 // interface
 #include <kernel/interface/partition.h>
 #include <kernel/interface/mbr.h>
 #include <config/disk.h>
 
+#endif
 
 // disk drivers
 #include <kernel/module/module.h>
 //extern void fs_register_mods(void);
+
+#if ENABLE_ATA
 #include <drivers/storage/ata/disk.h>
+#endif
 
 
 // limine modules
@@ -132,6 +138,13 @@ void _start(void)
 
     { // MADE BY @TSARAKI (github)
 
+        cpu_detect();
+        gdt_init();
+        idt_init();
+
+        BOOTUP_PRINT("[MEM] ", GFX_GRAY_70);
+        BOOTUP_PRINT("Initializing memory management\n", white());
+
         // Initialize mem
         physmem_init(memmap_request.response, hhdm_request.response);
         paging_init(hhdm_request.response);
@@ -148,6 +161,7 @@ void _start(void)
             panic("Cant initialize glime limine framebuffer_count 0");
         }
 
+        #if ENABLE_GLIME
         u64 phys_glime = map_region_alloc(hhdm_request.response, GRAPHICS_START, GRAPHICS_SIZE);
 
         limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
@@ -159,18 +173,23 @@ void _start(void)
         glres.pitch  = (u64)fb->pitch;
 
         glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
+        #else
+        BOOTUP_PRINT("[GLIME] ", GFX_GRAY_70);
+        BOOTUP_PRINT("skipped (hardware compatibility)\n", white());
+        #endif
 
+        #if ENABLE_ULIME
         u64 phys_ulime = map_region_alloc(hhdm_request.response, ULIME_START, ULIME_META_SIZE);
         ulime_t *ulime = ulime_init(hhdm_request.response, klime, glime, phys_ulime);
         if (!ulime) {
             BOOTUP_PRINTF("Erorr: ulime is not initialized");
             panic( "Erorr: ulime is not initialized");
         }
+        #else
+        BOOTUP_PRINT("[ULIME] ", GFX_GRAY_70);
+        BOOTUP_PRINT("skipped (hardware compatibility)\n",white());
+        #endif
 
-        // Initialize the CPU
-        cpu_detect();
-        gdt_init();
-        idt_init();
         u32 freq = 1000;
         timer_init(freq);
         BOOTUP_PRINT_INT(freq, white());
@@ -182,97 +201,113 @@ void _start(void)
 
         fs_system_init(klime);
 
-        ata_init();
-        {
-            // Initialize partition system
-            int part_result = partition_init();
-
-            if (part_result != 0 || partition_needs_format()) {
-                BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-
-                #if OVERWRITEALL == 1
-                    BOOTUP_PRINT("(OVERWRITEALL=1)...\n", yellow());
-                    if
-                        (partition_format_disk_fat32() == 0)
-                    {
-                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                        BOOTUP_PRINT("Creating FAT32 filesystem...\n", white());
-                        if
-                            (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0)
-                        {
-                            BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                            BOOTUP_PRINT("Disk formatted successfully!\n", green());
-                            partition_init();
-                        }  else
-                        {
-                            BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                            BOOTUP_PRINT("FAT32 format failed\n", red());
-                        }
-                    } else
-                    {
-                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                        BOOTUP_PRINT("MBR creation failed\n", red());
-                    }
-                #else
-                    BOOTUP_PRINT("Disk needs formatting\n", yellow());
-                    BOOTUP_PRINT("set \"OVERWRITEALL=0\" to \"1\" in shared/config/disk.h\n", white());
-                #endif
-            }
-
-            //fs_system_init(klime);
-
-            BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-            BOOTUP_PRINT("Mounting FAT32 filesystem...\n", white());
-            fat32_init();
-        }
-
         //BOOTUP_PRINT("\n", GFX_WHITE);
     }
+    #if ENABLE_ATA == 1
+    ata_init();{
+        // Initialize partition system
+        int part_result = partition_init();
+
+        if (part_result != 0 || partition_needs_format()) {
+            BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+
+            #if OVERWRITEALL == 1
+                BOOTUP_PRINT("(OVERWRITEALL=1)...\n", yellow());
+                if
+                    (partition_format_disk_fat32() == 0)
+                {
+                    BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                    BOOTUP_PRINT("Creating FAT32 filesystem...\n", white());
+                    if
+                        (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0)
+                    {
+                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                        BOOTUP_PRINT("Disk formatted successfully!\n", green());
+                        partition_init();
+                    }  else
+                    {
+                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                        BOOTUP_PRINT("FAT32 format failed\n", red());
+                    }
+                } else
+                {
+                    BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+                    BOOTUP_PRINT("MBR creation failed\n", red());
+                }
+            #else
+                BOOTUP_PRINT("Disk needs formatting\n", yellow());
+                BOOTUP_PRINT("set \"OVERWRITEALL=0\" to \"1\" in shared/config/disk.h\n", white());
+            #endif
+        }
+
+        #if ENABLE_FAT32 == 1
+        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+        BOOTUP_PRINT("Mounting FAT32 filesystem...\n", white());
+        fat32_init();
+        #endif
+    }
+    #else
+    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
+    BOOTUP_PRINT("skipped (hardware compatibility)\n", white());
+    #endif
 
     // Initialize Limine modules
-    limine_modules_init();
-    keymaps_load();
-    logos_load();
+    limine_modules_init(); {
+        keymaps_load();
+        logos_load();
+    }
     logo_init();
     draw_logo();
 
-    module_init();
-    // Register driver modules
-    BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init regs: \n", white());
-    module_register(&console_module);
-    module_register(&keyboard_module);
-    module_register(&ata_module);
-    BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
-    BOOTUP_PRINT("found ", white());
-    int count = module_get_count();
-    str_append_uint(buf, count);
-    BOOTUP_PRINT(buf, yellow());
-    BOOTUP_PRINT(" module(s)\n", white());
+    #if HARDWARE_SC == 1
+    // let the cpu rest a small time
+    for (volatile int i = 0; i < 1000000; i++) {
+        __asm__ volatile("nop");
+    }
+    #endif
 
-    //scan through recent registered modules
-    // this must happen AFTER module_register() calls
-    fs_register_mods();
+    module_init(); {
+        // Register driver modules
+        BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
+        BOOTUP_PRINT("Init regs: \n", white());
+        module_register(&console_module);
+        module_register(&keyboard_module);
+        #if ENABLE_ATA
+        module_register(&ata_module);
+        #endif
+        BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
+        BOOTUP_PRINT("found ", white());
+        int count = module_get_count();
+        str_append_uint(buf, count);
+        BOOTUP_PRINT(buf, yellow());
+        BOOTUP_PRINT(" module(s)\n", white());
 
-    //create test file in /tmp
-    fs_create_test_file();
-
-    buf[0] = '\0'; // clear buffer so it can be used again
-    //    hcf();
-    // delay(500); // for testing verbose/silent boot
-
-    // write file
-    /*int wf = fs_open("/tmp/log", O_CREAT | O_WRONLY);
-    fs_write(wf, "test", 4);
-    fs_close(wf);
-    */
-
-    if (init_boot_log >= 0) {
-        fs_close(init_boot_log);
-        init_boot_log = -1;
     }
 
-    user_config_init();
+    { // Final things
+        fs_register_mods();
+
+        //create test file in /tmp
+        fs_create_test_file();
+
+        //buf[0] = '\0'; // clear buffer so it can be used again
+
+        if (init_boot_log >= 0) {
+            fs_close(init_boot_log);
+            init_boot_log = -1;
+        }
+
+        user_config_init();
+
+        #if HARDWARE_SC == 1
+        // let the cpu rest a small time
+        for (volatile int i = 0; i < 1000000; i++) {
+            __asm__ volatile("nop");
+        }
+        #endif
+    }
+
+
     console_init();
     keyboard_poll();
 

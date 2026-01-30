@@ -1,11 +1,5 @@
 #pragma once
 
-// WARNING: This will ERASE ALL DATA on the disk!
-// 1 == enable automatic formatting
-// 0 == require manual formatting
-#define OVERWRITEALL 1
-
-
 #define PARTITION_START_LBA 2048
 #define PARTITION_TYPE_FAT32 0x0C  // FAT32 LBA
 

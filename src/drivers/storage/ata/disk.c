@@ -482,7 +482,8 @@ void ata_init(void) {
         BOOTUP_PRINT("Warning: No PCI IDE controller found, using legacy ports\n", GFX_YELLOW);
     }
 
-    ATAmodule_init();
+    //ATAmodule_init();
+    ATAdetect_devices();
 }
 
 static void ATAmodule_fini(void) {
@@ -491,7 +492,7 @@ static void ATAmodule_fini(void) {
 
 driver_module ata_module = {
     .name = "ata-hdd0",
-    .mount = "/dev/hdd0",
+    .mount = "/emr/drv/hdd0",
     .version = VERSION_NUM(0, 1, 0, 0),
     .init = ATAmodule_init,
     .fini = ATAmodule_fini,

@@ -110,7 +110,7 @@ int free(u64 *ptr) {
       return 0;
   }
 
-  if (!blk->size > (1ULL < 40)) {
+  if (blk->size > (1ULL << 40)) {
       BOOTUP_PRINTF("\n ERROR: implausible block size\n");
       return 0;
   }

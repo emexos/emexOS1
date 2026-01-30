@@ -29,6 +29,7 @@ extern int init_boot_log;
 #define EMAST_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/assets"
 #define EMLOG_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/logs"
 #define KEYMP_DIRECTORY /*" /emr "*/EMCFG_DIRECTORY "/keymaps"
+#define EMDRV_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/drv"
 
 
 #define CONF_DIRECTORY /* root/ */ "/.config" // == app configs

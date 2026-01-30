@@ -15,10 +15,10 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_clear, "clear", "clears the screen", "clear [color]"),
     CMDENTRY(cmd_help, "help", "displays all available commands", "help [command]"),
     CMDENTRY(cmd_fsize, "scale", "change screen size", "scale [2-4]"),
-    CMDENTRY(cmd_modules, "modules", "list loaded modules", "modules"),
+    CMDENTRY(cmd_modules, "lsmod", "list loaded modules", "lsmod"),
     CMDENTRY(cmd_meminfo, "meminfo", "displays memory infos", "meminfo"),
     //CMDENTRY(cmd_memtest, "memtest", "Memory test suite", "memtest"),
-    CMDENTRY(cmd_sysinfo, "dofetch", "displays doccrOS fetch", "dofetch"),
+    CMDENTRY(cmd_sysinfo, "dofetch", "system fetch", "dofetch"),
     CMDENTRY(cmd_cal, "calendar", "displays current date & time", "calendar"),
     CMDENTRY(cmd_date, "date", "displays current date", "date"),
     CMDENTRY(cmd_uptime, "uptime", "System uptime", "uptime"),
@@ -72,7 +72,7 @@ void console_init(void)
 {
     input_pos = 0;
     input_buffer[0] = '\0';
-    char buf[32];
+    char buf[64];
 
     print("[CONSOLE] ", GFX_GRAY_70);
     print("starting console...\n", white());
@@ -84,6 +84,8 @@ void console_init(void)
     print("[FM] ", GFX_GRAY_70);
     print("scaling font...\n", white());
     font_scale = 2;
+
+    //buf[0] = '\0';
     str_append_uint(buf, font_scale);
     print("[FM] ", GFX_GRAY_70);
     print("font scaled to: ", white());
