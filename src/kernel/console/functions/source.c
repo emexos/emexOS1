@@ -11,7 +11,7 @@ FHDR(cmd_source) {
     }
 
     if (str_equals(s, "console") || str_equals(s, "console/")) {
-        user_config_reload();
+        uci_reload();
 
         reload_console_theme();
 

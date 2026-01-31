@@ -184,8 +184,7 @@ void keyboard_poll(void) {
 }
 
 static int keyboard_module_init(void) {
-    BOOTUP_PRINT("[KEYBOARD] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Load Keyboard module...\n", white());
+    log("[KEYBOARD]", "Load Keyboard module...\n", d);
     keyboard_init();
     return 0;
 }

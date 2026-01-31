@@ -34,11 +34,10 @@ static u32 pci_read_config(u8 bus, u8 device, u8 function, u8 offset) {
 }
 
 int pci_find_ide_controller(void) {
-    BOOTUP_PRINT("[PCI-IDE] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Searching for IDE controller:\n", white());
+    log("[PCI-IDE]", "Searching for IDE controller:\n", d);
 
-    // Scan all PCI devices
-    for (int bus = 0; bus < 8; bus++) {  // Reduziert
+    // scan all PCI devices
+    for (int bus = 0; bus < 8; bus++) {
         for (int device = 0; device < 32; device++) {
             // check only function 0 first
             u32 vendor_device = pci_read_config(bus, device, 0, 0x00);
@@ -111,7 +110,8 @@ int pci_find_ide_controller(void) {
                     }
 
                     char buf[128];
-                    str_copy(buf, "[PCI-IDE] Found controller: ");
+                    log("[PCI-IDE]", "Found controller: ", d);
+                    //str_copy(buf, "[PCI-IDE] Found controller: ");
 
                     // vendor ID
                     char hex_chars[] = "0123456789ABCDEF";
@@ -135,7 +135,7 @@ int pci_find_ide_controller(void) {
 
                     str_append(buf, device_str);
                     str_append(buf, "\n");
-                    BOOTUP_PRINT(buf, GFX_CYAN);
+                    BOOTUP_PRINT(buf, white());
 
                     // print all BARs
                     str_copy(buf, "          BAR0 (Primary CMD):   0x");
@@ -165,7 +165,7 @@ int pci_find_ide_controller(void) {
         }
     }
 
-    BOOTUP_PRINT("[PCI-IDE] No IDE controller found\n", GFX_YELLOW);
+    log("[PCI-IDE]", "No IDE controller found\n", warning);
     return 0;
 }
 

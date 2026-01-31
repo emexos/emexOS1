@@ -54,6 +54,7 @@ glime_keyboardrb_t *glime_keyboard_init(glime_t *glime, u64 count)  {
 }
 
 int keyboard_put(glime_keyboardrb_t *kbrb, glime_key_event_t event) {
+    if (!kbrb) return 1;
     if (kbrb->count >= kbrb->len) {
         return 1;
     }
@@ -66,6 +67,7 @@ int keyboard_put(glime_keyboardrb_t *kbrb, glime_key_event_t event) {
 }
 
 int keyboard_next(glime_keyboardrb_t *kbrb, glime_key_event_t *out) {
+    if (!kbrb || !out) return 1;
     if (kbrb->count == 0) return 1;
 
     *out = kbrb->buf[kbrb->tail];
@@ -76,5 +78,6 @@ int keyboard_next(glime_keyboardrb_t *kbrb, glime_key_event_t *out) {
 }
 
 u8 keyboard_event_to_char(glime_key_event_t event) {
+    if (event.scancode >= 128) return 0;
     return scancode_to_ascii[event.scancode];
 }

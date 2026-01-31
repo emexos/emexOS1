@@ -58,9 +58,9 @@ void shell_print_prompt(void)
     if (!format) {
         printf("using standard");
         string("\n[", GFX_WHITE);
-        string(user_config_get_pc_name(), GFX_WHITE);
+        string(uci_get_pc_name(), GFX_WHITE);
         string("@", GFX_WHITE);
-        string(user_config_get_user_name(), GFX_WHITE);
+        string(uci_get_user_name(), GFX_WHITE);
         string("]", GFX_WHITE);
 
         if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
@@ -81,8 +81,8 @@ void shell_print_prompt(void)
     for (const char *p = format; *p; p++) {
         if (*p == '%') {
             p++;
-            if (*p == 'u') string(user_config_get_user_name(), GFX_WHITE);
-            else if (*p == 'h') string(user_config_get_pc_name(), GFX_WHITE);
+            if (*p == 'u') string(uci_get_user_name(), GFX_WHITE);
+            else if (*p == 'h') string(uci_get_pc_name(), GFX_WHITE);
             else if (*p == 'w') {
                 if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
                     char prompt_cwd[MAX_PATH_LEN];

@@ -6,17 +6,30 @@
 static user_config_t current_config = {
     .pc_name = PC_NAME,
     .user_name = USER_NAME,
-    .password = DEFAULT_PWD
+    .password = DEFAULT_PWD,
+    .keymap = DEFAULT_KM
 };
 
-void user_config_init(void) {
+void uci(void) {
     // Create /tmp/config directory
-
+    log("[UCI]", "initialize UCI... ", d);
     // writes the default conf to vfs
-    user_config_save();
+    uci_save();
+    const char* pc_name = uci_get_pc_name();
+    const char* user_name = uci_get_user_name();
+    const char* password = uci_get_password();
+    const char* keymap = uci_get_keymap();
+
+
+    log("\n     ", pc_name, d);
+    log("\n     ", user_name, d);
+    log("\n     ", password, d);
+    log("\n     ", keymap, d);
+
+    log("\n[UCI]", "save UCI... \n", d);
 }
 
-int user_config_save(void) {
+int uci_save(void) {
     int fd = fs_open("/emr/config/user.emcg", O_CREAT | O_WRONLY);
     if (fd < 0) return -1;
 
@@ -40,11 +53,17 @@ int user_config_save(void) {
     str_append(buf, "\n");
     fs_write(fd, buf, str_len(buf));
 
+    // Write KM
+    str_copy(buf, "KM: ");
+    str_append(buf, current_config.keymap);
+    str_append(buf, "\n");
+    fs_write(fd, buf, str_len(buf));
+
     fs_close(fd);
     return 0;
 }
 
-int user_config_load(void) {
+int uci_load(void) {
     int fd = fs_open("/emr/config/user.emcg", O_RDONLY);
     if (fd < 0) return -1;
 
@@ -100,6 +119,19 @@ int user_config_load(void) {
             }
             line = (*end) ? end + 1 : end;
         }
+        else if (str_starts_with(line, "KM: ")) {
+            line += 4; // Skip "KM: "
+            char *end = line;
+            while (*end && *end != '\n') end++;
+            int len = end - line;
+            if (len > 0 && len < sizeof(current_config.keymap)) {
+                for (int i = 0; i < len; i++) {
+                    current_config.keymap[i] = line[i];
+                }
+                current_config.keymap[len] = '\0';
+            }
+            line = (*end) ? end + 1 : end;
+        }
         else {
             // Skip to next line
             while (*line && *line != '\n') line++;
@@ -110,18 +142,22 @@ int user_config_load(void) {
     return 0;
 }
 
-const char* user_config_get_pc_name(void) {
+const char* uci_get_pc_name(void) {
     return current_config.pc_name;
 }
 
-const char* user_config_get_user_name(void) {
+const char* uci_get_user_name(void) {
     return current_config.user_name;
 }
 
-const char* user_config_get_password(void) {
+const char* uci_get_password(void) {
     return current_config.password;
 }
 
-void user_config_reload(void) {
-    user_config_load();
+const char* uci_get_keymap(void) {
+    return current_config.keymap;
+}
+
+void uci_reload(void) {
+    uci_load();
 }

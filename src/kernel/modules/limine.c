@@ -12,27 +12,24 @@
 extern void *fs_klime;
 
 void limine_modules_init(void) {
-    BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Checking for Limine modules...\n", white());
+    log("[LIMINE]", "checking for limine modules...\n", d);
 
     if (!module_request.response || module_request.response->module_count == 0) {
-        BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-        BOOTUP_PRINT("No module response available\n", red());
+        log("[LIMINE]", "No module response available\n", d);
         return;
     }
 
     struct limine_module_response *response =
         (struct limine_module_response *)module_request.response;
 
-    BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Found ", white());
+    log("[LIMINE]", "found ", d);
     BOOTUP_PRINT_INT(response->module_count, white());
     BOOTUP_PRINT(" module(s)\n", white());
 }
 
 int limine_module_load(const char *module_name, const char *vfs_path) {
     if (!module_request.response || module_request.response->module_count == 0) {
-        printf("[LIMINE] No modules available\n");
+        log("[LIMINE]", "No modules available\n", d);
         return -1;
     }
 
@@ -58,8 +55,7 @@ int limine_module_load(const char *module_name, const char *vfs_path) {
     }
 
     if (!module) {
-        BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Module not found: ", red());
+        log("[LIMINE]", "Module not found ", d);
         BOOTUP_PRINT(module_name, white());
         BOOTUP_PRINT("\n", white());
         return -1;
@@ -81,15 +77,14 @@ int limine_module_load(const char *module_name, const char *vfs_path) {
     // if its not tmpfs cuz fat32 has only read
     if (!is_tmpfs_path) {
         BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Skipping write to non-tmpfs path: ", yellow());
+        log("[LIMINE]", "Skipping write to non-tmpfs path: ", d);
         BOOTUP_PRINT(vfs_path, white());
         BOOTUP_PRINT(" (FAT32 is read-only)\n", white());
         return 0;
     }
     int fd = fs_open(vfs_path, O_CREAT | O_WRONLY);
     if (fd < 0) {
-        BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Cannot create: ", red());
+        log("[LIMINE]", "Cannot create: ", d);
         BOOTUP_PRINT(vfs_path, white());
         BOOTUP_PRINT("\n", white());
         return -1;
@@ -99,15 +94,13 @@ int limine_module_load(const char *module_name, const char *vfs_path) {
     fs_close(fd);
 
     if (written <= 0) {
-        BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Write failed: ", red());
+        log("[LIMINE]", "Write failed: ", d);
         BOOTUP_PRINT(vfs_path, white());
         BOOTUP_PRINT("\n", white());
         return -1;
     }
 
-    BOOTUP_PRINT("[LIMINE] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Loaded: ", white());
+    log("[LIMINE]", "Loaded ", d);
     BOOTUP_PRINT(module_name, cyan());
     BOOTUP_PRINT(" -> ", white());
     BOOTUP_PRINT(vfs_path, white());

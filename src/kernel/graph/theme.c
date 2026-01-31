@@ -3,8 +3,7 @@
 #include <kernel/data/conf.h>
 #include <string/string.h>
 
-
-// if fs is implemented these colors should be loaded from a stdclrs.toml file or any kind of format
+// Boot and Panic themes - hardcoded
 static const ThemeColors STD_THEME = {
     0xFF000000, /* BLACK */
     0xFF000000, /* BG */
@@ -29,6 +28,18 @@ static const ThemeColors FLU_THEME = {
     0xFFD8D8D8  /* WHITE */
 };
 
+// console
+static const ThemeColors DEFAULT_CONSOLE_THEME = {
+    0xFF111111, /* BLACK */
+    0xFF1F1F1F, /* BG */
+    0xFF9E6E6E, /* RED */
+    0xFF7A8A7A, /* GREEN */
+    0xFFB8A788, /* YELLOW */
+    0xFF6E7F8E, /* BLUE */
+    0xFF857A8E, /* PURPLE */
+    0xFF7A8E8E, /* CYAN */
+    0xFFD8D8D8  /* WHITE */
+};
 
 // for different contexts
 static const ThemeColors* bootup_theme = &STD_THEME;
@@ -64,7 +75,7 @@ static void load_console_theme_from_config(void) {
 
     if (count <= 0) {
         // uses FLU theme for default
-        console_theme_colors = FLU_THEME;
+        console_theme_colors = DEFAULT_CONSOLE_THEME;
         console_theme_loaded = 1;
         return;
     }

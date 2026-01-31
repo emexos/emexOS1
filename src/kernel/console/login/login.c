@@ -25,7 +25,7 @@ static void draw_login_screen(const char *message, u32 msg_color) {
 
     // prints the username in the midle of the screen
     font_scale = 4; // makes the username bigger
-    const char *username = user_config_get_user_name();
+    const char *username = uci_get_user_name();
     u32 username_width = str_len(username) * (8 * font_scale);
 
     cursor_x = center_x - (username_width / 2);
@@ -73,7 +73,7 @@ static void draw_login_screen(const char *message, u32 msg_color) {
 
 static int verify_password(void) {
     password_buffer[password_pos] = '\0';
-    const char *correct_pwd = user_config_get_password();
+    const char *correct_pwd = uci_get_password();
 
     return str_equals(password_buffer, correct_pwd);
 }

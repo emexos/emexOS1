@@ -199,7 +199,12 @@ int keymap_modules_init(void) {
     struct limine_module_response *response =
         (struct limine_module_response *)module_request.response;
 
-    printf("[KEYMAP] Found %lu Limine modules\n", response->module_count);
+    log("[KEYMAP]", "Found ", d);
+    char buf[32];
+    str_from_int(buf, (int)response->module_count);
+    BOOTUP_PRINT(buf, white());
+    BOOTUP_PRINT(" Limine modules\n", white());
+
 
     // lists all keymap modules
     int keymap_count = 0;
@@ -220,6 +225,16 @@ int keymap_modules_init(void) {
         }
     }
 
-    printf("[KEYMAP] Total keymaps found: %d\n", keymap_count);
+    buf[0] = '\0';
+    //char buf[64];
+    char numbuf[32];
+
+    str_copy(buf, "Total keymaps found: ");
+    str_from_int(numbuf, keymap_count);
+    str_append(buf, numbuf);
+    str_append(buf, "\n");
+
+    log("[KEYMAP]", buf, d);
+
     return keymap_count;
 }

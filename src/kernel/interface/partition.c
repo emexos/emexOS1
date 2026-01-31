@@ -13,8 +13,7 @@ static partition_info_t partitions[MAX_PARTITIONS];
 static int partition_count = 0;
 
 int partition_init(void) {
-    BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-    BOOTUP_PRINT("looking for partition.\n", white());
+    log("[PARTITION]", "looking for partition.\n", d);
 
     partition_count = 0;
     memset(partitions, 0, sizeof(partitions));
@@ -29,13 +28,11 @@ int partition_init(void) {
     u8 mbr_buffer[512];
     mbr_t *mbr = (mbr_t*)mbr_buffer;
     if (mbr_read(mbr_buffer) != 0) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("failed to read\n", red());
+        log("[PARTITION]", "failed to read\n", error);
         return -1;
     }
     if (!mbr_is_valid(mbr)) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Invalid MBR signature\n", yellow());
+        log("[PARTITION]", "Invalid MBR signature\n", warning);
         return -1;
     }
 
@@ -68,8 +65,9 @@ int partition_init(void) {
         partition_count++;
     }
 
+    log("[PARTITION]", "", d);
     char buf[64];
-    str_copy(buf, "[PARTITION] found");
+    str_copy(buf, "found ");
     str_append_uint(buf, partition_count);
     str_append(buf, " partitions\n");
     BOOTUP_PRINT(buf, white());

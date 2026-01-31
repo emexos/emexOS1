@@ -5,6 +5,7 @@
 #include <kernel/graph/fm.h>
 #include <kernel/include/logo.h>
 #include <kernel/graph/theme.h>
+#include <math/math.h>
 #include <theme/doccr.h>
 //#include <klib/graphics/font_manager.h>
 //int init_boot_log = -1; // boot logs
@@ -122,9 +123,9 @@ void _start(void)
         font_scale = 1; // Setze scale für bootup
 
         #if BOOTUP_VISUALS == 1
-            print("BOOTUP_VISUALS == 1\n", white());
+            log("[BOOT]", "BOOTUP_VISUALS == 1\n", warning);
         #else
-            print("BOOTUP_VISUALS == 0\n", white());
+            log("[BOOT]", "BOOTUP_VISUALS == 0\n", warning);
         #endif
 
         //actually not needed but maybe later (e.g. for testing themes)
@@ -142,9 +143,7 @@ void _start(void)
         gdt_init();
         idt_init();
 
-        BOOTUP_PRINT("[MEM] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Initializing memory management\n", white());
-
+        log("[MEM]", "Initializing memory management\n", d);
         // Initialize mem
         physmem_init(memmap_request.response, hhdm_request.response);
         paging_init(hhdm_request.response);
@@ -174,8 +173,7 @@ void _start(void)
 
         glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
         #else
-        BOOTUP_PRINT("[GLIME] ", GFX_GRAY_70);
-        BOOTUP_PRINT("skipped (hardware compatibility)\n", white());
+            log("[GLIME]", "skipped (hardware compatibility)\n", warning);
         #endif
 
         #if ENABLE_ULIME
@@ -186,8 +184,7 @@ void _start(void)
             panic( "Erorr: ulime is not initialized");
         }
         #else
-        BOOTUP_PRINT("[ULIME] ", GFX_GRAY_70);
-        BOOTUP_PRINT("skipped (hardware compatibility)\n",white());
+            log("[ULIME]", "skipped (hardware compatibility)\n", warning);
         #endif
 
         u32 freq = 1000;
@@ -209,46 +206,39 @@ void _start(void)
         int part_result = partition_init();
 
         if (part_result != 0 || partition_needs_format()) {
-            BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+            //BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
 
             #if OVERWRITEALL == 1
-                BOOTUP_PRINT("(OVERWRITEALL=1)...\n", yellow());
+                log("[DISK]", "(OVERWRITEALL=1)...\n", d);
                 if
                     (partition_format_disk_fat32() == 0)
                 {
-                    BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                    BOOTUP_PRINT("Creating FAT32 filesystem...\n", white());
+                    log("[DISK]", "Creating FAT32 filesystem...\n", d);
                     if
                         (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0)
                     {
-                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                        BOOTUP_PRINT("Disk formatted successfully!\n", green());
+                        log("[DISK]", "Disk formated successfully\n", success);
                         partition_init();
                     }  else
                     {
-                        BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                        BOOTUP_PRINT("FAT32 format failed\n", red());
+                        log("[DISK]", "FAT32 Format failed\n", error);
                     }
                 } else
                 {
-                    BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
-                    BOOTUP_PRINT("MBR creation failed\n", red());
+                    log("[DISK]", "MBR creation failed\n", error);
                 }
             #else
-                BOOTUP_PRINT("Disk needs formatting\n", yellow());
-                BOOTUP_PRINT("set \"OVERWRITEALL=0\" to \"1\" in shared/config/disk.h\n", white());
+                log("[DISK]", "Disk needs formatting\n", warning);
+                log("[DISK]", "set \"OVERWRITEALL=0\" to \"1\" in shared/config/disk.h\n", warning);
             #endif
         }
-
         #if ENABLE_FAT32 == 1
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Mounting FAT32 filesystem...\n", white());
+        log("[FAT32]", "mounting FAT32 file system\n", d);
         fat32_init();
         #endif
     }
     #else
-    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
-    BOOTUP_PRINT("skipped (hardware compatibility)\n", white());
+    log("[ATA]", "skipped (hardware compatibility)\n", warning);
     #endif
 
     // Initialize Limine modules
@@ -256,8 +246,8 @@ void _start(void)
         keymaps_load();
         logos_load();
     }
-    logo_init();
-    draw_logo();
+    //logo_init();
+    //draw_logo();
 
     #if HARDWARE_SC == 1
     // let the cpu rest a small time
@@ -268,15 +258,13 @@ void _start(void)
 
     module_init(); {
         // Register driver modules
-        BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Init regs: \n", white());
+        log("[MOD]", "Init regs:\n", d);
         module_register(&console_module);
         module_register(&keyboard_module);
         #if ENABLE_ATA
         module_register(&ata_module);
         #endif
-        BOOTUP_PRINT("[MOD] ", GFX_GRAY_70);
-        BOOTUP_PRINT("found ", white());
+        log("[MOD]", "found ", d);
         int count = module_get_count();
         str_append_uint(buf, count);
         BOOTUP_PRINT(buf, yellow());
@@ -297,7 +285,7 @@ void _start(void)
             init_boot_log = -1;
         }
 
-        user_config_init();
+        uci();
 
         #if HARDWARE_SC == 1
         // let the cpu rest a small time
@@ -307,6 +295,7 @@ void _start(void)
         #endif
     }
 
+    //hcf();
 
     console_init();
     keyboard_poll();

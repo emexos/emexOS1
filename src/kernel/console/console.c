@@ -378,7 +378,7 @@ void console_execute(const char *input)
         banner_force_update();
 
         // for PC_NAME and USER_NAME
-        user_config_reload();
+        uci_reload();
     } else {
         print(CONSOLE_NAME, WRONG_COMMAND_CL);
         print(": command not found:", WRONG_COMMAND_CL);

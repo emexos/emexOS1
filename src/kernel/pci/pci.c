@@ -13,8 +13,7 @@ void pci_init(void) {
 // before pci_get_device_count();
 // because in the kernel its used before this causes random character drawing
 
-    BOOTUP_PRINT("[PCI] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init PCI/PCIe \n", white());
+    log("[PCI]", "Init PCI/PCIe", d);
 
     pci_device_init();
 
@@ -29,8 +28,7 @@ void pci_init(void) {
             pcie_count++;
         }
     }
-    BOOTUP_PRINT("[PCI] ", GFX_GRAY_70);
-    BOOTUP_PRINT("found: ", white());
+    log("[PCI]", "found ", d);
     str_append_uint(buf, pcie_count);
     BOOTUP_PRINT(buf, white());
     BOOTUP_PRINT(" device(s)\n", white());

@@ -40,7 +40,7 @@ int ATAwait_drq(u16 base) {
         }
         if (status & ATA_STATUS_ERR) {
             u8 err = inb(base + 1); // read error register
-            BOOTUP_PRINT("[ATA] Error: ", red());
+            log("[ATA]", "Error: ", error);
             BOOTUP_PRINT_INT(err, white());
             BOOTUP_PRINT("\n", white());
             return -2; // rrror
@@ -242,8 +242,7 @@ int ATAdetect_devices(void)
 {
     ATAdevice_count = 0;
 
-    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Detecting devices...\n", white());
+    log("[ATA]", "Detecting devices...\n", d);
 
     // PCI-IDE ports (not legacy!)
     u16 primary_base = pci_ide_get_primary_base();
@@ -292,7 +291,8 @@ int ATAdetect_devices(void)
     }
 
     char buf[64];
-    str_copy(buf, "[ATA] Found ");
+    log("[ATA]", "", d);
+    str_copy(buf, "Found ");
     str_append_uint(buf, ATAdevice_count);
     str_append(buf, " device(s)\n");
     BOOTUP_PRINT(buf, white());
@@ -306,16 +306,16 @@ int ATAread_sectors(ATAdevice_t *dev, u64 lba, u8 sector_count, u16 *buffer)
     u16 base = dev->base_port;
     u8 drive = dev->is_slave ? ATA_DRIVE_SLAVE : ATA_DRIVE_MASTER;
     if (!dev || dev->type == ATA_DEVICE_NONE) {
-        BOOTUP_PRINT("[ATA] Invalid device\n", red());
+        log("[ATA]", "Invalid device\n", error);
         return -1;
     }
     if (sector_count == 0) {
-        BOOTUP_PRINT("[ATA] Zero sectors requested\n", red());
+        log("[ATA]", "Zero sectors requested\n", error);
         return -1;
     }
 
     if (ATAwait_bsy(base) != 0) {
-        BOOTUP_PRINT("[ATA] Initial BSY timeout\n", red());
+        log("[ATA]", "Initial BSY timeout\n", error);
         return -1;
     }
 
@@ -329,7 +329,7 @@ int ATAread_sectors(ATAdevice_t *dev, u64 lba, u8 sector_count, u16 *buffer)
 
     // waits abit
     if (ATAwait_bsy(base) != 0) {
-        BOOTUP_PRINT("[ATA] BSY waiting\n", red());
+        log("[ATA]", "BSY waiting\n", error);
         return -1;
     }
 
@@ -344,21 +344,21 @@ int ATAread_sectors(ATAdevice_t *dev, u64 lba, u8 sector_count, u16 *buffer)
     {
         // BSY clear
         if (ATAwait_bsy(base) != 0) {
-            BOOTUP_PRINT("[ATA] BSY timeout in sector loop at sector ", red());
-            BOOTUP_PRINT_INT(sector, white());
-            BOOTUP_PRINT("\n", white());
+            log("[ATA]", "BSY timeout in sector loop at sector ", error);
+            BOOTUP_PRINT_INT(sector, red());
+            BOOTUP_PRINT("\n", red());
             return -1;
         }
 
         // DRQ
         int drq_result = ATAwait_drq(base);
         if (drq_result != 0) {
-            BOOTUP_PRINT("[ATA] DRQ timeout at sector ", red());
-            BOOTUP_PRINT_INT(sector, white());
-            BOOTUP_PRINT(", status: ", white());
+            log("[ATA]", "DRQ timeout at sector ", error);
+            BOOTUP_PRINT_INT(sector, red());
+            BOOTUP_PRINT(", status: ", red());
             u8 status = ATAstatus_read(base);
-            BOOTUP_PRINT_INT(status, white());
-            BOOTUP_PRINT("\n", white());
+            BOOTUP_PRINT_INT(status, red());
+            BOOTUP_PRINT("\n", red());
             return -1;
         }
 
@@ -366,11 +366,11 @@ int ATAread_sectors(ATAdevice_t *dev, u64 lba, u8 sector_count, u16 *buffer)
         u8 status = ATAstatus_read(base);
         if (status & ATA_STATUS_ERR) {
             u8 err = inb(base + 1);
-            BOOTUP_PRINT("[ATA] Error status at sector ", red());
-            BOOTUP_PRINT_INT(sector, white());
-            BOOTUP_PRINT(", error code: ", white());
-            BOOTUP_PRINT_INT(err, white());
-            BOOTUP_PRINT("\n", white());
+            log("[ATA]", "Error status at sector ", error);
+            BOOTUP_PRINT_INT(sector, red());
+            BOOTUP_PRINT(", error code: ", red());
+            BOOTUP_PRINT_INT(err, red());
+            BOOTUP_PRINT("\n", red());
             return -1;
         }
 
@@ -466,20 +466,17 @@ int ATAget_device_count(void) {
 static int ATAmodule_init(void) {
     //ATAdetect_devices();
     // already done
-    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Load ATA module...\n", white());
+    log("[ATA]", "Load ATA module...\n", d);
     return 0;
 }
 
 // pub:
 void ata_init(void) {
-    BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init ATA driver\n", white());
+    log("[ATA]", "Init ATA driver...\n", d);
 
     // Initialize PCI IDE controller FIRST
     if (pci_find_ide_controller() == 0) {
-        BOOTUP_PRINT("[ATA] ", GFX_GRAY_70);
-        BOOTUP_PRINT("Warning: No PCI IDE controller found, using legacy ports\n", GFX_YELLOW);
+        log("[ATA]", "No PCI IDE controller found, using legacy ports\n", warning);
     }
 
     //ATAmodule_init();

@@ -3,122 +3,139 @@
 #include "../console.h"
 
 /* -------------------------------------------------------------------------------------------------------
- *
- * from https: //codeberg.org/warposteam/warpos-src/src/branch/warp/source/monolithic/shell/poweroff.zig#
- * converted to c
- *
+ * Simplified poweroff implementation
+ * FIXED: Removed all INT instructions that cause Reserved exceptions
  * -------------------------------------------------------------------------------------------------------
  */
-
-/// x86_64 specific poweroff implementation using QEMU's shutdown mechanism
-/// Writes to the QEMU-specific I/O port to trigger system shutdown
 
 #define POWEROFF_SHUTDOWN 0
 #define POWEROFF_REBOOT   1
 
 static inline void x86_poweroff(void) {
-    __asm__ volatile (
-        "outw %0, %1"
-        :
-        : "a" ((u16)0x2000),
-        "d" ((u16)0x604)
-        : "memory"
-    );
+    // QEMU/Bochs magic shutdown port
+    outw(0x604, 0x2000);
 }
 
 static inline void x86_restart(void) {
-    __asm__ volatile (
-        "movb $0xFE, %%al\n"
-        "outb %%al, $0x64\n"
-        :
-        :
-        : "al"
-    );
-    __asm__ volatile (
-        "movw $0xCF9, %%dx\n"
-        "inb %%dx, %%al\n"
-        "orb $0x6, %%al\n"
-        "outb %%al, %%dx\n"
-        :
-        :
-        : "al", "dx"
-    );
-    __asm__ volatile (
-        "lidt 0\n"
-        "int $3\n"
-    );
+    // Method 1: Keyboard Controller Reset (most reliable)
+    outb(0x64, 0xFE);
+
+    // Small delay
+    for (volatile int i = 0; i < 1000000; i++) {
+        __asm__ volatile("nop");
+    }
+
+    // Method 2: PCI Reset Control Register
+    u8 temp = inb(0xCF9);
+    outb(0xCF9, temp | 0x02);  // Request reset
+    outb(0xCF9, temp | 0x06);  // Actually reset
+
+    // Small delay
+    for (volatile int i = 0; i < 1000000; i++) {
+        __asm__ volatile("nop");
+    }
 }
 
 static inline void x86_shutdown(void) {
-    __asm__ volatile (
-        "movw $0x604, %%dx\n"
-        "movw $0x2000, %%ax\n"
-        "outw %%ax, %%dx\n"
-        :
-        :
-        : "ax", "dx"
-    );
-    __asm__ volatile (
-        "movw $0x5307, %%ax\n"
-        "movw $0x0001, %%bx\n"
-        "movw $0x0003, %%cx\n"
-        "int $0x15\n"
-        :
-        :
-        : "ax", "bx", "cx"
-    );
-    x86_poweroff();
+    // Try QEMU/Bochs shutdown port
+    outw(0x604, 0x2000);
+
+    // Small delay to let it work
+    for (volatile int i = 0; i < 10000000; i++) {
+        __asm__ volatile("nop");
+    }
+
+    // If that didn't work, try ACPI shutdown (simple version)
+    // This is for real hardware - won't work in QEMU but won't crash
+    outw(0xB004, 0x2000);  // Bochs/Old QEMU
+    outw(0x0604, 0x2000);  // QEMU alternative
+
+    // One more delay
+    for (volatile int i = 0; i < 10000000; i++) {
+        __asm__ volatile("nop");
+    }
 }
 
 __attribute__((visibility("default")))
 int poweroff(int operation) {
 #if defined(__x86_64__)
+    // Disable interrupts to prevent issues during shutdown
+    __asm__ volatile("cli" ::: "memory");
+
     if (operation == POWEROFF_REBOOT) {
-        #ifdef QEMU_BUILD
-            x86_poweroff();
-        #else
-            x86_restart();
-        #endif
+        x86_restart();
     } else if (operation == POWEROFF_SHUTDOWN) {
-        #ifdef QEMU_BUILD
-            x86_poweroff();
-        #else
-            x86_shutdown();
-        #endif
+        x86_shutdown();
     } else {
         return -1;
     }
+
+    // If we get here, shutdown/reboot didn't work
+    // Just halt the CPU
+    while(1) {
+        __asm__ volatile("hlt" ::: "memory");
+    }
+
     return 0;
 #else
+    (void)operation;
     return -1;
 #endif
 }
+
 FHDR(cmd_poweroff) {
     (void)s;
+
+    cursor_disable();  // Disable cursor before shutdown
     print("Shutting down system...\n", GFX_YELLOW);
-    print("Note: May not work on all hardware configurations\n", GFX_RED);
-    int result = poweroff(POWEROFF_SHUTDOWN);
-    if (result == -1) {
-        print("Shutdown failed\n", GFX_RED);
+
+    // Give time for message to display
+    for (volatile int i = 0; i < 5000000; i++) {
+        __asm__ volatile("nop");
+    }
+
+    poweroff(POWEROFF_SHUTDOWN);
+
+    // Should not reach here, but just in case
+    while(1) {
+        __asm__ volatile("cli; hlt" ::: "memory");
     }
 }
 
 FHDR(cmd_reboot) {
     (void)s;
+
+    cursor_disable();  // Disable cursor before reboot
     print("Restarting system...\n", GFX_YELLOW);
-    print("Note: May not work on all hardware configurations\n", GFX_RED);
-    int result = poweroff(POWEROFF_REBOOT);
-    if (result == -1) {
-        print("Restart failed\n", GFX_RED);
+
+    // Give time for message to display
+    for (volatile int i = 0; i < 5000000; i++) {
+        __asm__ volatile("nop");
+    }
+
+    poweroff(POWEROFF_REBOOT);
+
+    // Should not reach here, but just in case
+    while(1) {
+        __asm__ volatile("cli; hlt" ::: "memory");
     }
 }
 
 FHDR(cmd_shutdown) {
     (void)s;
+
+    cursor_disable();  // Disable cursor before shutdown
     print("Shutting down system...\n", GFX_YELLOW);
-    print("Note: May not work on all hardware configurations\n", GFX_RED);
-    int result = poweroff(POWEROFF_SHUTDOWN);
-    if (result == -1) {
-        print("Shutdown failed\n", GFX_RED);
+
+    // Give time for message to display
+    for (volatile int i = 0; i < 5000000; i++) {
+        __asm__ volatile("nop");
+    }
+
+    poweroff(POWEROFF_SHUTDOWN);
+
+    // Should not reach here, but just in case
+    while(1) {
+        __asm__ volatile("cli; hlt" ::: "memory");
     }
 }
