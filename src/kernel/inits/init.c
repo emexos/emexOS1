@@ -61,4 +61,7 @@ void users_load(void) {
         fs_write(fd_system, system_config, str_len(system_config));
         fs_close(fd_system);
     }
+    fs_mkdir("/users");
+    fs_mkdir("/users/bin");
+    fs_mkdir("/users/apps");
 }
