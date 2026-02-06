@@ -3,7 +3,8 @@
 #define OS_DEFNAME "emexOS [x64] "
 //#define OS_DEFSNAME "emexOS"
 #define OS_DEFRELEASE "v0.5"
-#define OS_DEFRELEASE_NAME " v26J2 "
+#define OS_DEFRELEASE_NAME " v26J4 "
+#define SYSTEMINI_PATH "/emr/config/system.ini"
 
 #define USE_HCF 1
 #define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1

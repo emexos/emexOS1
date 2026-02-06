@@ -258,6 +258,7 @@ void _start(void)
     limine_modules_init(); {
         keymaps_load();
         logos_load();
+        users_load();
     }
     logo_init();
     draw_logo();

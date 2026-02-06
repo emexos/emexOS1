@@ -4,5 +4,6 @@
 // Load all Limine modules to VFS
 void keymaps_load(void);
 void logos_load(void);
+void users_load(void);
 
 #endif

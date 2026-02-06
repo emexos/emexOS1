@@ -1,5 +1,7 @@
 #pragma once
 
+#define USERINI_PATH
+
 #define PC_NAME "pc"
 #define USER_NAME "emex"
 

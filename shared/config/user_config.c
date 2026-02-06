@@ -11,7 +11,7 @@ static user_config_t current_config = {
 };
 
 void uci(void) {
-    // Create /tmp/config directory
+    // create /emr/config directory
     log("[UCI]", "initialize UCI... ", d);
     // writes the default conf to vfs
     uci_save();
@@ -29,7 +29,78 @@ void uci(void) {
     log("\n[UCI]", "save UCI... \n", d);
 }
 
+int uci_load_users_ini(void) {
+    int fd = fs_open(USERINI_PATH "", O_RDONLY); // idk how this can work...
+    if (fd < 0) return -1;
+
+    char buf[1024];
+    ssize_t bytes_read = fs_read(fd, buf, sizeof(buf) - 1);
+    fs_close(fd);
+
+    if (bytes_read <= 0) return -1;
+    buf[bytes_read] = '\0';
+
+    char *line = buf;
+    char current_section[32] = {0};
+    int in_section = 0;
+
+    while (*line) {
+        while (*line == ' ' || *line == '\t') line++;
+
+        // this checks the section []
+        // it loads the username between []
+        if (*line == '[') {
+            line++; // Skip '['
+            char *end = line;
+            while (*end && *end != ']') end++;
+            int len = end - line;
+            if (len > 0 && len < sizeof(current_section)) {
+                for (int i = 0; i < len; i++) {
+                    current_section[i] = line[i];
+                }
+                current_section[len] = '\0';
+            }
+            in_section = 1;
+            line = (*end) ? end + 1 : end;
+            continue;
+        }
+
+        // it needs to have permissions of user/guest
+        if (in_section && str_starts_with(line, "permissions=")) {
+            line += 12; // skip "permissions="
+            char *end = line;
+            while (*end && *end != '\n') end++;
+            int len = end - line;
+
+            char perm[16] = {0};
+            if (len > 0 && len < sizeof(perm)) {
+                for (int i = 0; i < len; i++) {
+                    perm[i] = line[i];
+                }
+                perm[len] = '\0';
+            }
+
+            // theres also administrator but i don't want that rn...
+            // also this is just a simple implementation withouth password hashing
+            if (str_equals(perm, "user") || str_equals(perm, "guest")) {
+                // in future "guest" will only has less permissions than "user"
+                // make current_config.user_name to the section name
+                str_copy(current_config.user_name, current_section);
+            }
+
+            line = (*end) ? end + 1 : end;
+            continue;
+        }
+        while (*line && *line != '\n') line++;
+        if (*line == '\n') line++;
+    }
+    return 0;
+}
+
 int uci_save(void) {
+    // ensure we load the correct username from users.ini
+    uci_load_users_ini();
+
     int fd = fs_open("/emr/config/user.emcg", O_CREAT | O_WRONLY);
     if (fd < 0) return -1;
 
