@@ -1,10 +1,11 @@
 #ifndef ISR_H
 #define ISR_H
 
-#include <kernel/cpu/idt.h>
 #include <types.h>
+#include <kernel/cpu/cpu.h>
+#include <kernel/arch/x64/idt/idt.h>
 
-// Exception Messages
+// messages
 #define ISR_DIVISION_ERROR          0
 #define ISR_DEBUG                   1
 #define ISR_NMI                     2
@@ -28,7 +29,8 @@
 #define ISR_VIRTUALIZATION          20
 #define ISR_SECURITY_EXCEPTION      30
 
-// ISR Handler Type
+
+
 typedef void (*isr_handler_t)(cpu_state_t* state);
 
 void isr_install(void);

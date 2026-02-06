@@ -2,7 +2,7 @@
 #include "../heap/heap.h"
 #include "../slab/slab.h"
 #include "../paging/paging.h"
-#include <kernel/exceptions/panic.h>
+#include <kernel/arch/x64/exceptions/panic.h>
 
 #include <memory/main.h>
 #include <kernel/communication/serial.h>

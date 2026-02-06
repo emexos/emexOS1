@@ -1,5 +1,5 @@
 #include "console.h"
-#include <kernel/exceptions/timer.h>
+#include <kernel/arch/x64/exceptions/timer.h>
 
 static int cursor_visible = 1;
 static u32 cursor_blink_counter = 0;

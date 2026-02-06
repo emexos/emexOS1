@@ -1,6 +1,6 @@
 #include "idt.h"
-#include <kernel/exceptions/isr.h>
-#include <kernel/exceptions/irq.h>
+#include <kernel/arch/x64/exceptions/isr.h>
+#include <kernel/arch/x64/exceptions/irq.h>
 #include <memory/main.h>
 #include <string/string.h>
 #include <theme/stdclrs.h>
@@ -15,7 +15,7 @@ extern void idt_flush(u64);
 void idt_set_gate(u8 num, u64 handler, u8 flags)
 {
     idt[num].offset_low = handler & 0xFFFF;
-    idt[num].selector = 0x08; // Kernel Code Segment
+    idt[num].selector = 0x08; // kernel Code Segment
     idt[num].ist = 0;
     idt[num].flags = flags;
     idt[num].offset_mid = (handler >> 16) & 0xFFFF;
@@ -35,15 +35,8 @@ void idt_init(void)
 {
     BOOTUP_PRINT("[IDT] ", GFX_GRAY_70);
     BOOTUP_PRINT("Init interrupts\n", white());
-    // Clear IDT
-    memset(&idt, 0, sizeof(idt));
-
-    // Set ISR Handler (Exceptions 0-31)
+    memset(&idt, 0, sizeof(idt)); // clear idt
     isr_install();
-
-    // Set IRQ Handler (32-47)
     irq_install();
-
-    // Load IDT
     idt_load();
 }

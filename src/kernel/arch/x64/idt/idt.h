@@ -38,7 +38,7 @@ typedef struct {
     u64 ss;
 } __attribute__((packed)) interrupt_frame_t;
 
-// CPU State für Context Switching
+// CPU state ffor context switching
 typedef struct {
     u64 r15, r14, r13, r12, r11, r10, r9, r8;
     u64 rbp, rdi, rsi, rdx, rcx, rbx, rax;

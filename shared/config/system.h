@@ -31,3 +31,7 @@
     #define ENABLE_ULIME 1
     #define ENABLE_GLIME 1
 #endif
+
+#define X64 1
+#define RISCV64 0
+#define AARCH64 0

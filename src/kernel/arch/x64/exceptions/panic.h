@@ -2,7 +2,7 @@
 #define PANIC_H
 
 #include <types.h>
-#include <kernel/cpu/idt.h>
+#include <kernel/arch/x64/idt/idt.h>
 
 // Kernel panic
 __attribute__((noreturn)) void panic(const char *message);

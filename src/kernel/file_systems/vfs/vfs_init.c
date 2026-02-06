@@ -5,7 +5,7 @@ char *logpath = "/emr/logs/log1.txt";
 #include <kernel/mem/klime/klime.h>
 #include <kernel/include/reqs.h>
 #include <kernel/module/module.h>
-#include <kernel/exceptions/panic.h>
+#include <kernel/arch/x64/exceptions/panic.h>
 
 #include <string/string.h>
 #include <kernel/graph/theme.h>

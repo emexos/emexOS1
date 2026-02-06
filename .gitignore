@@ -15,6 +15,7 @@ include/limine
 tools/old
 tools/png
 tools/bmp
+tools/lg.py
 
 dsk/hdd0
 dsk/disk.img

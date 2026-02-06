@@ -2,10 +2,11 @@
 #define ULIME_H
 
 #include <types.h>
-#include "../mem.h"
-#include "../klime/klime.h"
-#include "../glime/glime.h"
-#include "../phys/physmem.h"
+#include <kernel/mem/mem.h>
+#include <kernel/mem/klime/klime.h>
+#include <kernel/mem/glime/glime.h>
+#include <kernel/mem/phys/physmem.h>
+#include "syscalls.h"
 
 
 typedef struct ulime_proc {
@@ -28,12 +29,6 @@ typedef struct ulime_proc {
     struct ulime_proc *prev;
 } ulime_proc_t;
 
-//@TODO: move someone else
-#define SYS_EXIT    0
-#define SYS_WRITE   1
-//#define SYS_READ    2
-//#define SYS_GETPID  3
-
 typedef u64 (*syscall_handler_t)(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3);
 
 typedef struct ulime_thread {
@@ -53,9 +48,8 @@ typedef struct ulime {
     u64 tid_next;
 
     klime_t *klime;
-    glime_t *glime;
+    void *glime;  // changed from glime_t* to void* for compatibility
     limine_hhdm_response_t *hpr;
-
 
     syscall_handler_t syscalls[256];
 
@@ -79,7 +73,12 @@ typedef struct ulime {
 #define PROC_BLOCKED    4
 #define PROC_ZOMBIE     5
 
-ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, glime_t *glime, u64 uphys_start);
+#if ENABLE_GLIME
+    ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, glime_t *glime, u64 uphys_start);
+#else
+    ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, void *glime, u64 uphys_start);
+#endif
+
 void ulime_init_syscalls(ulime_t *ulime);
 
 ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point);

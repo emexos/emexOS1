@@ -32,7 +32,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_tree, "tree", "shows every folder, file * content", "tree"),
     CMDENTRY(cmd_mkdir, "mkdir", "create directory", "mkdir <path>"),
     CMDENTRY(cmd_font, "font", "change console font", "font [0-1]"),
-    CMDENTRY(cmd_keymap, "keymap", "change keyboard layout", "keymap [US|DE]"),
+    CMDENTRY(cmd_keymap, "loadkeys", "change keyboard layout", "loadkeys [keymap]"),
     CMDENTRY(cmd_whoami, "whoami", "display current user", "whoami"),
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),

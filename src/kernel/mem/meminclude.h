@@ -6,7 +6,6 @@
 #include <kernel/mem/heap/heap.h>
 #include <kernel/mem/klime/klime.h>
 #include <kernel/mem/glime/glime.h>
-#include <kernel/mem/ulime/ulime.h>
+#include <kernel/user/ulime.h>
 
 #endif
-

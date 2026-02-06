@@ -3,7 +3,7 @@
 #include <drivers/cmos/cmos.h>
 #include <string/string.h>
 #include <config/system.h>
-#include <kernel/exceptions/timer.h>
+#include <kernel/arch/x64/exceptions/timer.h>
 
 #include <kernel/console/console.h>
 

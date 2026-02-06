@@ -23,11 +23,16 @@
 
 // CPU
 #include <kernel/cpu/cpu.h>
-#include <kernel/cpu/gdt.h>
-#include <kernel/cpu/idt.h>
-/*#include <kernel/cpu/isr.h>
-#include <kernel/cpu/irq.h>
-#include <kernel/cpu/timer.h>*/ // moved to /exception
+#if X64 == 1
+    #include <kernel/arch/x64/gdt/gdt.h>
+    #include <kernel/arch/x64/idt/idt.h>
+    #include <kernel/arch/x64/exceptions/panic.h>
+    #include <kernel/arch/x64/exceptions/timer.h>
+#elif RISCV64 == 1
+    #include <kernel/arch/riscv64/table/trap.h> // trap Table / exception Table
+#elif AARCH64 == 1
+    #include <kernel/arch/aarch64/exception/vectab.h> // vector table
+#endif
 
 // Memory
 #include <memory/main.h>
@@ -39,13 +44,6 @@
 
 //debug
 #include <kernel/communication/serial.h>
-
-//process
-#include "exceptions/panic.h"
-
-//exception/timer
-#include <kernel/exceptions/timer.h>
-#include <kernel/exceptions/panic.h>
 
 //vFS & fs
 #include <kernel/file_systems/vfs/vfs.h>
@@ -65,7 +63,6 @@
 // disk drivers
 #include <kernel/module/module.h>
 //extern void fs_register_mods(void);
-
 #if ENABLE_ATA
 #include <drivers/storage/ata/disk.h>
 #endif
@@ -80,8 +77,8 @@
 
 
 // usermode stuff
-//#include <kernel/syscalls/syscall.h>
-//#include <kernel/userspace/userspace.h>
+//#include <kernel/userspace/usermode.h>
+//#include <kernel/syscalls/syscalls.h>
 //extern void userspace_test_init(ulime_t *ulime);
 
 void _start(void)
@@ -128,6 +125,10 @@ void _start(void)
             log("[BOOT]", "BOOTUP_VISUALS == 0\n", warning);
         #endif
 
+        BOOTUP_PRINT("\n\nWelcome to ", white());
+        BOOTUP_PRINT("emexOS", cyan());
+        BOOTUP_PRINT("!\n\n", white());
+
         //actually not needed but maybe later (e.g. for testing themes)
         //draw_rect(10, 10, fb_width - 20, fb_height - 20, blue());
 
@@ -135,13 +136,21 @@ void _start(void)
 
     char buf[512]; //for all string operations
 
-    klime_t *klime;
+    klime_t *klime = NULL;
+    #if ENABLE_GLIME
+        glime_t *glime = NULL;
+    #endif
+    #if ENABLE_ULIME
+        ulime_t *ulime = NULL;
+    #endif
 
     { // MADE BY @TSARAKI (github)
 
         cpu_detect();
-        gdt_init();
-        idt_init();
+        #if X64 == 1
+            gdt_init();
+            idt_init();
+        #endif
 
         log("[MEM]", "Initializing memory management\n", d);
         // Initialize mem
@@ -161,27 +170,31 @@ void _start(void)
         }
 
         #if ENABLE_GLIME
-        u64 phys_glime = map_region_alloc(hhdm_request.response, GRAPHICS_START, GRAPHICS_SIZE);
+            u64 phys_glime = map_region_alloc(hhdm_request.response, GRAPHICS_START, GRAPHICS_SIZE);
 
-        limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
+            limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
 
-        glime_response_t glres;
-        glres.start_framebuffer = (u64 *)fb->address;
-        glres.width  = (u64)fb->width;
-        glres.height = (u64)fb->height;
-        glres.pitch  = (u64)fb->pitch;
+            glime_response_t glres;
+            glres.start_framebuffer = (u64 *)fb->address;
+            glres.width  = (u64)fb->width;
+            glres.height = (u64)fb->height;
+            glres.pitch  = (u64)fb->pitch;
 
-        glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
+            glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
         #else
             log("[GLIME]", "skipped (hardware compatibility)\n", warning);
         #endif
 
         #if ENABLE_ULIME
-        u64 phys_ulime = map_region_alloc(hhdm_request.response, ULIME_START, ULIME_META_SIZE);
-        ulime_t *ulime = ulime_init(hhdm_request.response, klime, glime, phys_ulime);
+            u64 phys_ulime = map_region_alloc(hhdm_request.response, ULIME_START, ULIME_META_SIZE);
+        #if ENABLE_GLIME
+            ulime = ulime_init(hhdm_request.response, klime, (void*)glime, phys_ulime);
+        #else
+            ulime = ulime_init(hhdm_request.response, klime, NULL, phys_ulime);
+        #endif
         if (!ulime) {
-            BOOTUP_PRINTF("Erorr: ulime is not initialized");
-            panic( "Erorr: ulime is not initialized");
+            BOOTUP_PRINTF("Error: ulime is not initialized");
+            panic("Error: ulime is not initialized");
         }
         #else
             log("[ULIME]", "skipped (hardware compatibility)\n", warning);
@@ -238,7 +251,7 @@ void _start(void)
         #endif
     }
     #else
-    log("[ATA]", "skipped (hardware compatibility)\n", warning);
+        log("[ATA]", "skipped (hardware compatibility)\n", warning);
     #endif
 
     // Initialize Limine modules
@@ -246,14 +259,14 @@ void _start(void)
         keymaps_load();
         logos_load();
     }
-    //logo_init();
-    //draw_logo();
+    logo_init();
+    draw_logo();
 
     #if HARDWARE_SC == 1
-    // let the cpu rest a small time
-    for (volatile int i = 0; i < 1000000; i++) {
-        __asm__ volatile("nop");
-    }
+        // let the cpu rest a small time
+        for (volatile int i = 0; i < 1000000; i++) {
+            __asm__ volatile("nop");
+        }
     #endif
 
     module_init(); {
@@ -288,14 +301,26 @@ void _start(void)
         uci();
 
         #if HARDWARE_SC == 1
-        // let the cpu rest a small time
-        for (volatile int i = 0; i < 1000000; i++) {
-            __asm__ volatile("nop");
-        }
+            // let the cpu rest a small time
+            for (volatile int i = 0; i < 1000000; i++) {
+                __asm__ volatile("nop");
+            }
         #endif
     }
 
     //hcf();
+
+    /*#if ENABLE_ULIME
+        if (ulime) {
+            //usermodeinit(ulime);
+        } else {
+            hcf();
+            panic("USE_HCF; FAILED --> USING PANIC");
+            //console_init();
+        }
+    #else
+        console_init();
+    #endif*/
 
     console_init();
     keyboard_poll();

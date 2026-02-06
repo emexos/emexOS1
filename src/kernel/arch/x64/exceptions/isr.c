@@ -1,6 +1,6 @@
 #include "isr.h"
 #include "exception_handler.h"
-#include <kernel/cpu/idt.h>
+//#include <kernel/arch/x64/idt/idt.h>
 
 static isr_handler_t isr_handlers[32];
 
@@ -11,7 +11,7 @@ void isr_install(void)
         isr_handlers[i] = NULL;
     }
 
-    // Set IDT Gates for ALL Exceptions
+    // set IDT Gates for ALL Exceptions
     idt_set_gate(0, (u64)isr0, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(1, (u64)isr1, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(2, (u64)isr2, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
@@ -63,10 +63,10 @@ void isr_unregister_handler(u8 num)
 void isr_handler(cpu_state_t* state)
 {
     if (state->int_no < 32 && isr_handlers[state->int_no] != NULL) {
-        // Custom handler registered
+        //c ustom handler registered
         isr_handlers[state->int_no](state);
     } else {
-        // No handler - panic
+        // panic if no handler is there
         exception_handler(state);
     }
 }

@@ -2,7 +2,7 @@
 #include <memory/main.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/module/module.h>
-#include <kernel/exceptions/timer.h>
+#include <kernel/arch/x64/exceptions/timer.h>
 #include <kernel/cpu/cpu.h>
 
 FHDR(cmd_modules)
