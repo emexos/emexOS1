@@ -31,12 +31,3 @@
 #define A_GFX_CYAN    "\033[36m"
 #define A_GFX_WHITE   "\033[37m"
 #define A_GFX_RESET   "\033[0m"
-
-#define red A_GFX_RED
-#define green A_GFX_GREEN
-#define yellow A_GFX_YELLOW
-#define blue A_GFX_BLUE
-#define magenta A_GFX_MAGENTA
-#define cyan A_GFX_CYAN
-#define white A_GFX_WHITE
-#define reset A_GFX_RESET
