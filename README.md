@@ -1,8 +1,8 @@
 # emexOS - a simple 64 Bit OS written in C
 
-<div style="display: flex; gap: 10px; flex-wrap: wrap;">
-  <img src="./screenshots/screen_size1.png" alt="screensize1" style="max-width: 49%;">
-  <img src="./screenshots/login.png" alt="login" style="max-width: 49%;">
+<div style="display: flex; gap: 10px;">
+  <img src="./screenshots/screen_size1.png" alt="screensize1" width="50%">
+  <img src="./screenshots/login.png" alt="login" width="50%">
 </div>
 
 ## Build Dependencies
