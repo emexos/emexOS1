@@ -1,8 +1,8 @@
 # emexOS - a simple 64 Bit OS written in C
 
 <div align="center">
-  <img src="./screenshots/screen_size1.png" width="45%">
-  <img src="./screenshots/login.png" width="45%">
+  <img src="./screenshots/screen_size1.png" width="50%">
+  <img src="./screenshots/login.png" width="50%">
 </div>
 
 ## Build Dependencies

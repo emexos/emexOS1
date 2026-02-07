@@ -1,12 +1,12 @@
 #include "print.h"
 #include <kernel/graph/graphics.h>
 #include <kernel/communication/serial.h>
-#include <ui/fonts/font_8x8_dos.h>
+#include <ui/fonts/font_8x8_bold.h>
 #include <kernel/console/graph/dos.h>
 
 static void putchar_bootstrap_at(char c, u32 x, u32 y, u32 color)
 {
-    const u8 *glyph = font_8x8_dos[(u8)c];
+    const u8 *glyph = font_8x8_bold[(u8)c];
 
     for (int dy = 0; dy < 8; dy++)
     {

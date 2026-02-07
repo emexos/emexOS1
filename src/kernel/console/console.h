@@ -9,6 +9,7 @@
 #include "graph/uno.h"
 #include "graph/dos.h"
 #include <kernel/graph/theme.h>
+#include <kernel/graph/fm.h>
 #include <theme/doccr.h>
 #include <config/user.h>
 #include <config/system.h>
@@ -67,7 +68,7 @@ void cursor_disable(void);
 void cursor_reset_blink(void);
 
 
-void prompt_config_init(void); // config for promt in /.config/ekmsh/promts/promt.conf
+void console_config_init(void); // config for promt in /.config/ekmsh/promts/promt.conf
 
 
 console_cmd_t* console_find_cmd(const char *name);

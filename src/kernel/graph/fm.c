@@ -4,7 +4,7 @@
 #include <theme/stdclrs.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
-static font_type_t current_font_type = FONT_8X8_DOS; // default font
+static font_type_t current_font_type = FONT_8X8_BOLD; // default font
 static const font_t *current_font = NULL;
 
 void fm_init(void) {
@@ -12,8 +12,8 @@ void fm_init(void) {
     BOOTUP_PRINTBS("start font manager\n", white());
 
     // default font is DOS font
-    current_font_type = FONT_8X8_DOS;
-    current_font = &font_registry[FONT_8X8_DOS];
+    current_font_type = FONT_8X8_BOLD;
+    current_font = &font_registry[FONT_8X8_BOLD];
 
     BOOTUP_PRINTBS("[FM] ", GFX_GRAY_70);
     BOOTUP_PRINTBS("default: ", white());
@@ -43,10 +43,31 @@ int f_setcontext(font_type_t font_type)
 font_type_t fm_get_current_font(void) {
     return current_font_type;
 }
-const u8* fm_get_glyph(u8 character){
-    // return glyph data for character
-    const u8 (*font_data)[132][8] = current_font->data;
-    return (*font_data)[character];
+
+const u8* fm_get_glyph(u8 character) {
+    if (!current_font || !current_font->data) return NULL;
+    if (current_font->char_height == 8 && current_font->char_width == 8) {
+        const u8 (*font_data_8)[256][8] = current_font->data;
+        return (*font_data_8)[character];
+    }
+    // 8x16 fonts
+    else if (current_font->char_height == 16 && current_font->char_width == 8) {
+        const u8 (*font_data_16)[256][16] = current_font->data;
+        return (*font_data_16)[character];
+    }
+
+    return NULL;
+}
+const u16* fm_get_glyph_16(u8 character) {
+    if (!current_font || !current_font->data) return NULL;
+
+    // 32 fonts
+    if (current_font->char_width == 16 && current_font->char_height == 32) {
+        const u16 (*font_data_16x32)[256][32] = current_font->data;
+        return (*font_data_16x32)[character];
+    }
+
+    return NULL;
 }
 u32 fm_get_char_width(void) {
     if (!current_font) return 8;

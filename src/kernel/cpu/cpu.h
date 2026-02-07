@@ -67,6 +67,10 @@ typedef struct {
     u32 cache_l1i;
     u32 cache_l2;
     u32 cache_l3;
+
+    //amd save boot
+    u8 has_long_mode;
+    u8 has_nx;
 } cpu_info_t;
 
 void cpu_detect(void);

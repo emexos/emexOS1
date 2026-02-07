@@ -4,6 +4,8 @@
 #include <theme/stdclrs.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+#include <kernel/arch/x64/exceptions/panic.h>
+//#include <kernel/arch/amd64/exeptions/panic.h>
 
 static cpu_info_t cpu_info;
 
@@ -55,9 +57,21 @@ void cpu_detect(void) {
     cpu_info.cache_line_size = ((ebx >> 8) & 0xFF) * 8;
     cpu_info.threads = (ebx >> 16) & 0xFF;
 
-    cpuid(7, &eax, &ebx, &ecx, &edx);
-    cpu_info.extended_features_ebx = ebx;
-    cpu_info.extended_features_ecx = ecx;
+    // extended (leaf 7)
+    u32 max_basic;
+    cpuid(0, &max_basic, &ebx, &ecx, &edx);
+    if (max_basic >= 7) {
+        cpuid_ext(7, 0, &eax, &ebx, &ecx, &edx);
+        cpu_info.extended_features_ebx = ebx;
+        cpu_info.extended_features_ecx = ecx;
+    }
+/*
+    cpuid(0, &eax, &ebx, &ecx, &edx);
+    if (eax >= 7) {
+        cpuid_ext(7, 0, &eax, &ebx, &ecx, &edx);
+        cpu_info.extended_features_ebx = ebx;
+        cpu_info.extended_features_ecx = ecx;
+    }*/
 
     // Get brand string if available
     cpuid(0x80000000, &eax, &ebx, &ecx, &edx);
@@ -89,6 +103,19 @@ void cpu_detect(void) {
             }
             cpu_info.brand[i] = '\0';
         }
+    }
+    // amd
+    if (str_equals(cpu_info.vendor, "AuthenticAMD")) {
+        cpuid(0x80000001, &eax, &ebx, &ecx, &edx);
+        cpu_info.has_long_mode = (edx & (1 << 29)) != 0;
+        cpu_info.has_nx        = (edx & (1 << 20)) != 0;
+
+        if (!cpu_info.has_long_mode) {
+            panic("CPU does not support long mode");
+        }
+
+        // Threads fallback
+        cpu_info.threads = cpu_info.cores;
     }
 
     // cache info for Intel

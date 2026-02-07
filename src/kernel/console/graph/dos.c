@@ -1,6 +1,7 @@
 #include "dos.h"
 #include "uno.h"
 #include <kernel/graph/graphics.h>
+#include <kernel/graph/fm.h>
 
 void console_window_init(void) {
     cursor_x = CONSOLE_PADDING_X;
@@ -36,7 +37,7 @@ u32 console_window_get_max_y(void) {
 
 void console_window_check_scroll(void)
 {
-    u32 char_height = 8 * font_scale;
+    u32 char_height = fm_get_char_height() * font_scale;
     u32 line_height = char_height + 2 * font_scale;
     u32 fb_h = get_fb_height();
     u32 banner_h = banner_get_height();

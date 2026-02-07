@@ -8,19 +8,43 @@
 
 static void putchar_at(char c, u32 x, u32 y, u32 color)
 {
-    const u8 *glyph = fm_get_glyph((u8)c);
+    u32 char_width = fm_get_char_width();
+    u32 char_height = fm_get_char_height();
 
-    for (int dy = 0; dy < 8; dy++)
-    {
-        u8 row = glyph[dy];
-        for (int dx = 0; dx < 8; dx++)
+    // 16 fonts
+    if (char_width == 16 && char_height == 32) {
+        const u16 *glyph = fm_get_glyph_16((u8)c);
+        if (!glyph) return;
+        for (u32 dy = 0; dy < char_height; dy++)
         {
-            if (row & (1 << (7 - dx)))
+            u16 row = glyph[dy];
+            for (u32 dx = 0; dx < char_width; dx++)
             {
-                // Draw scaled pixel
-                for (u32 sy = 0; sy < font_scale; sy++) {
-                    for (u32 sx = 0; sx < font_scale; sx++) {
-                        putpixel(x + dx * font_scale + sx, y + dy * font_scale + sy, color);
+                if (row & (1 << (15 - dx)))
+                {
+                    for (u32 sy = 0; sy < font_scale; sy++) {
+                        for (u32 sx = 0; sx < font_scale; sx++) {
+                            putpixel(x + dx * font_scale + sx, y + dy * font_scale + sy, color);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else { // 8 fonts
+        const u8 *glyph = fm_get_glyph((u8)c);
+        if (!glyph) return;
+        for (u32 dy = 0; dy < char_height; dy++)
+        {
+            u8 row = glyph[dy];
+            for (u32 dx = 0; dx < char_width; dx++)
+            {
+                if (row & (1 << (7 - dx)))
+                {
+                    for (u32 sy = 0; sy < font_scale; sy++) {
+                        for (u32 sx = 0; sx < font_scale; sx++) {
+                            putpixel(x + dx * font_scale + sx, y + dy * font_scale + sy, color);
+                        }
                     }
                 }
             }
@@ -30,8 +54,8 @@ static void putchar_at(char c, u32 x, u32 y, u32 color)
 
 void putchar(char c, u32 color)
 {
-    u32 char_width = 8 * font_scale;
-    u32 char_height = 8 * font_scale;
+    u32 char_width = fm_get_char_width() * font_scale;
+    u32 char_height = fm_get_char_height() * font_scale;
     u32 char_spacing = char_width;
     u32 line_height = char_height + 2 * font_scale;
 

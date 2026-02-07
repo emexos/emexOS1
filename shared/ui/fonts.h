@@ -3,10 +3,11 @@
 #include <types.h>
 
 typedef enum {
-    FONT_8X8_DOS = 0,
+    FONT_8X8_BOLD = 0,
     FONT_8X8 = 1,
     FONT_8X16 = 2,
-    FONT_COUNT = 3
+    FONT_16X32 = 3,
+    FONT_COUNT = 4
 } font_type_t;
 typedef struct {
     const char *name;

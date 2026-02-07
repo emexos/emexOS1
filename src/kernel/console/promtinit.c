@@ -1,9 +1,10 @@
 #include "console.h"
 #include <kernel/file_systems/vfs/vfs.h>
 
-void prompt_config_init(void) {
+void console_config_init(void) {
     // Create directories
     fs_mkdir("/.config/ekmsh");
+    fs_mkdir("/.config/ekmsh/fonts");
     //fs_mkdir("/.config/ekmsh/prompts");
 
     // Create default prompt.conf
@@ -45,10 +46,11 @@ void prompt_config_init(void) {
             "CONSOLE_PROG: \"ekmsh\"\n"
             "CONSOLE_NAME: \"console\"\n"
             "\n"
-            "CONSOLE_VERS: \"1.2\" # new with login\n"
+            "CONSOLE_VERS: \"1.3\" # new with login\n"
         ;
 
         fs_write(fd, Cconfiguration, str_len(Cconfiguration));
         fs_close(fd);
     }
+    // copy bdf here...
 }

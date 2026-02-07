@@ -123,7 +123,7 @@ void console_init(void)
     fs_mkdir("/.config/ekmsh/promts");
     fs_open("/.config/ekmsh/promts/promt.conf", O_CREAT | O_WRONLY);*/
 
-    prompt_config_init();
+    console_config_init();
 
     clear(CONSOLESCREEN_BG_COLOR);
     banner_init();
@@ -161,11 +161,13 @@ void console_run(void)
 
 static void console_redraw_input_line(void) {
     u32 saved_y = cursor_y;
-    u32 char_width = 8 * font_scale;
+    u32 char_width = fm_get_char_width() * font_scale;
+    u32 char_height = fm_get_char_height() * font_scale;
     u32 start_x = cursor_x;
     u32 clear_width = get_fb_width() - cursor_x;
 
-    draw_rect(cursor_x, cursor_y, clear_width, 8 * font_scale, CONSOLESCREEN_BG_COLOR);
+    draw_rect(cursor_x, cursor_y, clear_width, char_height, CONSOLESCREEN_BG_COLOR);
+
     for (int i = input_pos; input_buffer[i] != '\0'; i++) {
         putchar(input_buffer[i], GFX_WHITE);
     }
@@ -296,7 +298,8 @@ void console_handle_key(char c)
             //input_buffer[input_pos] = '\0';
 
             // just move the cursor back then print space, draw rext, and move back again
-            u32 char_width = 8 * font_scale;
+            u32 char_width = fm_get_char_width() * font_scale;
+            u32 char_height = fm_get_char_height() * font_scale;
             /*if (cursor_x >= char_width) {
                 cursor_x -= char_width;
                 putchar(' ', GFX_WHITE);
@@ -305,6 +308,7 @@ void console_handle_key(char c)
                 draw_rect(cursor_x, cursor_y, char_width, 8 * font_scale, CONSOLESCREEN_BG_COLOR);
                 }*/
             cursor_x -= char_width;
+            draw_rect(cursor_x, cursor_y, char_width, char_height, CONSOLESCREEN_BG_COLOR);
             console_redraw_input_line();
         }
         cursor_reset_blink();

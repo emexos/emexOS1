@@ -117,7 +117,7 @@ void _start(void)
         clear(bg());
         cursor_x = 0;
         cursor_y = 0;
-        font_scale = 1; // Setze scale für bootup
+        font_scale = 1;
 
         #if BOOTUP_VISUALS == 1
             log("[BOOT]", "BOOTUP_VISUALS == 1\n", warning);

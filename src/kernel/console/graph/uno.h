@@ -5,7 +5,7 @@
 #include <theme/stdclrs.h>
 #include <theme/doccr.h>
 
-#define BANNER_HEIGHT 15
+//#define BANNER_HEIGHT 15
 #define BANNER_Y_SPACING 4  // vertical spacing
 #define BANNER_BG_COLOR GFX_GRAY_20 // bar background
 #define BANNER_BORDER_COLOR GFX_GRAY_40 // border bottom

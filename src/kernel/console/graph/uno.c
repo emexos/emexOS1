@@ -1,5 +1,6 @@
 #include "uno.h"
 #include <kernel/graph/graphics.h>
+#include <kernel/graph/fm.h>
 #include <drivers/cmos/cmos.h>
 #include <string/string.h>
 #include <config/system.h>
@@ -11,9 +12,9 @@ static u32 banner_y = 0;
 static u32 banner_y_s = BANNER_Y_SPACING;
 static u8 last_second = 0;
 static u8 needs_update = 1;
-static u32 current_banner_height = BANNER_HEIGHT;
+static u32 current_banner_height = 0;//BANNER_HEIGHT;
 
-// Forward declaration
+// forward declaration
 static void banner_timer_callback(void);
 
 void banner_init(void)
@@ -22,25 +23,28 @@ void banner_init(void)
     banner_y_s = BANNER_Y_SPACING;
     last_second = 0;
     needs_update = 1;
-    current_banner_height = BANNER_HEIGHT;
+    //current_banner_height = BANNER_HEIGHT;
 
-    // Register timer callback
+    u32 char_height = fm_get_char_height() * font_scale;
+    current_banner_height = char_height + (banner_y_s * 2);
+
     timer_register_callback(banner_timer_callback);
-
     banner_draw();
 }
 
 void banner_draw(void)
 {
     u32 fb_w = get_fb_width();
-    // based on screen scale
-    u32 char_height = 8 * font_scale;
+
+    // based on font scale
+    u32 char_height = fm_get_char_height() * font_scale;
     u32 o_cursor_x = cursor_x;
     u32 o_cursor_y = cursor_y;
     u32 o_scale = font_scale;
     current_banner_height = char_height + (banner_y_s * 2);
 
-    draw_rect(0, banner_y, fb_w, current_banner_height, BANNER_BG_COLOR); //comes from GFX_GRAY_20
+    // draw background (in future moved to the wm)
+    draw_rect(0, banner_y, fb_w, current_banner_height, BANNER_BG_COLOR);
     draw_rect(0, banner_y + current_banner_height - font_scale, fb_w, font_scale, BANNER_BORDER_COLOR);
 
     // use current screen_scale for banner
@@ -57,7 +61,7 @@ void banner_draw(void)
     // TODO:
     // should be called after the current app
     const char *center_text = CONSOLE_APP_NAME;
-    int text_width = str_len(center_text) * (8 * font_scale + font_scale);
+    int text_width = str_len(center_text) * (fm_get_char_width() * font_scale);
     cursor_x = (fb_w - text_width) / 2;
     cursor_y = banner_y + banner_y_s;
 
@@ -117,10 +121,9 @@ void banner_update_time(void)
     //same for here its from cmos.c
 
     int text_len = str_len(time_buf);
-    int text_pixel_width = text_len * (8 * font_scale + font_scale);
+    int text_pixel_width = text_len * (fm_get_char_width() * font_scale);
 
-
-
+    u32 char_height = fm_get_char_height() * font_scale;
     draw_rect(fb_w - text_pixel_width - 8, banner_y, text_pixel_width + 8, current_banner_height, BANNER_BG_COLOR);
 
     cursor_x = fb_w - text_pixel_width - 4;
@@ -131,7 +134,8 @@ void banner_update_time(void)
     }
 
     //otherwise the time banner will overwrite the line
-    draw_rect(fb_w - text_pixel_width - 8, banner_y + current_banner_height - font_scale, text_pixel_width + 8, font_scale, BANNER_BORDER_COLOR);
+    draw_rect(fb_w - text_pixel_width - 8, banner_y + current_banner_height - font_scale,
+              text_pixel_width + 8, font_scale, BANNER_BORDER_COLOR);
 
     font_scale = o_scale;
     cursor_x = o_cursor_x;

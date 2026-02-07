@@ -1,5 +1,6 @@
 #include "console.h"
 #include <kernel/arch/x64/exceptions/timer.h>
+#include <kernel/graph/fm.h>
 
 static int cursor_visible = 1;
 static u32 cursor_blink_counter = 0;
@@ -10,19 +11,17 @@ static int cursor_enabled = 1;
 #define CURSOR_BLINK_RATE 300 // blinking
 //------------------------
 // "_"
-#define CURSOR_WIDTH 6
-#define CURSOR_HEIGHT 1
+#define CURSOR_WIDTH_RATIO 6
+#define CURSOR_HEIGHT_RATIO 1
 //------------------------
 // "█"
-//#define CURSOR_WIDTH 5
-//#define CURSOR_HEIGHT 8
+//#define CURSOR_WIDTH_RATIO 5
+//#define CURSOR_HEIGHT_RATIO 8
 //------------------------
 // "|"
-//#define CURSOR_WIDTH 1
-///#define CURSOR_HEIGHT 8
+//#define CURSOR_WIDTH_RATIO 1
+///#define CURSOR_HEIGHT_RATIO 8
 //------------------------
-
-
 static void cursor_timer_callback() {
     if (!cursor_enabled) return;
 
@@ -44,21 +43,25 @@ void cursor_(void) {
 void cursor_draw(void) {
     if (!cursor_visible || !cursor_enabled) return;
 
-    u32 char_width = CURSOR_WIDTH * font_scale;
-    u32 char_height = 8 * font_scale;
-    u32 cursor_y_pos = cursor_y + char_height - (CURSOR_HEIGHT * font_scale);
+    u32 char_width = fm_get_char_width() * font_scale;
+    u32 char_height = fm_get_char_height() * font_scale;
 
-    // this is the cursor
-    draw_rect(cursor_x, cursor_y_pos, char_width, CURSOR_HEIGHT * font_scale, CONSOLESCREEN_COLOR);
+    u32 cursor_width = (char_width * CURSOR_WIDTH_RATIO) / 8;
+    u32 cursor_height = (char_height * CURSOR_HEIGHT_RATIO) / 8;
+    u32 cursor_y_pos = cursor_y + char_height - cursor_height;
+
+    draw_rect(cursor_x, cursor_y_pos, cursor_width, cursor_height, CONSOLESCREEN_COLOR);
 }
 
 void cursor_c(void) {
-    u32 char_width = CURSOR_WIDTH * font_scale;
-    u32 char_height = 8 * font_scale;
-    u32 cursor_y_pos = cursor_y + char_height - (CURSOR_HEIGHT * font_scale);
+    u32 char_width = fm_get_char_width() * font_scale;
+    u32 char_height = fm_get_char_height() * font_scale;
 
-    // same cursor but inverted color
-    draw_rect(cursor_x, cursor_y_pos, char_width, CURSOR_HEIGHT * font_scale, CONSOLESCREEN_BG_COLOR);
+    u32 cursor_width = (char_width * CURSOR_WIDTH_RATIO) / 8;
+    u32 cursor_height = (char_height * CURSOR_HEIGHT_RATIO) / 8;
+    u32 cursor_y_pos = cursor_y + char_height - cursor_height;
+
+    draw_rect(cursor_x, cursor_y_pos, cursor_width, cursor_height, CONSOLESCREEN_BG_COLOR);
 }
 
 void cursor_redraw(void) {
