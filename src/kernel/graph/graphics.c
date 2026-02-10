@@ -69,7 +69,7 @@ void scroll_up(u32 lines)
     // Clear bottom lines
     for (u32 y = fb_height - pixels_to_scroll; y < fb_height; y++) {
         for (u32 x = 0; x < fb_width; x++) {
-            framebuffer[y * pitch_dwords + x] = CONSOLESCREEN_BG_COLOR;
+            framebuffer[y * pitch_dwords + x] = bg();
         }
     }
 }

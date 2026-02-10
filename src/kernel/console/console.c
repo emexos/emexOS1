@@ -8,7 +8,7 @@ char cwd[MAX_PATH_LEN] = "/";
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-int cmd_count = 25;
+int cmd_count = 26;
 
 console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -37,6 +37,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
     CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
+    CMDENTRY(cmd_ps, "ps", "displays processes", "ps")
 };
 
 //----------------------------------
@@ -44,8 +45,7 @@ console_cmd_t commands[MAX_CMDS] = {
 //module---------------------------
 static int console_module_init(void) {
     // console already initialized in main
-    BOOTUP_PRINT("[CONSOLE] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Load CONSOLE module...\n", white());
+    log("[CONSOLE]", "Load CONSOLE module...\n", d);
     return 0;
 }
 
@@ -74,27 +74,22 @@ void console_init(void)
     input_buffer[0] = '\0';
     char buf[64];
 
-    print("[CONSOLE] ", GFX_GRAY_70);
-    print("starting console...\n", white());
+    log("[CONSOLE]","starting console...\n", d);
 
     //sconsole_theme(THEME_FLU);
     f_setcontext(FONT_8X8);
     clear(CONSOLESCREEN_BG_COLOR);
 
-    print("[FM] ", GFX_GRAY_70);
-    print("scaling font...\n", white());
-    font_scale = 2;
+    font_scale = 1;
 
     //buf[0] = '\0';
-    str_append_uint(buf, font_scale);
-    print("[FM] ", GFX_GRAY_70);
-    print("font scaled to: ", white());
-    print(buf, white());
     print("\n", white());
 
     if (!login_authenticate()) {
         console_execute("shutdown");
     }
+    f_setcontext(FONT_8X8);
+    font_scale = 2;
 
     buf[0] = '\0'; //reset
     //reset_cursor();

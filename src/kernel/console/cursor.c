@@ -1,5 +1,5 @@
 #include "console.h"
-#include <kernel/arch/x64/exceptions/timer.h>
+#include <kernel/arch/x86_64/exceptions/timer.h>
 #include <kernel/graph/fm.h>
 
 static int cursor_visible = 1;

@@ -52,8 +52,7 @@ static void tss_set_entry(void)
 
 void gdt_init(void)
 {
-    BOOTUP_PRINT("[GDT] ", GFX_GRAY_70);
-    BOOTUP_PRINT("init (Global Descriptor Table)\n", white());
+    log("[GDT]", "init (Global Descriptor Table)\n", d);
     gdt_ptr.limit = sizeof(gdt) - 1;
     gdt_ptr.base = (u64)&gdt;
 
@@ -90,6 +89,7 @@ void gdt_init(void)
 
 void tss_init(void)
 {
+    log("[TSS]", "init (Task State Segment)\n", d);
     memset(&tss, 0, sizeof(tss_t));
     tss.rsp0 = (u64)kernel_stack + sizeof(kernel_stack);
     tss.iopb_offset = sizeof(tss_t);

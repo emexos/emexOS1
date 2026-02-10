@@ -52,6 +52,26 @@ static void putchar_at(char c, u32 x, u32 y, u32 color)
     }
 }
 
+/*static void aware_scroll_byprint(void)
+{
+    u32 char_height = fm_get_char_height() * font_scale;
+    u32 fb_h = get_fb_height();
+
+    // Check if cursor is out of screen
+    if (cursor_y + char_height > fb_h) {
+        u32 line_height = char_height + 2 * font_scale;
+
+        // Use scroll_up from graphics.c which is already theme-aware
+        scroll_up(line_height);
+
+        // Move cursor up
+        cursor_y -= line_height;
+        if (cursor_y < 0) {
+            cursor_y = 0;
+        }
+    }
+}*/
+
 void putchar(char c, u32 color)
 {
     u32 char_width = fm_get_char_width() * font_scale;
@@ -66,6 +86,7 @@ void putchar(char c, u32 color)
 
         // use console window scroll check
         console_window_check_scroll();
+        //aware_scroll_byprint();
         return;
     }
 

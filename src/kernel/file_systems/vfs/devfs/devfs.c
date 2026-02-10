@@ -132,10 +132,9 @@ int devfs_register_device(driver_module *mod)
 
     fs_addchild(devfs_root, node);
 
-    BOOTUP_PRINT("[DevFS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("registered ", GFX_ST_WHITE);
-    BOOTUP_PRINT(name, GFX_ST_CYAN);
-    BOOTUP_PRINT("\n", GFX_ST_WHITE);
+    log("[DEVFS]", "registered ", d);
+    BOOTUP_PRINT(name,white());
+    BOOTUP_PRINT("\n",white());
 
     return 0;
 }

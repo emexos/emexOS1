@@ -9,6 +9,9 @@
 #define USE_HCF 1
 #define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
 
+// 1 == run tests like processes, scheduler which are in early developement and not finished
+// 0 == disable running those tests
+#define RUNTESTS 1
 
 // 1 == Hardware compatibility on
 // 0 == Hardware compatibility off
@@ -34,5 +37,5 @@
 #endif
 
 #define X64 1
-#define RISCV64 0
-#define AARCH64 0
+#define RISCV 0
+#define ARM64 0

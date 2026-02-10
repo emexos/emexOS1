@@ -1,12 +1,13 @@
-// src/kernel/mem/ulime/ulime.c - FIXED VERSION
 #include "ulime.h"
 #include <kernel/communication/serial.h>
-#include <kernel/arch/x64/exceptions/panic.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
 #include <memory/main.h>
 #include <string/string.h>
 #include <kernel/mem/paging/paging.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+
+// ulime == (U)ser (LI)fe ti(ME)
 
 ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, void *glime, u64 uphys_start) {
     (void)uphys_start;
@@ -41,7 +42,12 @@ ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, void *glime, u6
     ulime->user_space_used = ulime->user_space_base;
     ulime->hpr = hpr;
 
-    printf("[ULIME] Initialized: user_space_base=0x%lx\n", ulime->user_space_base);
+    log("[ULIME]","initialized at user_space_base=", d);
+    char buf[32];
+    //str_copy(buf, "user_space_base=");
+    str_append_uint(buf, ulime->user_space_base);
+    log("", buf, d);
+    BOOTUP_PRINT("\n", white());
 
     return ulime;
 }
@@ -174,7 +180,7 @@ int ulime_proc_kill(ulime_t *ulime, u64 pid) {
 void ulime_schedule(ulime_t *ulime) {
     if (!ulime->ptr_proc_list) return;
 
-    // Simple round-robin scheduling
+    // simple round-robin scheduling
     if (!ulime->ptr_proc_curr) {
         // No current process, pick first one
         ulime->ptr_proc_curr = ulime->ptr_proc_list;
@@ -192,15 +198,26 @@ void ulime_schedule(ulime_t *ulime) {
     }
 }
 
-void ulime_proc_list(ulime_t *ulime) {
-    BOOTUP_PRINTF("Process List:\n");
-    BOOTUP_PRINTF("PID\tState\tName\t\tEntry Point\n");
-    BOOTUP_PRINTF("---\t-----\t----\t\t-----------\n");
+static void append_spaces(char *buf, int count){
+    for (int i = 0; i < count; i++)
+        str_append(buf, " ");
+}
+
+void ulime_proc_list(ulime_t *ulime)
+{
+    char line[256];
+    char numbuf[32];
+
+    BOOTUP_PRINT("Process List:\n", white());
+    BOOTUP_PRINT("PID   State       Name            Entry Point\n", white());
+    BOOTUP_PRINT("----  ----------  --------------  -----------\n", white());
 
     ulime_proc_t *current = ulime->ptr_proc_list;
-    while (current) {
+    while (current)
+    {
         const char *state_str = "UNKNOWN";
-        switch (current->state) {
+        switch (current->state)
+        {
             case PROC_CREATED: state_str = "CREATED"; break;
             case PROC_READY:   state_str = "READY"; break;
             case PROC_RUNNING: state_str = "RUNNING"; break;
@@ -208,8 +225,27 @@ void ulime_proc_list(ulime_t *ulime) {
             case PROC_ZOMBIE:  state_str = "ZOMBIE"; break;
         }
 
-        BOOTUP_PRINTF("%lu\t%s\t%s\t\t0x%lX\n",
-               current->pid, state_str, current->name, current->entry_point);
+        line[0] = 0;
+
+        str_from_int(numbuf, (int)current->pid);
+        str_append(line, numbuf);
+        append_spaces(line, PIDSPACE - str_len(numbuf) + 2);
+
+        str_append(line, state_str);
+        append_spaces(line, STATSPACE - str_len(state_str) + 2);
+
+        str_append(line, (char*)current->name);
+        append_spaces(line, NAMESPACE - str_len((char*)current->name) + 2);
+
+        // we need str_from_hex because otherwise it would print hex-prefix + decimal number
+        str_append(line, "0x");
+        str_from_hex(numbuf, current->entry_point);
+        str_append(line, numbuf);
+
+        str_append(line, "\n");
+
+        BOOTUP_PRINT(line, white());
+
         current = current->next;
     }
 }
@@ -226,46 +262,4 @@ int ulime_load_program(ulime_proc_t *proc, u8 *code, u64 code_size) {
     BOOTUP_PRINTF("Loaded program (%lu bytes) into process %s at 0x%lX\n",
            code_size, proc->name, proc->entry_point);
     return 0;
-}
-
-// syscall handlers
-u64 call_write(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
-    (void)proc;
-    (void)fd;
-
-    const char *str = (const char *)buf;
-    for (u64 i = 0; i < count; i++) {
-        //count ++;
-        BOOTUP_PRINTF("%c", str[i]);
-    }
-
-    return count;
-}
-
-u64 call_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3) {
-    (void)arg2;
-    (void)arg3;
-
-    BOOTUP_PRINTF("\n[USERMODE] process '%s' exited with code %lu\n",
-           proc->name, exit_code);
-    proc->state = PROC_ZOMBIE;
-
-    BOOTUP_PRINTF("[USERMODE] !!! RETURN !!!\n");
-
-    while(1) {
-        __asm__ volatile("cli; hlt");
-    }
-
-    return 0;
-}
-
-void ulime_init_syscalls(ulime_t *ulime) {
-    memset(ulime->syscalls, 0, sizeof(ulime->syscalls));
-
-    ulime->syscalls[EXIT]   = call_exit;
-    ulime->syscalls[WRITE]  = call_write;
-    //ulime->syscalls[READ]   = call_read;
-    //ulime->syscalls[SGETPID] = call_getpid;
-
-    printf("[ULIME] syscalls initialized\n");
 }

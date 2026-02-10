@@ -10,30 +10,30 @@ static keymap_t current_keymap;
 static char current_keymap_name[16] = "US";
 
 int keymap_init(void) {
-    printf("[KEYMAP] Initializing keymap system...\n");
+    log("[KEYMAP]", "Initializing keymap system...\n", d);
     keymap_modules_init();
 
     // loads default (US)
     if (keymap_load_from_module("US", &current_keymap) == 0) {
         str_copy(current_keymap_name, "US");
-        printf("[KEYMAP] Loaded default: US\n");
+        log("[KEYMAP]", "Loaded default: US\n", d);
         return 0;
     }
 
     // If US not found, try DE
     if (keymap_load_from_module("DE", &current_keymap) == 0) {
         str_copy(current_keymap_name, "DE");
-        printf("[KEYMAP] Loaded default: DE\n");
+        log("[KEYMAP]", "Loaded default: DE\n", d);
         return 0;
     }
 
     if (keymap_load_from_module("PL", &current_keymap) == 0) {
         str_copy(current_keymap_name, "PL");
-        printf("[KEYMAP] Loaded default: PL\n");
+        log("[KEYMAP]", "Loaded default: PL\n", d);
         return 0;
     }
 
-    printf("[KEYMAP] ERROR: No keymap could be loaded!\n");
+    log("[KEYMAP]", "ERROR: No keymap could be loaded!\n", warning);
     return -1;
 }
 
@@ -58,6 +58,6 @@ int keymap_set(const char *name) {
         return 0;
     }
 
-    printf("[KEYMAP] ERROR: Keymap '%s' not found\n", name);
+    printf("ERROR: Keymap '%s' not found\n", name);
     return -1;
 }

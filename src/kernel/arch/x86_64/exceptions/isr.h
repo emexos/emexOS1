@@ -3,7 +3,7 @@
 
 #include <types.h>
 #include <kernel/cpu/cpu.h>
-#include <kernel/arch/x64/idt/idt.h>
+#include <kernel/arch/x86_64/idt/idt.h>
 
 // messages
 #define ISR_DIVISION_ERROR          0

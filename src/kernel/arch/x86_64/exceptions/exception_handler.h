@@ -2,7 +2,7 @@
 #define EXCEPTION_HANDLER_H
 
 #include <types.h>
-#include <kernel/arch/x64/idt/idt.h>
+#include <kernel/arch/x86_64/idt/idt.h>
 //#include <kernel/cpu/cpu.h>
 
 extern const char* exception_messages[32];

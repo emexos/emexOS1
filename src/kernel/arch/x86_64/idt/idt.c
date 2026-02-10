@@ -1,6 +1,6 @@
 #include "idt.h"
-#include <kernel/arch/x64/exceptions/isr.h>
-#include <kernel/arch/x64/exceptions/irq.h>
+#include <kernel/arch/x86_64/exceptions/isr.h>
+#include <kernel/arch/x86_64/exceptions/irq.h>
 #include <memory/main.h>
 #include <string/string.h>
 #include <theme/stdclrs.h>
@@ -33,8 +33,7 @@ void idt_load(void)
 
 void idt_init(void)
 {
-    BOOTUP_PRINT("[IDT] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init interrupts\n", white());
+    log("[IDT]", "Init interrupts\n", d);
     memset(&idt, 0, sizeof(idt)); // clear idt
     isr_install();
     irq_install();

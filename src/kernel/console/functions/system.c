@@ -2,7 +2,7 @@
 #include <memory/main.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/module/module.h>
-#include <kernel/arch/x64/exceptions/timer.h>
+#include <kernel/arch/x86_64/exceptions/timer.h>
 #include <kernel/cpu/cpu.h>
 
 FHDR(cmd_modules)
@@ -114,23 +114,23 @@ FHDR(cmd_sysinfo)
 
     print("                  \n", GFX_GREEN);
     print(" ###########;m;    ", GFX_GREEN); print(PC_NAME, GFX_GREEN); print("@", GFX_GREEN); print(USER_NAME, GFX_GREEN); print("\n", GFX_GREEN);
-    print(" # #########;m;    \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN); //15 characters
+    print(" # #########;m;    ---------------\n", GFX_GREEN); //15 characters
     print(" # #;m;            Kernel: ", GFX_GREEN); print(OS_DEFNAME, GFX_WHITE); print(OS_DEFRELEASE, GFX_WHITE); print("\n", GFX_WHITE);
     print(" # #;m;            Resolution: ", GFX_GREEN); print_res();
     print(" # ########;m;     Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
     print(" # ########;m;     CPU: ", GFX_GREEN); ShowCPUName(); print("\n", GFX_WHITE);
     print(" # #;m;            Date: ", GFX_GREEN); GetCMOSDate(); print("\n", GFX_WHITE);
     print(" # #;m;            Uptime: ", GFX_GREEN); timer_print_uptime(); print("\n", GFX_WHITE);
-    print(" # #########;m;    \x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\x02\n", GFX_GREEN);
+    print(" # #########;m;    ---------------\n", GFX_GREEN);
     print(" ###########;m;    ", GFX_GREEN);
-        print("\x09 ", GFX_WHITE); //all colors:
-        print("\x09 ", GFX_RED);
-        print("\x09 ", GFX_GREEN);
-        print("\x09 ", GFX_YELLOW);
-        print("\x09 ", GFX_BLUE);
-        print("\x09 ", GFX_PURPLE);
-        print("\x09 ", GFX_CYAN);
-        print("\x09 \n", GFX_BG); //i think nobody will see this xd
+        print("^ ", GFX_WHITE); //all colors:
+        print("^ ", GFX_RED);
+        print("^ ", GFX_GREEN);
+        print("^ ", GFX_YELLOW);
+        print("^ ", GFX_BLUE);
+        print("^ ", GFX_PURPLE);
+        print("^ ", GFX_CYAN);
+        print("^ \n", GFX_BG); //i think nobody will see this xd
     print("                        ", GFX_GREEN); // empty/new line
 
 }

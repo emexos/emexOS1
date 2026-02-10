@@ -132,7 +132,7 @@ int ATAidentify(ATAdevice_t *dev, ATAidentify_t *identify)
         // ATAPI device
         dev->type = (lba_mid == 0x14 && lba_high == 0xEB) ?
                     ATA_DEVICE_PATAPI : ATA_DEVICE_SATAPI;
-        BOOTUP_PRINT("    ATAPI devices are not supported\n", GFX_YELLOW);
+        BOOTUP_PRINT("    ATAPI devices are not supported", GFX_RED);
         return -2; // not supported yet
     }
 

@@ -20,8 +20,7 @@ void keymaps_load(void)
         fs_close(fd_keymap_cfg);
     }
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("created keymap.cfg\n", white());
+    log("[FS]","created keymap.cfg\n", d);
 
     // load all keymaps
     limine_module_load("US.map", "/emr/config/keymaps/US.map");

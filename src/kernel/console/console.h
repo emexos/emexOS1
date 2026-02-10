@@ -15,6 +15,8 @@
 #include <config/system.h>
 #include "login/login.h"
 #include <config/user_config.h>
+#include <kernel/proc/scheduler.h>
+#include <kernel/proc/proc_manager.h>
 
 #include <string/string.h>
 

@@ -81,19 +81,17 @@ static u32 partition_start_lba = 0;
 
 void fat32_init(void)
 {
-    printf("[FAT32] Initializing FAT32 driver\n");
+    log("[FAT32]","Initializing FAT32 driver\n", d);
 
     if (!fs_klime) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("fs_klime not found\n", red());
+        log("[FAT32]", "fs_klime not found\n", error);
         return;
     }
 
     // Get first ATA device
     disk_device = ATAget_device(0);
     if (!disk_device) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("no ATA device found\n", red());
+        log("[FAT32]", "no ATA device found\n", error);
         return;
     }
 
@@ -101,8 +99,7 @@ void fat32_init(void)
     partition_info_t *fat32_part = NULL;
     int part_count = partition_get_count();
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("searching ", white());
+    log("[FAT32]", "searching ", d);
     BOOTUP_PRINT_INT(part_count, white());
     BOOTUP_PRINT(" partitions\n", white());
 
@@ -111,8 +108,7 @@ void fat32_init(void)
         if (part && (part->type == 0x0B || part->type == 0x0C)) {
             // 0x0B = FAT32, 0x0C = FAT32 LBA
             fat32_part = part;
-            BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-            BOOTUP_PRINT("found FAT32 partition at LBA ", white());
+            log("[FAT32]", "found FAT32 partition at LBA ", d);
             BOOTUP_PRINT_INT(part->start_lba, white());
             BOOTUP_PRINT("\n", white());
             break;
@@ -120,26 +116,22 @@ void fat32_init(void)
     }
 
     if (!fat32_part) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("no FAT32 partition found\n", red());
+        log("[FAT32]", "no FAT32 partition found\n", error);
         return;
     }
 
     partition_start_lba = fat32_part->start_lba;
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("read boot sector from LBA ", white());
+    log("[FAT32]", "read boot sector from LBA ", d);
     BOOTUP_PRINT_INT(partition_start_lba, white());
     BOOTUP_PRINT("...\n", white());
 
     if (ATAread_sectors(disk_device, partition_start_lba, 1, (u16*)&bootSector) != 0) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("failed to read boot sector\n", red());
+        log("[FAT32]", "failed to read boot sector\n", error);
         return;
     }
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("boot signature: 0x", white());
+    log("[FAT32]", "boot signature: 0x", d);
     char hex[] = "0123456789ABCDEF";
     char buf[3] = {0};
     u8 *bs_bytes = (u8*)&bootSector;
@@ -151,7 +143,7 @@ void fat32_init(void)
     BOOTUP_PRINT(buf, white());
     BOOTUP_PRINT("\n", white());
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+    log("[FAT32]", "[FAT32] ", d);
     BOOTUP_PRINT("FSType at offset 0x52: '", white());
     for (int i = 0; i < 8; i++) {
         char c = bootSector.fat_type_label[i];
@@ -166,9 +158,8 @@ void fat32_init(void)
 
     // verify FAT32
     if (memcmp(bootSector.fat_type_label, "FAT32   ", 8) != 0) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("not a valid FAT32 partition\n", yellow());
-        BOOTUP_PRINT("        should have 'FAT32   ' (8 chars), got '", white());
+        log("[FAT32]", "not a valid FAT32 partition\n", warning);
+        BOOTUP_PRINT("        should have 'FAT32   ' (8 chars), got '", GFX_ST_YELLOW);
         for (int i = 0; i < 8; i++) {
             char c = bootSector.fat_type_label[i];
             if (c >= 32 && c < 127) {
@@ -182,8 +173,7 @@ void fat32_init(void)
         return;
     }
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("found.\n", green());
+    log("[FAT32]", "found.\n", green());
 
     FAT = (uint32_t*)klime_create((klime_t*)fs_klime,
                                   bootSector.table_size_32 * bootSector.bytes_per_sector);
@@ -191,15 +181,13 @@ void fat32_init(void)
                                  bootSector.sectors_per_cluster * bootSector.bytes_per_sector);
 
     if (!FAT || !working_buffer) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("failed: allocate buffers\n", red());
+        log("[FAT32]", "failed: allocate buffers\n", error);
         return;
     }
 
     // read FAT
     u32 fat_lba = partition_start_lba + bootSector.reserved_sector_count;
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("reading FAT from LBA ", white());
+    log("[FAT32]", "reading FAT from LBA ", d);
     BOOTUP_PRINT_INT(fat_lba, white());
     BOOTUP_PRINT("...\n", white());
 
@@ -209,11 +197,9 @@ void fat32_init(void)
     }
 
     fat32_initialized = 1;
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("finish\n", green());
+    log("[FAT32]", "finish\n", success);
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Bytes/sector: ", white());
+    log("[FAT32]", "Bytes/sector: ", d);
     BOOTUP_PRINT_INT(bootSector.bytes_per_sector, white());
     BOOTUP_PRINT(", Sectors/cluster: ", white());
     BOOTUP_PRINT_INT(bootSector.sectors_per_cluster, white());
@@ -516,16 +502,14 @@ void fat32_close(file_t* file)
 
 int fat32_test_write(void) {
     if (!fat32_initialized) {
-        BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-        BOOTUP_PRINT("cannot test write\n", red());
+        log("[FAT32]", "cannot test write\n", error);
         return -1;
     }
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("test\n", white());
+    //BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
+    //BOOTUP_PRINT("test\n", white());
 
 
-    BOOTUP_PRINT("[FAT32] ", GFX_GRAY_70);
-    BOOTUP_PRINT("finish\n", green());
+    log("[FAT32]", "finish\n", success);
     return 0;
 }

@@ -18,5 +18,6 @@ int str_contains(const char *str, const char *substr);
 void str_to_upper(char *str);
 
 void str_from_int(char *buf, int value);
+void str_from_hex(char *buf, u64 value);
 
 #endif

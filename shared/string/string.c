@@ -193,6 +193,30 @@ int str_to_int(const char *str)
     return result * sign;
 }
 
+void str_from_hex(char *buf, u64 value)
+{
+    char hexchars[] = "0123456789ABCDEF";
+    char tmp[32];
+    int i = 0;
+
+    if (value == 0) {
+        buf[0] = '0';
+        buf[1] = 0;
+        return;
+    }
+
+    while (value > 0) {
+        tmp[i++] = hexchars[value & 0xF];
+        value >>= 4;
+    }
+
+    int j = 0;
+    while (i > 0) {
+        buf[j++] = tmp[--i];
+    }
+    buf[j] = 0;
+}
+
 void str_from_int(char *buf, int value)
 {
     if (!buf) return;

@@ -4,18 +4,17 @@
 #include <theme/stdclrs.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
-#include <kernel/arch/x64/exceptions/panic.h>
-//#include <kernel/arch/amd64/exeptions/panic.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
+#include <kernel/arch/amd64/amd64.h>
 
 static cpu_info_t cpu_info;
-
-//this only works on qemu and may some other emulators
+static amd64_info_t amd64_info;
+static int is_amd_cpu = 0;
 
 static void cpuid(u32 code, u32 *a, u32 *b, u32 *c, u32 *d) {
     __asm__ volatile("cpuid"
         : "=a"(*a), "=b"(*b), "=c"(*c), "=d"(*d)
-        //: "a"(code));
-        : "a"(code), "c"(0)) ;
+        : "a"(code), "c"(0));
 }
 
 static void cpuid_ext(u32 code, u32 subcode, u32 *a, u32 *b, u32 *c, u32 *d) {
@@ -25,9 +24,10 @@ static void cpuid_ext(u32 code, u32 subcode, u32 *a, u32 *b, u32 *c, u32 *d) {
 }
 
 void cpu_detect(void) {
-    BOOTUP_PRINT("[CPU] ", GFX_GRAY_70);
+    //BOOTUP_PRINT("[CPU] ", GFX_GRAY_70);
 
     memset(&cpu_info, 0, sizeof(cpu_info_t));
+    memset(&amd64_info, 0, sizeof(amd64_info_t));
     u32 eax, ebx, ecx, edx;
 
     // Get vendor string
@@ -37,7 +37,10 @@ void cpu_detect(void) {
     *(u32*)(cpu_info.vendor + 8) = ecx;
     cpu_info.vendor[12] = '\0';
 
-    // Get features
+    // check if AMD CPU (AuthenticAMD)
+    is_amd_cpu = (ebx == 0x68747541 && edx == 0x69746E65 && ecx == 0x444D4163);
+
+    // get basic features
     cpuid(1, &eax, &ebx, &ecx, &edx);
     cpu_info.features_edx = edx;
     cpu_info.features_ecx = ecx;
@@ -57,7 +60,7 @@ void cpu_detect(void) {
     cpu_info.cache_line_size = ((ebx >> 8) & 0xFF) * 8;
     cpu_info.threads = (ebx >> 16) & 0xFF;
 
-    // extended (leaf 7)
+    // extended features (leaf 7)
     u32 max_basic;
     cpuid(0, &max_basic, &ebx, &ecx, &edx);
     if (max_basic >= 7) {
@@ -65,15 +68,15 @@ void cpu_detect(void) {
         cpu_info.extended_features_ebx = ebx;
         cpu_info.extended_features_ecx = ecx;
     }
-/*
-    cpuid(0, &eax, &ebx, &ecx, &edx);
-    if (eax >= 7) {
-        cpuid_ext(7, 0, &eax, &ebx, &ecx, &edx);
-        cpu_info.extended_features_ebx = ebx;
-        cpu_info.extended_features_ecx = ecx;
-    }*/
+    /*
+        cpuid(0, &eax, &ebx, &ecx, &edx);
+        if (eax >= 7) {
+            cpuid_ext(7, 0, &eax, &ebx, &ecx, &edx);
+            cpu_info.extended_features_ebx = ebx;
+            cpu_info.extended_features_ecx = ecx;
+        }*/
 
-    // Get brand string if available
+    // get brand string if available
     cpuid(0x80000000, &eax, &ebx, &ecx, &edx);
     if (eax >= 0x80000004) {
         u32 *brand_ptr = (u32*)cpu_info.brand;
@@ -92,7 +95,7 @@ void cpu_detect(void) {
 
         cpu_info.brand[48] = '\0';
 
-        // Trim leading spaces
+        // trim leading spaces
         char *start = cpu_info.brand;
         while (*start == ' ') start++;
         if (start != cpu_info.brand) {
@@ -104,23 +107,34 @@ void cpu_detect(void) {
             cpu_info.brand[i] = '\0';
         }
     }
-    // amd
-    if (str_equals(cpu_info.vendor, "AuthenticAMD")) {
+
+    // AMD-specific detection
+    if (is_amd_cpu) {
         cpuid(0x80000001, &eax, &ebx, &ecx, &edx);
         cpu_info.has_long_mode = (edx & (1 << 29)) != 0;
-        cpu_info.has_nx        = (edx & (1 << 20)) != 0;
+        cpu_info.has_nx = (edx & (1 << 20)) != 0;
 
         if (!cpu_info.has_long_mode) {
             panic("CPU does not support long mode");
         }
 
-        // Threads fallback
-        cpu_info.threads = cpu_info.cores;
-    }
+        // run full AMD64 detection
+        amd64_detect(&amd64_info);
 
-    // cache info for Intel
-    if (cpu_info.vendor[0] == 'G')
-    { // (GenuineIntel) x86_84
+        // use AMD-specific cache info
+        cpu_info.cache_l1d = amd64_info.l1_data_cache_kb;
+        cpu_info.cache_l1i = amd64_info.l1_inst_cache_kb;
+        cpu_info.cache_l2 = amd64_info.l2_cache_kb;
+        cpu_info.cache_l3 = amd64_info.l3_cache_kb;
+        cpuid(0x80000008, &eax, &ebx, &ecx, &edx);
+        cpu_info.cores = (ecx & 0xFF) + 1;
+
+
+        if (cpu_info.threads == 0) {
+            cpu_info.threads = cpu_info.cores;
+        }
+    }
+    else if (cpu_info.vendor[0] == 'G') { // GenuineIntel
         cpuid(4, &eax, &ebx, &ecx, &edx);
 
         // L1 data cache
@@ -162,37 +176,34 @@ void cpu_detect(void) {
             u32 sets = ecx + 1;
             cpu_info.cache_l3 = (ways * partitions * line_size * sets) / 1024;
         }
-    }
-    else if (cpu_info.vendor[0] == 'A')
-    { // (AuthenticAMD) == for macbooks or others
-        cpuid(0x80000005, &eax, &ebx, &ecx, &edx);
-        cpu_info.cache_l1d = (ecx >> 24) & 0xFF;
-        cpu_info.cache_l1i = (edx >> 24) & 0xFF;
 
-        cpuid(0x80000006, &eax, &ebx, &ecx, &edx);
-        cpu_info.cache_l2 = (ecx >> 16) & 0xFFFF;//   KB
-        cpu_info.cache_l3 = ((edx >> 18) & 0x3FFF) * 512;
+        // core count
+        cpuid(0x80000008, &eax, &ebx, &ecx, &edx);
+        cpu_info.cores = (ecx & 0xFF) + 1;
     }
 
-    // core count
-    cpuid(0x80000008, &eax, &ebx, &ecx, &edx);
-    cpu_info.cores = (ecx & 0xFF) + 1;
-
-    BOOTUP_PRINT("detected: ", white());
+    log("[CPU]", "detected: ", d);
     BOOTUP_PRINT(cpu_info.brand, white());
     BOOTUP_PRINT("\n", white());
 
-    BOOTUP_PRINT("  Vendor: ", white());
+    log("     ", "Vendor: ", d);
     BOOTUP_PRINT(cpu_info.vendor, white());
     BOOTUP_PRINT("\n", white());
 
-    BOOTUP_PRINT("  Cores: ", white());
+    log("     ", "Cores: ", d);
     BOOTUP_PRINT_INT(cpu_info.cores, white());
     BOOTUP_PRINT("\n", white());
 
-    BOOTUP_PRINT("  Threads: ", white());
+    log("     ", "Threads: ", d);
     BOOTUP_PRINT_INT(cpu_info.threads, white());
     BOOTUP_PRINT("\n", white());
+
+    // amd-specfific
+    if (is_amd_cpu) {
+        BOOTUP_PRINT("\n", white());
+        amd64_print_info(&amd64_info);
+        amd64_init_optimizations();
+    }
 }
 
 const char* cpu_get_vendor(void) {
@@ -205,6 +216,14 @@ const char* cpu_get_brand(void) {
 
 cpu_info_t* cpu_get_info(void) {
     return &cpu_info;
+}
+
+amd64_info_t* cpu_get_amd64_info(void) {
+    return is_amd_cpu ? &amd64_info : NULL;
+}
+
+int cpu_is_amd(void) {
+    return is_amd_cpu;
 }
 
 int cpu_has_feature(u32 feature) {

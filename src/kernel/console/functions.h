@@ -50,3 +50,6 @@ FHDR(cmd_shutdown);
 
 // view.c
 FHDR(cmd_view);
+
+// proc
+FHDR(cmd_ps);

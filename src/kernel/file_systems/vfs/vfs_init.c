@@ -5,7 +5,7 @@ char *logpath = "/emr/logs/log1.txt";
 #include <kernel/mem/klime/klime.h>
 #include <kernel/include/reqs.h>
 #include <kernel/module/module.h>
-#include <kernel/arch/x64/exceptions/panic.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
 
 #include <string/string.h>
 #include <kernel/graph/theme.h>
@@ -58,20 +58,17 @@ void fs_load_bootconf(void) {
 
 static void load_limine_module(void) {
     if (!module_request.response || module_request.response->module_count == 0) {
-        BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-        BOOTUP_PRINT("no limine modules to copy\n", white());
+        log("[FS]", "no limine modules to copy\n", warning);
         return;
     }
 
     struct limine_module_response *response = (struct limine_module_response *)module_request.response;
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("setting UI config...\n", white());
+    log("[FS]", "setting UI config...\n", d);
     fs_mkdir("/boot/ui");
     fs_mkdir("/boot/ui/assets");
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("copying limine modules to VFS:\n", white());
+    log("[FS]", "copying limine modules to VFS:\n", d);
 
     for (u64 i = 0; i < response->module_count; i++) {
         char buf[32];
@@ -96,7 +93,7 @@ static void load_limine_module(void) {
 
         int fd = fs_open(vfs_path, O_CREAT | O_WRONLY);
         if (fd < 0) {
-            BOOTUP_PRINT("  ERROR: cannot create ", red());
+            BOOTUP_PRINT("    ERROR: cannot create ", red());
             BOOTUP_PRINT(vfs_path, white());
             BOOTUP_PRINT("\n", white());
             continue;
@@ -106,7 +103,7 @@ static void load_limine_module(void) {
         fs_close(fd);
 
         if (written > 0) {
-            BOOTUP_PRINT("  ", GFX_GRAY_70);
+            BOOTUP_PRINT("    ", white());
             BOOTUP_PRINT(module->path, white());
             BOOTUP_PRINT(" : ", white());
             BOOTUP_PRINT(vfs_path, white());
@@ -133,8 +130,7 @@ void fs_system_init(void *klime)
     tmpfs_register();
     devfs_register();
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("mounting roots: \n", white());
+    log("[FS]", "mounting roots: \n", white());
 
     // mount root as tmpfs
     fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS); // in future its just root so for (fat32,ext2,...)
@@ -155,10 +151,12 @@ void fs_system_init(void *klime)
     fs_mkdir(CONF_DIRECTORY);
 
     init_boot_log = fs_open(logpath, O_CREAT | O_WRONLY);
-    BOOTUP_PRINTF("[FS] wrote %s \n", logpath);
+    log("[FS]", "[FS] wrote", d);
+    BOOTUP_PRINT(logpath, white());
     if (init_boot_log < 0) {
         panic("Cannot open [logs]");
     }
+    BOOTUP_PRINT("\n", white());
     //TODO: bootconf loading from /boot/bootconf
     // in shared/theme/bootconf file
 
@@ -178,8 +176,7 @@ void fs_register_mods()
     int total = module_get_count();
     int dev_cnt = 0; // device count
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("scann modules:\n", white());
+    log("[FS]", "scann modules:\n", d);
 
     for (int i = 0; i < total; i++) {
         driver_module *mod = module_get_by_index(i);
@@ -194,8 +191,7 @@ void fs_register_mods()
         }
     }
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("registered ", white());
+    log("[FS]", "registered ", d);
     BOOTUP_PRINT_INT(dev_cnt, white()); // device count
     BOOTUP_PRINT(" device(s)\n", white());
 }
@@ -205,16 +201,14 @@ void fs_create_test_file(void) {
     // Write only
     int fd = fs_open("/tmp/t", O_CREAT | O_WRONLY);
     if (fd < 0) {
-        BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-        BOOTUP_PRINT("failed to create file\n", white());
+        log("[FS]", "failed to create file\n", error);
         return;
     }
 
     fs_write(fd, "this is a test for fs this file has no other use", str_len("this is a test for fs this file has no other use"));
     fs_close(fd);
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("created ", white());
+   log("[FS]", "created ", d);
     BOOTUP_PRINT("/tmp/t", white());
     BOOTUP_PRINT("\n", white());
 }

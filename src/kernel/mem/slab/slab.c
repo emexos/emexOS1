@@ -1,6 +1,6 @@
 #include "slab.h"
 #include <kernel/communication/serial.h>
-#include <kernel/arch/x64/exceptions/panic.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
 #include <memory/main.h>
 
 void slab_init(slab_allocator_t *ptr_slab, u64 *ptr_slab_meta, u64 *ptr_slab_data) {

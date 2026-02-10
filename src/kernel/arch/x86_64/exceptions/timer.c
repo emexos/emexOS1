@@ -5,6 +5,7 @@
 #include <string/string.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/graph/theme.h>
+#include <kernel/proc/scheduler.h>
 #include <theme/doccr.h>
 
 // using PIT (8254)
@@ -14,6 +15,10 @@ static volatile int timer_initialized = 0;
 static u64 boot_timestamp = 0;
 static timer_callback_t timer_callbacks[MAX_TIMER_CALLBACKS];
 static int callback_count = 0;
+
+#if ENABLE_ULIME
+extern scheduler_t* scheduler;  // Zugriff auf globale Variable
+#endif
 
 void timer_handler(cpu_state_t* state)
 {
@@ -34,9 +39,11 @@ void timer_handler(cpu_state_t* state)
     //banner_tick();
 
     // call schedule
-    // if (sched_is_enabled()) {
-    //     sched_tick();
-    // }
+    #if ENABLE_ULIME
+        if (scheduler) {
+            scheduler_tick(scheduler);
+        }
+    #endif
 }
 
 void timer_init(u32 frequency)
@@ -80,8 +87,7 @@ void timer_init(u32 frequency)
     //TODO:
     // its not exactly uptime because everything before imer_set_boot_time() doesnt get count
     // so we could set it to +50 milliseconds or something so its a bit more realistic i think...
-    BOOTUP_PRINT("[TIME] ", GFX_GRAY_70);
-    BOOTUP_PRINT("Init timer (", GFX_ST_WHITE);
+    log("[TIME]","Init timer (", d);
 }
 
 // reg callback
@@ -155,8 +161,7 @@ u64 timer_get_milliseconds(void)
 
 void timer_set_boot_time(void) {
     boot_timestamp = timer_ticks;
-    BOOTUP_PRINT("[TIME] ", GFX_GRAY_70);
-    BOOTUP_PRINT("started uptime now...\n", GFX_ST_WHITE);
+    log("[TIME]","started uptime now...\n", d);
 }
 
 u64 timer_get_uptime_seconds(void)
@@ -164,7 +169,7 @@ u64 timer_get_uptime_seconds(void)
     if (!timer_initialized) {
         return 0;
     }
-    // Uptime seit timer_set_boot_time()
+    // uptime since timer_set_boot_time()
     u64 current_ticks = timer_ticks - boot_timestamp;
     return current_ticks / TIMER_FREQUENCY;
 }

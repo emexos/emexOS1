@@ -66,8 +66,7 @@ int fs_register(fs_type *type) {
 
     types[type_cnt++] = type;
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("registered: ", white());
+    log("[FS]","registered: ", d);
     BOOTUP_PRINT(type->name, white());
     BOOTUP_PRINT("\n", white());
     return 0;
@@ -111,8 +110,7 @@ int fs_mount(const char *src, const char *tgt, const char *type_name) {
 
     mnt->active = 1;
 
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("mount ", white());
+    log("[FS]", "mount ", d);
     BOOTUP_PRINT(type_name, white());
     BOOTUP_PRINT(" to ", white());
     BOOTUP_PRINT(tgt, white());
@@ -203,8 +201,7 @@ int fs_addchild(fs_node *parent, fs_node *child) {
 // main init
 //
 void fs_init(void) {
-    BOOTUP_PRINT("[FS] ", GFX_GRAY_70);
-    BOOTUP_PRINT("init generic VFS\n", white());
+    log("[FS]", "init generic VFS\n", d);
 
     for (int i = 0; i < FS_MAX_MNTS; i++) mnts[i].active = 0;
     for (int i = 0; i < FS_MAX_FDS; i++) fds[i] = NULL;

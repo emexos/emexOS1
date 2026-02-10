@@ -13,7 +13,7 @@ void pci_init(void) {
 // before pci_get_device_count();
 // because in the kernel its used before this causes random character drawing
 
-    log("[PCI]", "Init PCI/PCIe", d);
+    log("[PCI]", "Init PCI/PCIe\n", d);
 
     pci_device_init();
 

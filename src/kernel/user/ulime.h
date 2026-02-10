@@ -6,7 +6,11 @@
 #include <kernel/mem/klime/klime.h>
 #include <kernel/mem/glime/glime.h>
 #include <kernel/mem/phys/physmem.h>
-#include "syscalls.h"
+#include "calls.h"
+
+#define NAMESPACE 14
+#define PIDSPACE 4
+#define STATSPACE 10
 
 
 typedef struct ulime_proc {
@@ -66,7 +70,6 @@ typedef struct ulime {
 } ulime_t;
 
 
-
 #define PROC_CREATED    1
 #define PROC_READY      2
 #define PROC_RUNNING    3
@@ -79,7 +82,7 @@ typedef struct ulime {
     ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, void *glime, u64 uphys_start);
 #endif
 
-void ulime_init_syscalls(ulime_t *ulime);
+//void ulime_init_syscalls(ulime_t *ulime);
 
 ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point);
 int ulime_proc_kill(ulime_t *ulime, u64 pid);

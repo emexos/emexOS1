@@ -1,5 +1,5 @@
 #include "glime.h"
-#include <kernel/arch/x64/exceptions/panic.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
 #include "../heap/heap.h"
 #include <string/string.h>
 #include <memory/main.h>

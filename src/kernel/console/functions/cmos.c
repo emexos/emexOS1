@@ -1,6 +1,6 @@
 #include <kernel/console/console.h>
 #include <drivers/cmos/cmos.h>
-#include <kernel/arch/x64/exceptions/timer.h>
+#include <kernel/arch/x86_64/exceptions/timer.h>
 
 FHDR(cmd_cal) {
     (void)s;

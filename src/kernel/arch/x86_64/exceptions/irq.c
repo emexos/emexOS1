@@ -1,5 +1,5 @@
 #include "irq.h"
-#include <kernel/arch/x64/idt/idt.h>
+#include <kernel/arch/x86_64/idt/idt.h>
 #include <kernel/include/ports.h>
 
 static irq_handler_t irq_handlers[16];

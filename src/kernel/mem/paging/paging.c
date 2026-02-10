@@ -3,7 +3,7 @@
 
 #include "../mem.h"
 #include "../phys/physmem.h"
-#include <kernel/arch/x64/exceptions/panic.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
 #include <memory/main.h>
 
 #include <string/string.h>

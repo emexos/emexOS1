@@ -1,7 +1,7 @@
 #include "keyboard.h"
 #include "maps.h"
 #include <kernel/include/ports.h>
-#include <kernel/arch/x64/exceptions/irq.h>
+#include <kernel/arch/x86_64/exceptions/irq.h>
 #include <theme/doccr.h>
 #include <kernel/graph/theme.h>
 

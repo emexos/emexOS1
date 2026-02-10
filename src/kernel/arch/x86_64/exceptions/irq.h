@@ -1,7 +1,7 @@
 #ifndef IRQ_H
 #define IRQ_H
 
-#include <kernel/arch/x64/idt/idt.h>
+#include <kernel/arch/x86_64/idt/idt.h>
 #include <types.h>
 
 // IRQ Numbers

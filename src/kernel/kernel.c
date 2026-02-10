@@ -24,20 +24,26 @@
 // CPU
 #include <kernel/cpu/cpu.h>
 #if X64 == 1
-    #include <kernel/arch/x64/gdt/gdt.h>
-    #include <kernel/arch/x64/idt/idt.h>
-    #include <kernel/arch/x64/exceptions/panic.h>
-    #include <kernel/arch/x64/exceptions/timer.h>
-#elif RISCV64 == 1
-    #include <kernel/arch/riscv64/table/trap.h> // trap Table / exception Table
-#elif AARCH64 == 1
-    #include <kernel/arch/aarch64/exception/vectab.h> // vector table
+    #include <kernel/arch/x86_64/gdt/gdt.h>
+    #include <kernel/arch/x86_64/idt/idt.h>
+    #include <kernel/arch/x86_64/exceptions/panic.h>
+    #include <kernel/arch/x86_64/exceptions/timer.h>
+#elif RISCV == 1
+    #include <kernel/arch/riscv/table/trap.h> // trap Table / exception Table
+#elif ARM64 == 1
+    #include <kernel/arch/arm64/exception/vectab.h> // vector table
 #endif
 
 // Memory
 #include <memory/main.h>
 #include <kernel/mem/meminclude.h>
-//#include "mem_manager/virtmem.h" //not implemendet
+#if ENABLE_ULIME
+    #include <kernel/proc/scheduler.h>
+    #include <kernel/proc/proc_manager.h>
+    scheduler_t *scheduler = NULL;
+    proc_manager_t *proc_mgr = NULL;
+#endif
+#define SCHEDQUANT 20
 
 //Console
 #include <kernel/console/console.h>
@@ -52,19 +58,18 @@
 //extern void fs_create_test_file(void);
 
 #if ENABLE_FAT32
-#include <kernel/file_systems/fat32/fat32.h> // finally fat32!
-// interface
-#include <kernel/interface/partition.h>
-#include <kernel/interface/mbr.h>
-#include <config/disk.h>
-
+    #include <kernel/file_systems/fat32/fat32.h> // finally fat32!
+    // interface
+    #include <kernel/interface/partition.h>
+    #include <kernel/interface/mbr.h>
+    #include <config/disk.h>
 #endif
 
 // disk drivers
 #include <kernel/module/module.h>
 //extern void fs_register_mods(void);
 #if ENABLE_ATA
-#include <drivers/storage/ata/disk.h>
+    #include <drivers/storage/ata/disk.h>
 #endif
 
 
@@ -107,27 +112,25 @@ void _start(void)
         printf("\ninit graphics, draw logo\n");
         //draw_logo();
 
-        // main kernel
-        printf("==============================================\n");
-        printf("==                  emexOS                  ==\n");
-        printf("==    the OS which does what you tell it    ==\n");
-        printf("==============================================\n");
-
         fm_init();
         clear(bg());
         cursor_x = 0;
         cursor_y = 0;
         font_scale = 1;
 
+        BOOTUP_PRINT("\n\n ======================\n", white());
+        BOOTUP_PRINT(" | Welcome to ", white());
+        BOOTUP_PRINT("emexOS", cyan());
+        BOOTUP_PRINT("! |\n", white());
+        BOOTUP_PRINT(" ======================\n\n", white());
+        delay(2);
+
         #if BOOTUP_VISUALS == 1
             log("[BOOT]", "BOOTUP_VISUALS == 1\n", warning);
         #else
             log("[BOOT]", "BOOTUP_VISUALS == 0\n", warning);
         #endif
-
-        BOOTUP_PRINT("\n\nWelcome to ", white());
-        BOOTUP_PRINT("emexOS", cyan());
-        BOOTUP_PRINT("!\n\n", white());
+        delay(3);
 
         //actually not needed but maybe later (e.g. for testing themes)
         //draw_rect(10, 10, fb_width - 20, fb_height - 20, blue());
@@ -142,6 +145,10 @@ void _start(void)
     #endif
     #if ENABLE_ULIME
         ulime_t *ulime = NULL;
+        //scheduler_t *scheduler = NULL;
+        //proc_manager_t *proc_mgr = NULL;
+        scheduler = scheduler_init(ulime, 10);  // 10 tick quantum
+        proc_mgr = proc_mng_init(ulime);
     #endif
 
     { // MADE BY @TSARAKI (github)
@@ -199,6 +206,24 @@ void _start(void)
         #else
             log("[ULIME]", "skipped (hardware compatibility)\n", warning);
         #endif
+        #if ENABLE_ULIME
+            if (ulime) {
+                scheduler = scheduler_init(ulime, SCHEDQUANT);
+                proc_mgr = proc_mng_init(ulime);
+
+                if (scheduler) {
+                    char buf[32];
+                    str_append_uint(buf, SCHEDQUANT);
+                    log("[SCHED]", "initialized quantum == ", d);
+                    BOOTUP_PRINT(buf, white());
+                    BOOTUP_PRINT("\n", white());
+                }
+                if (proc_mgr) {
+                    log("[PROCMGR]", "initialized\n", d);
+                }
+            }
+        #endif
+
 
         u32 freq = 1000;
         timer_init(freq);
@@ -260,8 +285,8 @@ void _start(void)
         logos_load();
         users_load();
     }
-    logo_init();
-    draw_logo();
+    //logo_init();
+    //draw_logo();
 
     #if HARDWARE_SC == 1
         // let the cpu rest a small time
@@ -305,6 +330,20 @@ void _start(void)
             // let the cpu rest a small time
             for (volatile int i = 0; i < 1000000; i++) {
                 __asm__ volatile("nop");
+            }
+        #endif
+        #if ENABLE_ULIME && RUNTESTS // set to 1 to enable test
+        //BOOTUP_PRINT("test RUNTESTS block\n", white());
+            if (proc_mgr)
+            {
+                ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)"runp", 0x40000000, 100);
+                ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__runp", 0x40001000, 50);
+
+                log("[TEST]", "creating test processes\n", d);
+                if (p1) log("[TEST]", "created runp\n", d);
+                if (p2) log("[TEST]", "created __runp\n", d);
+
+                proc_list_procs(proc_mgr);
             }
         #endif
     }
