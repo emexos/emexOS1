@@ -7,17 +7,12 @@
 #include <kernel/graph/theme.h>
 #include <math/math.h>
 #include <theme/doccr.h>
+#include <kernel/images/bmp.h>
 //#include <klib/graphics/font_manager.h>
 //int init_boot_log = -1; // boot logs
 
-// TODO:
-// add a exact time for start and end, which cpu, how long it booted...
-
-// pictures
-#include <kernel/images/bmp.h>
-
 // Drivers
-#include <drivers/ps2/ps2.h>
+#include <drivers/drivers.h>
 //#include <drivers/usb/xhci.h>
 //#include <drivers/ps2/keyboard/keyboard.h>
 
@@ -28,11 +23,16 @@
     #include <kernel/arch/x86_64/idt/idt.h>
     #include <kernel/arch/x86_64/exceptions/panic.h>
     #include <kernel/arch/x86_64/exceptions/timer.h>
+    #include <kernel/arch/x86_64/syscalls/syscall_init.h>
 #elif RISCV == 1
-    #include <kernel/arch/riscv/table/trap.h> // trap Table / exception Table
+    #include <kernel/arch/riscv/tables/trap.h> // trap Table / exception Table
 #elif ARM64 == 1
     #include <kernel/arch/arm64/exception/vectab.h> // vector table
+    #include <kernel/arch/arm64/syscalls/syscall_init.h>
 #endif
+
+// usermode stuff
+#include <kernel/user/user.h>
 
 // Memory
 #include <memory/main.h>
@@ -41,9 +41,9 @@
     #include <kernel/proc/scheduler.h>
     #include <kernel/proc/proc_manager.h>
     scheduler_t *scheduler = NULL;
+    #define SCHEDQUANT 20
     proc_manager_t *proc_mgr = NULL;
 #endif
-#define SCHEDQUANT 20
 
 //Console
 #include <kernel/console/console.h>
@@ -77,14 +77,8 @@
 #include <kernel/modules/limine.h>
 #include <kernel/inits/init.h>
 
-//PCIe
 #include <kernel/pci/pci.h>
 
-
-// usermode stuff
-//#include <kernel/userspace/usermode.h>
-//#include <kernel/syscalls/syscalls.h>
-//extern void userspace_test_init(ulime_t *ulime);
 
 void _start(void)
 {
@@ -221,6 +215,9 @@ void _start(void)
                 if (proc_mgr) {
                     log("[PROCMGR]", "initialized\n", d);
                 }
+
+                syscall_arch_init(); // SYSCALL/SYSRET
+                _init_syscalls_table(ulime);
             }
         #endif
 
@@ -338,12 +335,29 @@ void _start(void)
             {
                 ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)"runp", 0x40000000, 100);
                 ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__runp", 0x40001000, 50);
+                ulime_proc_t *p4 = proc_create_proc(proc_mgr, (u8*)"user", 0x40004000, 100);
+                // NOP with infinite loop
+                static u8 test_code[] =
+                {
+                    0x90, 0x90, 0x90, 0xEB, 0xFE
+                };
 
-                log("[TEST]", "creating test processes\n", d);
-                if (p1) log("[TEST]", "created runp\n", d);
-                if (p2) log("[TEST]", "created __runp\n", d);
+                //log("[TEST]", "creating test processes\n", d);
+                //if (p1) log("[TEST]", "created runp\n", d);
+                //if (p2) log("[TEST]", "created __runp\n", d);
 
                 proc_list_procs(proc_mgr);
+
+                // let cpu rest
+                for (volatile int i = 0; i < 1000000; i++) {
+                    __asm__ volatile("nop");
+                }
+
+                log("[TEST_CODE]", "loading test code:\n", d);
+                ulime_load_program(p4, test_code, sizeof(test_code));
+
+                log("[TEST_CODE]", "test code loaded successfully\n", d);
+                JumpToUserspace(p4);
             }
         #endif
     }

@@ -52,7 +52,7 @@ void banner_draw(void)
     cursor_x = 4;
     cursor_y = banner_y + banner_y_s;
 
-    const char *os_name = OS_DEFNAME;
+    const char *os_name = KERNEL_VERSION;
     for (int i = 0; os_name[i]; i++) {
         putchar(os_name[i], BANNER_TEXT_COLOR);
     }

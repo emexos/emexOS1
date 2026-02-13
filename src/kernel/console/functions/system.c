@@ -115,7 +115,7 @@ FHDR(cmd_sysinfo)
     print("                  \n", GFX_GREEN);
     print(" ###########;m;    ", GFX_GREEN); print(PC_NAME, GFX_GREEN); print("@", GFX_GREEN); print(USER_NAME, GFX_GREEN); print("\n", GFX_GREEN);
     print(" # #########;m;    ---------------\n", GFX_GREEN); //15 characters
-    print(" # #;m;            Kernel: ", GFX_GREEN); print(OS_DEFNAME, GFX_WHITE); print(OS_DEFRELEASE, GFX_WHITE); print("\n", GFX_WHITE);
+    print(" # #;m;            Kernel: ", GFX_GREEN); print(KERNEL_VERSION, GFX_WHITE); print("\n", GFX_WHITE);
     print(" # #;m;            Resolution: ", GFX_GREEN); print_res();
     print(" # ########;m;     Bootloader: ", GFX_GREEN); print("Limine \n", GFX_WHITE);
     print(" # ########;m;     CPU: ", GFX_GREEN); ShowCPUName(); print("\n", GFX_WHITE);

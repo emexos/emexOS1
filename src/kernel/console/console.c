@@ -8,7 +8,7 @@ char cwd[MAX_PATH_LEN] = "/";
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-int cmd_count = 26;
+int cmd_count = 27;
 
 console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -25,7 +25,8 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_time, "time", "displays current time", "time"),
     CMDENTRY(cmd_poweroff, "poweroff", "Power off the system", "poweroff"),
     CMDENTRY(cmd_reboot, "reboot", "Reboot the system", "reboot"),
-    CMDENTRY(cmd_shutdown, "shutdown", "Shutdown the system", "shutdown"),
+    CMDENTRY(cmd_shutdown, "shutdown", "Shutsdown the system", "shutdown"),
+    CMDENTRY(cmd_shutdown, "shut", "Shutsdown the system", "shut"), // alias
     CMDENTRY(cmd_cat, "cat", "show file", "cat <file>"),
     CMDENTRY(cmd_ls, "ls", "list directory contents", "ls [path]"),
     CMDENTRY(cmd_cd, "cd", "Change directory", "cd [path]"),
@@ -37,7 +38,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
     CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
-    CMDENTRY(cmd_ps, "ps", "displays processes", "ps")
+    CMDENTRY(cmd_ps, "ps", "displays processes", "ps"),
 };
 
 //----------------------------------
