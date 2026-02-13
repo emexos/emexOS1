@@ -333,13 +333,15 @@ void _start(void)
         //BOOTUP_PRINT("test RUNTESTS block\n", white());
             if (proc_mgr)
             {
-                ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)"runp", 0x40000000, 100);
-                ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__runp", 0x40001000, 50);
-                ulime_proc_t *p4 = proc_create_proc(proc_mgr, (u8*)"user", 0x40004000, 100);
+                ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)KERNELPROC, KERNELSPACE, KERNELPRIORITY);
+                ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__rt", 0x40001000, 2); // run tests
+                ulime_proc_t *p4 = proc_create_proc(proc_mgr, (u8*)USERPROC, USERSPACE, USERPRIORITY);
                 // NOP with infinite loop
                 static u8 test_code[] =
                 {
-                    0x90, 0x90, 0x90, 0xEB, 0xFE
+                    0x90, 0x90, 0x90,
+                    0xEB,0xF1        // jump back
+                    //0xEB,0xFE
                 };
 
                 //log("[TEST]", "creating test processes\n", d);

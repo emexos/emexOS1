@@ -6,6 +6,11 @@
 #define KERNEL_DEFRELEASE_NAME " v26J5 "
 #define KERNEL_VERSION KERNEL_BARENAME " " KERNEL_DEFRELEASE
 #define SYSTEMINI_PATH "/emr/config/system.ini"
+#define VERIFYSYSGEN "62522870358368638010"
+#define KERNELADRESSNUM "kman"
+#define KERNELPROC "kernel"
+#define KERNELSPACE 0x40000000
+#define KERNELPRIORITY 255
 
 #define USE_HCF 1
 #define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1

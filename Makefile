@@ -51,6 +51,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@cp shared/images/desktop_icon.bmp $(ISODIR)/boot/images/
 	@cp shared/images/console_icon.bmp $(ISODIR)/boot/images/
 	@cp shared/images/background.bmp $(ISODIR)/boot/images/
+	@cp shared/images/frog.bmp $(ISODIR)/boot/images/
 
 	@cp shared/images/bg.jpg $(ISODIR)/boot/
 

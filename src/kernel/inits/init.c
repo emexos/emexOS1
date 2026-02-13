@@ -25,7 +25,7 @@ void keymaps_load(void)
     // load all keymaps
     limine_module_load("US.map", "/emr/config/keymaps/US.map");
     limine_module_load("DE.map", "/emr/config/keymaps/DE.map");
-    limine_module_load("PL.map", "/emr/config/keymaps/PL.map");
+    //limine_module_load("PL.map", "/emr/config/keymaps/PL.map");
 
 }
 
@@ -34,7 +34,9 @@ void logos_load(void) {
     limine_module_load("logo.bmp", "/emr/assets/logo.bmp");
     //limine_module_load("console_icon.bmp", "/images/iconsole.bmp");
     //limine_module_load("desktop_icon.bmp", "/images/idesktop.bmp");
-    limine_module_load("background.bmp", "/images/bg.bmp");
+    //fs_mkdir("/emr/images/");
+    //limine_module_load("background.bmp", "/emr/assets/bg.bmp");
+    limine_module_load("frog.bmp", "/emr/assets/frog.bmp");
 }
 
 void users_load(void) {
