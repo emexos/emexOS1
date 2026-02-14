@@ -34,6 +34,9 @@
 // usermode stuff
 #include <kernel/user/user.h>
 
+// executables
+#include <kernel/exec/elf/loader.h>
+
 // Memory
 #include <memory/main.h>
 #include <kernel/mem/meminclude.h>
@@ -331,18 +334,10 @@ void _start(void)
         #endif
         #if ENABLE_ULIME && RUNTESTS // set to 1 to enable test
         //BOOTUP_PRINT("test RUNTESTS block\n", white());
-            if (proc_mgr)
-            {
+            /*if (proc_mgr){
                 ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)KERNELPROC, KERNELSPACE, KERNELPRIORITY);
                 ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__rt", 0x40001000, 2); // run tests
                 ulime_proc_t *p4 = proc_create_proc(proc_mgr, (u8*)USERPROC, USERSPACE, USERPRIORITY);
-                // NOP with infinite loop
-                static u8 test_code[] =
-                {
-                    0x90, 0x90, 0x90,
-                    0xEB,0xF1        // jump back
-                    //0xEB,0xFE
-                };
 
                 //log("[TEST]", "creating test processes\n", d);
                 //if (p1) log("[TEST]", "created runp\n", d);
@@ -351,15 +346,45 @@ void _start(void)
                 proc_list_procs(proc_mgr);
 
                 // let cpu rest
-                for (volatile int i = 0; i < 1000000; i++) {
+                for (volatile int i = 0; i < 10000; i++) {
                     __asm__ volatile("nop");
                 }
 
-                log("[TEST_CODE]", "loading test code:\n", d);
-                ulime_load_program(p4, test_code, sizeof(test_code));
+                //log("[TEST_CODE]", "loading test code:\n", d);
+                //ulime_load_program(p4, test_code, sizeof(test_code));
+                //log("[TEST_CODE]", "test code loaded successfully\n", d);
+                //JumpToUserspace(p4);
+            }*/
+            if (proc_mgr && ulime && module_request.response && module_request.response->module_count > 0) {
 
-                log("[TEST_CODE]", "test code loaded successfully\n", d);
-                JumpToUserspace(p4);
+                struct limine_module_response *mod_resp = module_request.response;
+                struct limine_file *hello_mod = NULL;
+
+                for (u64 i = 0; i < mod_resp->module_count; i++) {
+                    const char *path = mod_resp->modules[i]->path;
+                    if (str_contains((char*)path, "hello.elf")) {
+                        hello_mod = mod_resp->modules[i];
+                        break;
+                    }
+                }
+
+                if (hello_mod) {
+                    log("[ELF]", "found hello.elf module\n", d);
+
+                    ulime_proc_t *proc = proc_create_proc(proc_mgr, (u8*)"hello", 0, 1);
+                    if (proc) {
+                        u8 *elf_data = (u8*)hello_mod->address;
+                        u64 elf_size = hello_mod->size;
+
+                        if (elf_load(proc, elf_data, elf_size) == 0) {
+                            ulime->ptr_proc_curr = proc;
+                            log("[ELF]", "jumping to userspace\n", d);
+                            JumpToUserspace(proc);
+                        }
+                    }
+                } else {
+                    log("[ELF]", "hello.elf not found in modules\n", error);
+                }
             }
         #endif
     }

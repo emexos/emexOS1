@@ -1,7 +1,9 @@
 include common.mk
 
 # Find all C, C++ and Assembly files
-SRCS = $(shell find $(SRC_DIR) shared -name "*.c" -or -name "*.cpp" -or -name "*.asm")
+SRCS = $(shell find $(SRC_DIR) shared \
+	-path "src/userspace" -prune -o \
+	\( -name "*.c" -o -name "*.cpp" -o -name "*.asm" \) -print)
 OBJS = $(SRCS:%=$(BUILD_DIR)/%.o)
 
 .PHONY: all fetchDeps run clean
@@ -22,10 +24,15 @@ disk:
 	@./tools/createfs.sh
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
+	@mkdir -p $(dir $@)
 	$(VLD) $(LDFLAGS) -T $< $(OBJS) -o $@
 
+# Build userspace first
+userspace:
+	@$(MAKE) -C src/userspace
+
 # Create bootable ISO
-$(ISO): limine.conf $(BUILD_DIR)/kernel.elf
+$(ISO): limine.conf $(BUILD_DIR)/kernel.elf userspace
 	@echo "[ISO] Creating bootable image..."
 	@rm -rf $(ISODIR)
 	@mkdir -p $(ISODIR)/boot/limine $(ISODIR)/EFI/BOOT
@@ -41,6 +48,10 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf
 	@mkdir -p $(ISODIR)/boot/modules
 	@mkdir -p $(ISODIR)/boot/keymaps
 	@mkdir -p $(ISODIR)/boot/images
+	@mkdir -p $(ISODIR)/boot/programs
+
+	@echo "[MOD] creating executables..."
+	@cp src/userspace/hello.elf $(ISODIR)/boot/programs/hello.elf
 
 	@echo "[MOD] copying configs..."
 	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg

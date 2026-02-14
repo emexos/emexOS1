@@ -80,16 +80,6 @@ void console_init(void)
     //sconsole_theme(THEME_FLU);
     f_setcontext(FONT_8X8);
     clear(CONSOLESCREEN_BG_COLOR);
-
-    font_scale = 1;
-
-    //buf[0] = '\0';
-    print("\n", white());
-
-    if (!login_authenticate()) {
-        console_execute("shutdown");
-    }
-    f_setcontext(FONT_8X8);
     font_scale = 2;
 
     buf[0] = '\0'; //reset

@@ -4,6 +4,7 @@
 #include <kernel/communication/serial.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+#include <types.h>
 
 // MSR addresses
 #define MSR_EFER 0xC0000080
@@ -37,7 +38,7 @@ void syscall_arch_init(void) {
     // bits 47:32 == user CS/SS for SYSCALL
     u64 star = 0;
     star |= ((u64)KERNEL_CODE_SELECTOR << 32);
-    star |= ((u64)(USER_CODE_SELECTOR - 16) << 48);
+    star |= ((u64)0x10 << 48);
 
     wrmsr(MSR_STAR, star);
     wrmsr(MSR_LSTAR, (u64)syscall_entry);

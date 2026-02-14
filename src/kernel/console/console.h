@@ -13,7 +13,7 @@
 #include <theme/doccr.h>
 #include <config/user.h>
 #include <config/system.h>
-#include "login/login.h"
+//#include "login/login.h"
 #include <config/user_config.h>
 #include <kernel/proc/scheduler.h>
 #include <kernel/proc/proc_manager.h>

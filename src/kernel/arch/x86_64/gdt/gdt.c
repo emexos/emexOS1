@@ -59,24 +59,24 @@ void gdt_init(void)
     // NULL descriptor (0x00)
     gdt_set_gate(0, 0, 0, 0, 0);
 
-    // kernel Code Segment (0x08)
+    // kernel code Segment (0x08)
     gdt_set_gate(1, 0, 0xFFFFF,
                  GDT_PRESENT | GDT_RING0 | GDT_CODE_DATA | GDT_EXECUTABLE | GDT_RW,
                  GDT_GRANULAR | GDT_LONG_MODE);
 
-    // kernel Data Segment (0x10)
+    // kernel data Segment (0x10)
     gdt_set_gate(2, 0, 0xFFFFF,
                  GDT_PRESENT | GDT_RING0 | GDT_CODE_DATA | GDT_RW,
                  GDT_GRANULAR | GDT_LONG_MODE);
 
-    // user Code Segment (0x18 | 3 = 0x1B) - Ring 3
-    gdt_set_gate(3, 0, 0xFFFFFFFF,
-                 GDT_PRESENT | GDT_RING3 | GDT_CODE_DATA | GDT_EXECUTABLE | GDT_RW,
+    // user data Segment (0x18)
+    gdt_set_gate(3, 0, 0xFFFFF,
+                 GDT_PRESENT | GDT_RING3 | GDT_CODE_DATA | GDT_RW,
                  GDT_GRANULAR | GDT_LONG_MODE);
 
-    // user Data Segment (0x20 | 3 = 0x23) - Ring 3
-    gdt_set_gate(4, 0, 0xFFFFFFFF,
-                 GDT_PRESENT | GDT_RING3 | GDT_CODE_DATA | GDT_RW,
+    // user code Segment (0x20)
+    gdt_set_gate(4, 0, 0xFFFFF,
+                 GDT_PRESENT | GDT_RING3 | GDT_CODE_DATA | GDT_EXECUTABLE | GDT_RW,
                  GDT_GRANULAR | GDT_LONG_MODE);
 
     // TSS Segment (0x28) 2 entrys
