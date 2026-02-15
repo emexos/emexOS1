@@ -1,6 +1,6 @@
 #include "theme.h"
 #include <kernel/file_systems/vfs/vfs.h>
-#include <kernel/data/conf.h>
+#include <kernel/data/conf/conf.h>
 #include <string/string.h>
 
 // Boot and Panic themes - hardcoded

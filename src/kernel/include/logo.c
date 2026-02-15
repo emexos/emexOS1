@@ -8,7 +8,7 @@
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 #include <kernel/mem/klime/klime.h>
-#include <kernel/images/bmp.h>
+#include <kernel/data/images/bmp.h>
 
 // input data from logo
 u8 *logo_data = NULL;

@@ -7,7 +7,7 @@
 #include <kernel/graph/theme.h>
 #include <math/math.h>
 #include <theme/doccr.h>
-#include <kernel/images/bmp.h>
+#include <kernel/data/images/bmp.h>
 //#include <klib/graphics/font_manager.h>
 //int init_boot_log = -1; // boot logs
 

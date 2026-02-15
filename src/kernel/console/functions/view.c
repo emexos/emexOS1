@@ -1,5 +1,5 @@
 #include <kernel/console/console.h>
-#include <kernel/images/bmp.h>
+#include <kernel/data/images/bmp.h>
 #include <drivers/ps2/keyboard/keyboard.h>
 
 FHDR(cmd_view) {

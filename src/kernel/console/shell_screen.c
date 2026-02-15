@@ -1,7 +1,7 @@
 #include "console.h"
 #include "graph/uno.h"
 #include "graph/dos.h"
-#include <kernel/data/conf.h>
+#include <kernel/data/conf/conf.h>
 
 void shell_clear_screen(u32 color)
 {
