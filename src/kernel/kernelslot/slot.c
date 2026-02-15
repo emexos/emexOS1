@@ -1,6 +1,7 @@
 #include <kernel/kernelslot/slot.h>
-#include <string/string.h>   // falls nötig
+#include <string/string.h>
 #include <string/log.h>
+#include <kernel/modules/limine.h>
 
 void dualslotvalidating(void)
 {
@@ -10,6 +11,7 @@ void dualslotvalidating(void)
         fs_write(fd, default_config, str_len(default_config));
         fs_close(fd);
     }
+    //limine_module_load("activeslot.cfg", "/boot/activeslot.cfg");
 }
 
 char readslot(void)

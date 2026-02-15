@@ -19,8 +19,8 @@ fetchDeps:
 	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
 
 disk:
-	@mkdir /dsk
-	@touch /dsk/disk.img
+	@mkdir -p $(DISK_DIR)
+	@touch $(DISK_DIR)/disk.img
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 	@mkdir -p $(dir $@)
@@ -38,7 +38,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 #@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_a.elf
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_b.elf
-	@cp activeslot.txt $(ISODIR)/boot/activeslot.txt # slot system
+	@cp activeslot.txt $(ISODIR)/boot/activeslot.cfg # slot system
 
 	@cp $< $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
@@ -58,6 +58,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 
 	@echo "[MOD] copying configs..."
 	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
+	@cp shared/theme/font8x15.bin $(ISODIR)/boot/liminefont.f15
 
 	@echo "[MOD] copying assets..."
 	@cp shared/ui/assets/bootlogo.bin $(ISODIR)/boot/ui/assets/
@@ -92,7 +93,7 @@ run: $(ISO)
 		-m 512 \
 		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
-		-drive file=dsk/disk.img,format=raw,if=ide,index=0 \
+		-drive file=$(DISK_IMG),format=raw,if=ide,index=0 \
 		-cdrom $< \
 		-serial stdio 2>&1 \
 		#-no-reboot \
