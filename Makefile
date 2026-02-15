@@ -20,8 +20,7 @@ fetchDeps:
 
 disk:
 	@mkdir /dsk
-	@chmod +x tools/createfs.sh
-	@./tools/createfs.sh
+	@touch /dsk/disk.img
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 	@mkdir -p $(dir $@)
@@ -32,7 +31,7 @@ userspace:
 	@$(MAKE) -C src/userspace
 
 # Create bootable ISO
-$(ISO): limine.conf $(BUILD_DIR)/kernel.elf userspace
+$(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 	@echo "[ISO] Creating bootable image..."
 	@rm -rf $(ISODIR)
 	@mkdir -p $(ISODIR)/boot/limine $(ISODIR)/EFI/BOOT
