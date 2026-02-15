@@ -65,7 +65,7 @@ static void load_limine_module(void) {
     struct limine_module_response *response = (struct limine_module_response *)module_request.response;
 
     log("[FS]", "setting UI config...\n", d);
-    fs_mkdir("/boot/ui");
+    //("/boot/ui");
     fs_mkdir("/boot/ui/assets");
 
     log("[FS]", "copying limine modules to VFS:\n", d);

@@ -36,7 +36,11 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf userspace
 	@echo "[ISO] Creating bootable image..."
 	@rm -rf $(ISODIR)
 	@mkdir -p $(ISODIR)/boot/limine $(ISODIR)/EFI/BOOT
-	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/
+#@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/
+	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_a.elf
+	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_b.elf
+	@cp activeslot.txt $(ISODIR)/boot/activeslot.txt # slot system
+
 	@cp $< $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/

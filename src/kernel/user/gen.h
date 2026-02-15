@@ -18,12 +18,14 @@
 #include <config/user_config.h>
 #include <kernel/proc/scheduler.h>
 #include <kernel/proc/proc_manager.h>
+#include <kernel/include/assembly.h>
+#include <kernel/console/console.h>
 
 #include <string/string.h>
 
 #include <kernel/module/module.h>
 
 
-void _userinit();
+void DEinit();
 
 #endif

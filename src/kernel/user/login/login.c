@@ -1,4 +1,4 @@
-/*#include "login.h"
+#include "login.h"
 #include <drivers/ps2/keyboard/keyboard.h>
 #include <drivers/cmos/cmos.h>
 #include <kernel/graph/graphics.h>
@@ -135,4 +135,3 @@ int login_authenticate(void) {
 
     return 0;
 }
-*/

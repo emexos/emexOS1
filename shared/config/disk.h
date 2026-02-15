@@ -1,5 +1,7 @@
 #pragma once
 
+#include "system.h"
+
 #define PARTITION_START_LBA 2048
 #define PARTITION_TYPE_FAT32 0x0C  // FAT32 LBA
 
@@ -9,4 +11,4 @@
 #define FAT32_ROOT_CLUSTER 2
 
 #define FAT32_VOLUME_LABEL "EMEXOS"
-#define FAT32_OEM_NAME "EMEX0.5"
+#define FAT32_OEM_NAME "EMEX" KERNEL_DEFRELEASE

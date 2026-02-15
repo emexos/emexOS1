@@ -2,7 +2,9 @@
 #include "fonts/font_8x8.h"
 #include "fonts/font_8x8_bold.h"
 #include "fonts/font_8x16.h"
+#include "fonts/font_8x16_bold.h"
 #include "fonts/font_16x32.h"
+#include "fonts/gohufont.h"
 
 // font registery
 const font_t font_registry[FONT_COUNT] = {
@@ -18,6 +20,12 @@ const font_t font_registry[FONT_COUNT] = {
         .char_width = 8,
         .char_height = 16
     },
+    [FONT_8X16_BOLD] = {
+        .name = "8x16_BOLD",
+        .data = &font_8x16_bold,
+        .char_width = 8,
+        .char_height = 16
+    },
     [FONT_8X8] = {
         .name = "8x8",
         .data = &font_8x8,
@@ -29,5 +37,11 @@ const font_t font_registry[FONT_COUNT] = {
         .data = &font_16x32,
         .char_width = 16,
         .char_height = 32
-    }
+    }/*,
+    [GOHUFONT] = {
+        .name = "gohufont",
+        .data = &gohufont_8x16,
+        .char_width = 8,
+        .char_height = 12
+    }*/
 };

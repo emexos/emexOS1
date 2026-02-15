@@ -1,13 +1,4 @@
-#include <limine/limine.h>
-//#include <config/paths.h>
-#include <kernel/file_systems/vfs/vfs.h>
-#include <kernel/communication/serial.h>
-#include <kernel/modules/limine.h>
-#include <kernel/graph/theme.h>
-#include <theme/doccr.h>
-
-#include <config/user.h>
-#include <config/system.h>
+#include "init.h"
 
 void keymaps_load(void)
 {
@@ -35,7 +26,7 @@ void logos_load(void) {
     //limine_module_load("console_icon.bmp", "/images/iconsole.bmp");
     //limine_module_load("desktop_icon.bmp", "/images/idesktop.bmp");
     //fs_mkdir("/emr/images/");
-    //limine_module_load("background.bmp", "/emr/assets/bg.bmp");
+    limine_module_load("background.bmp", "/emr/assets/bg.bmp");
     limine_module_load("frog.bmp", "/emr/assets/frog.bmp");
 }
 
@@ -62,7 +53,7 @@ void users_load(void) {
         fs_write(fd_system, system_config, str_len(system_config));
         fs_close(fd_system);
     }
-    fs_mkdir("/users");
-    fs_mkdir("/users/bin");
-    fs_mkdir("/users/apps");
+    //fs_mkdir("/users");
+    //fs_mkdir("/users/bin");
+    //fs_mkdir("/users/apps");
 }

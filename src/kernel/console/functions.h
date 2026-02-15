@@ -43,7 +43,7 @@ FHDR(cmd_source);
 FHDR(cmd_keymap);
 
 // poweroff.c
-FHDR(cmd_poweroff);
+//FHDR(cmd_poweroff);
 FHDR(cmd_reboot);
 FHDR(cmd_shutdown);
 
@@ -53,3 +53,6 @@ FHDR(cmd_view);
 
 // proc
 FHDR(cmd_ps);
+
+// slots.c
+FHDR(cmd_slot);

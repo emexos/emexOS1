@@ -48,8 +48,8 @@
     proc_manager_t *proc_mgr = NULL;
 #endif
 
-//Console
-#include <kernel/console/console.h>
+//Desktop Enviroment
+#include <kernel/user/gen.h>
 
 //debug
 #include <kernel/communication/serial.h>
@@ -281,6 +281,7 @@ void _start(void)
 
     // Initialize Limine modules
     limine_modules_init(); {
+        dualslotvalidating();
         keymaps_load();
         logos_load();
         users_load();
@@ -334,7 +335,7 @@ void _start(void)
         #endif
         #if ENABLE_ULIME && RUNTESTS // set to 1 to enable test
         //BOOTUP_PRINT("test RUNTESTS block\n", white());
-            /*if (proc_mgr){
+            if (proc_mgr){
                 ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)KERNELPROC, KERNELSPACE, KERNELPRIORITY);
                 ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__rt", 0x40001000, 2); // run tests
                 ulime_proc_t *p4 = proc_create_proc(proc_mgr, (u8*)USERPROC, USERSPACE, USERPRIORITY);
@@ -354,8 +355,8 @@ void _start(void)
                 //ulime_load_program(p4, test_code, sizeof(test_code));
                 //log("[TEST_CODE]", "test code loaded successfully\n", d);
                 //JumpToUserspace(p4);
-            }*/
-            if (proc_mgr && ulime && module_request.response && module_request.response->module_count > 0) {
+            }
+            /*if (proc_mgr && ulime && module_request.response && module_request.response->module_count > 0) {
 
                 struct limine_module_response *mod_resp = module_request.response;
                 struct limine_file *hello_mod = NULL;
@@ -385,7 +386,7 @@ void _start(void)
                 } else {
                     log("[ELF]", "hello.elf not found in modules\n", error);
                 }
-            }
+            }*/
         #endif
     }
 
@@ -403,8 +404,7 @@ void _start(void)
         console_init();
     #endif*/
 
-    console_init();
-    keyboard_poll();
+    DEinit();
 
     //should not reach here
     //font_manager_set_context(FONT_CONTEXT_PANIC);

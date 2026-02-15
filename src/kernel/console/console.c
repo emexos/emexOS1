@@ -23,7 +23,6 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_date, "date", "displays current date", "date"),
     CMDENTRY(cmd_uptime, "uptime", "System uptime", "uptime"),
     CMDENTRY(cmd_time, "time", "displays current time", "time"),
-    CMDENTRY(cmd_poweroff, "poweroff", "Power off the system", "poweroff"),
     CMDENTRY(cmd_reboot, "reboot", "Reboot the system", "reboot"),
     CMDENTRY(cmd_shutdown, "shutdown", "Shutsdown the system", "shutdown"),
     CMDENTRY(cmd_shutdown, "shut", "Shutsdown the system", "shut"), // alias
@@ -39,6 +38,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_touch, "touch", "create empty file", "touch <file>"),
     CMDENTRY(cmd_view, "view", "view BMP image", "view <image.bmp>"),
     CMDENTRY(cmd_ps, "ps", "displays processes", "ps"),
+    CMDENTRY(cmd_slot, "slot", "switch kernel slots", "slot <A|B>"),
 };
 
 //----------------------------------
@@ -118,12 +118,15 @@ void console_init(void)
     console_window_init();
     cursor_();
 
+    //string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+#,.-;:_'*`?=!\\\"$%&/()^°", GFX_WHITE);
+    // font testing
     shell_print_prompt();
 
     //console_execute("view /images/logo.bmp");
     cursor_draw();
 
     console_run();
+
 }
 
 void console_run(void)
