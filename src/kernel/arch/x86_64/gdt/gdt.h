@@ -5,7 +5,7 @@
 
 #define GDT_ENTRIES 7
 
-// GDT Entry Flags
+// GDT entry flags
 #define GDT_PRESENT     0x80
 #define GDT_RING0       0x00
 #define GDT_RING3       0x60
@@ -15,19 +15,19 @@
 #define GDT_RW          0x02
 #define GDT_ACCESSED    0x01
 
-// GDT Granularity Flags
+// GDT granularity flags
 #define GDT_GRANULAR    0x80  // 4KB blocks
 #define GDT_LONG_MODE   0x20  // 64-bit
 #define GDT_32BIT       0x40  // 32-bit protected mode
 
-// Segment Selectors
+// segment selectors
 #define KERNEL_CODE_SELECTOR  0x08
 #define KERNEL_DATA_SELECTOR  0x10
 #define USER_DATA_SELECTOR    0x18
 #define USER_CODE_SELECTOR    0x20
 #define TSS_SELECTOR          0x28
 
-// GDT Entry Structure (64-bit)
+// GDT entry structure (64-bit)
 typedef struct {
     u16 limit_low;
     u16 base_low;
@@ -37,7 +37,7 @@ typedef struct {
     u8  base_high;
 } __attribute__((packed)) gdt_entry_t;
 
-// TSS Entry Structure (64-bit)
+// TSS entry structure (64-bit)
 typedef struct {
     u16 limit_low;
     u16 base_low;
@@ -49,16 +49,16 @@ typedef struct {
     u32 reserved;
 } __attribute__((packed)) gdt_tss_entry_t;
 
-// GDT Pointer Structure
+// GDT ptr structure
 typedef struct {
     u16 limit;
     u64 base;
 } __attribute__((packed)) gdt_ptr_t;
 
-// Task State Segment (64-bit)
+// TSS
 typedef struct {
     u32 reserved0;
-    u64 rsp0;  // Kernel stack pointer
+    u64 rsp0;  // kernel stack pointer
     u64 rsp1;
     u64 rsp2;
     u64 reserved1;
@@ -74,11 +74,14 @@ typedef struct {
     u16 iopb_offset;
 } __attribute__((packed)) tss_t;
 
-// Functions
+
+
 void gdt_init(void);
 void gdt_set_kernel_stack(u64 stack);
 void gdt_load(void);
 void tss_init(void);
 void tss_set_stack(u64 stack);
+void verify_gdt_setup(void);
+
 
 #endif

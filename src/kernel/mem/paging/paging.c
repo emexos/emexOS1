@@ -13,7 +13,7 @@
 extern u8 _kernel_start[];
 extern u8 _kernel_end[];
 
-static page_table_t *kernel_pml4 = NULL;
+page_table_t *kernel_pml4 = NULL;
 
 inline void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr) {
     return (void*)(phys_addr + hpr->offset);

@@ -72,6 +72,16 @@ int str_len(const char *str)
     return len;
 }
 
+void str_append_char(char *dest, char c)
+{
+    if (!dest) return;
+
+    int len = str_len(dest);
+    dest[len] = c;
+    dest[len + 1] = '\0';
+}
+
+
 int str_starts_with(const char *str, const char *prefix)
 {
     if (!str || !prefix) return 0;

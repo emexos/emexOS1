@@ -2,20 +2,10 @@
 .global _start
 
 _start:
-    # write(1, msg, 26)
-    mov $1, %rax  # SYS_WRITE
-    mov $1, %rdi  # fd = STDOUT
-    lea msg(%rip), %rsi # buf = msg
-    mov $26, %rdx # count = 26
+    # Just exit immediately with code 42 to test if user mode works
+    mov $60, %rax      # SYS_EXIT
+    mov $42, %rdi      # status = 42
     syscall
 
-    # exit(0)
-    mov $60, %rax  # SYS_EXIT
-    xor %rdi, %rdi # status = 0
-    syscall
-
+    # Should never reach here
     hlt
-
-.section .rodata
-msg:
-    .ascii "hello world from usermode\n"

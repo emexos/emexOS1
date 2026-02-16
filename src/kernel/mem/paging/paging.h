@@ -26,12 +26,15 @@ typedef struct {
     u64 entries[512];
 } page_table_t;
 
+extern page_table_t *kernel_pml4;
+
 void paging_map_page(limine_hhdm_response_t *hpr, u64 virtual_addr, u64 physical_addr, u64 flags);
 void paging_unmap_page(u64 virtual_addr);
 void paging_init(limine_hhdm_response_t *hpr);
 u64 map_region_alloc(limine_hhdm_response_t *hpr, u64 virt, u64 size);
 void map_region(limine_hhdm_response_t *hpr, u64 phys, u64 virt, u64 size, u64 flags);
 void map_ulime_region(limine_hhdm_response_t *hpr, u64 phys_start, u64 size);
+int verify_page_permissions(limine_hhdm_response_t *hpr, u64 virtual_addr, const char *name);
 
 void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr);
 u64 virt_to_phys(limine_hhdm_response_t *hpr, void* virt_addr);

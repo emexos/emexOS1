@@ -4,16 +4,19 @@
 
 
 #define PT_LOAD 1
-#define ELF_MAGIC 0x7F454C46
+//#define ELF_MAGIC 0x7F454C46
 
 
+// (16 bytes)
 typedef struct {
-    u32 magic;
-    u8  class;
-    u8  endian;
-    u8  version;
-    u8  osabi;
-    u64 reserved;
+    u8 magic[4];      // 0x7F, 'E', 'L', 'F'                    (4)
+    u8 class;         // 1 = 32 , 2 = 64                        (1)
+    u8 endian;        // 1 = little endian , 2 = big endian     (1)
+    u8 version;       // ALWAYS 1                               (1)
+    u8 osabi;         // OS/ABI identification                  (1)
+    u8 abiversion;    //                                        (1)
+    // 5 + 4 + 7 = 16
+    u8 pad[7];        // padding to 16 bytes                    (7)
 } __attribute__((packed)) elf_ident_t;
 
 typedef struct {

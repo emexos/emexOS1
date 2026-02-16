@@ -101,7 +101,7 @@ int limine_module_load(const char *module_name, const char *vfs_path) {
     }
 
     log("[LIMINE]", "Loaded ", d);
-    BOOTUP_PRINT(module_name, cyan());
+    BOOTUP_PRINT(module_name, white());
     BOOTUP_PRINT(" -> ", white());
     BOOTUP_PRINT(vfs_path, white());
 

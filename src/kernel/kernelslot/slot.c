@@ -6,6 +6,7 @@
 char readslot(void)
 {
     char buf[4];
+    buf[0] = '\0';
     int fd = fs_open(SLOT_PATH, O_RDONLY);
     if (fd < 0)
         return 'A';
@@ -34,6 +35,7 @@ int writeslot(char slot)
         return -1;
 
     char buf[1];
+    buf[0] = '\0';
     buf[0] = slot;
 
     int fd = fs_open(SLOT_PATH, O_WRONLY);
@@ -74,9 +76,10 @@ void dualslotvalidating(void)
 
     char active_slot = readslot();
     char buf[16];
-    str_append_uint(buf, active_slot);
+    buf[0] = '\0';
+    str_append_char(buf, active_slot);
     log("[SLOT]","read active slot... \n", d);
     log("[SLOT]","active slot: ", d);
-    BOOTUP_PRINT(buf, cyan());
+    BOOTUP_PRINT(buf, white());
     BOOTUP_PRINT("\n", white());
 }

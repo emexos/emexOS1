@@ -2,7 +2,9 @@
 #include <kernel/user/ulime.h>
 #include <kernel/proc/proc_manager.h>
 #include <kernel/exec/elf/loader.h>
+#include <kernel/mem/paging/paging.h>
 #include <kernel/communication/serial.h>
+#include <kernel/arch/x86_64/gdt/gdt.h>
 #include <kernel/include/reqs.h>
 #include <string/string.h>
 #include <string/log.h>
@@ -97,7 +99,12 @@ void kproc(void ) {
                     if (elf_load(proc, elf_data, elf_size) == 0) {
                         ulime->ptr_proc_curr = proc;
                         log("[ELF]", "jumping to userspace\n", d);
-                        JumpToUserspace(proc);
+                        u64 user_rsp = (proc->stack_base + proc->stack_size - 16) & ~0xFULL;
+
+                        verify_page_permissions(proc->ulime->hpr, proc->entry_point, "Code page");
+                        verify_page_permissions(proc->ulime->hpr, user_rsp, "Stack page");
+                        verify_gdt_setup();
+                        //JumpToUserspace(proc);
                     }
                 }
             } else {

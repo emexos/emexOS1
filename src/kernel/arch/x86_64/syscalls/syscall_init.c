@@ -4,6 +4,7 @@
 #include <kernel/communication/serial.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+#include <string/string.h>
 #include <types.h>
 
 // MSR addresses
@@ -37,12 +38,19 @@ void syscall_arch_init(void) {
     // bits 63:48 == kernel CS/SS for SYSRET
     // bits 47:32 == user CS/SS for SYSCALL
     u64 star = 0;
-    star |= ((u64)KERNEL_CODE_SELECTOR << 32);
+    star |= ((u64)0x08 << 32);
     star |= ((u64)0x10 << 48);
 
     wrmsr(MSR_STAR, star);
     wrmsr(MSR_LSTAR, (u64)syscall_entry);
-    wrmsr(MSR_SFMASK, 0x200);  // clear IF
+    wrmsr(MSR_SFMASK, 0x200);
+
+    log("[SYSCALL]", "STAR=0x", d);
+    char buf[32];
+    buf[0] = '\0';
+    str_from_hex(buf, star);
+    BOOTUP_PRINT(buf, white());
+    BOOTUP_PRINT("\n", white());
 
     log("[SYSCALL]", "enabled\n", success);
 }
