@@ -1,23 +1,25 @@
 #include <kernel/include/assembly.h>
 #include <kernel/include/reqs.h>
-
-//theming
 #include <kernel/graph/fm.h>
 #include <kernel/include/logo.h>
 #include <kernel/graph/theme.h>
 #include <math/math.h>
 #include <theme/doccr.h>
 #include <kernel/data/images/bmp.h>
-//#include <klib/graphics/font_manager.h>
 //int init_boot_log = -1; // boot logs
+
 
 // Drivers
 #include <drivers/drivers.h>
-//#include <drivers/usb/xhci.h>
-//#include <drivers/ps2/keyboard/keyboard.h>
+
+
+// Dual Slot Kernel System
+#include <kernel/kernelslot/slot.h>
+
 
 // CPU
 #include <kernel/cpu/cpu.h>
+#include <kernel/pci/pci.h>
 #if X64 == 1
     #include <kernel/arch/x86_64/gdt/gdt.h>
     #include <kernel/arch/x86_64/idt/idt.h>
@@ -31,25 +33,34 @@
     #include <kernel/arch/arm64/syscalls/syscall_init.h>
 #endif
 
+
+
 // usermode stuff
 #include <kernel/user/user.h>
+//Desktop Enviroment
+#include <kernel/user/gen.h>
+
 
 // executables
 #include <kernel/exec/elf/loader.h>
 
+
 // Memory
 #include <memory/main.h>
 #include <kernel/mem/meminclude.h>
+klime_t *klime = NULL;
+#if ENABLE_GLIME
+    glime_t *glime = NULL;
+#endif
 #if ENABLE_ULIME
     #include <kernel/proc/scheduler.h>
     #include <kernel/proc/proc_manager.h>
     scheduler_t *scheduler = NULL;
     #define SCHEDQUANT 20
     proc_manager_t *proc_mgr = NULL;
+    ulime_t *ulime = NULL;
 #endif
 
-//Desktop Enviroment
-#include <kernel/user/gen.h>
 
 //debug
 #include <kernel/communication/serial.h>
@@ -57,9 +68,6 @@
 //vFS & fs
 #include <kernel/file_systems/vfs/vfs.h>
 #include <kernel/file_systems/vfs/init.h>
-//extern void fs_system_init(klime_t *klime);
-//extern void fs_create_test_file(void);
-
 #if ENABLE_FAT32
     #include <kernel/file_systems/fat32/fat32.h> // finally fat32!
     // interface
@@ -70,7 +78,6 @@
 
 // disk drivers
 #include <kernel/module/module.h>
-//extern void fs_register_mods(void);
 #if ENABLE_ATA
     #include <drivers/storage/ata/disk.h>
 #endif
@@ -79,8 +86,6 @@
 // limine modules
 #include <kernel/modules/limine.h>
 #include <kernel/inits/init.h>
-
-#include <kernel/pci/pci.h>
 
 
 void _start(void)
@@ -91,8 +96,6 @@ void _start(void)
         sbootup_theme(THEME_STD);
         //sconsole_theme(THEME_FLU);
         spanic_theme(THEME_STD);
-
-        //f_setcontext(FONT_8X8_DOS);  // already set as default
 
         // Temporaly before switchin to glime_t
         // emexOS start
@@ -115,6 +118,8 @@ void _start(void)
         cursor_y = 0;
         font_scale = 1;
 
+        f_setcontext(FONT_8X8);
+
         BOOTUP_PRINT("\n\n ======================\n", white());
         BOOTUP_PRINT(" | Welcome to ", white());
         BOOTUP_PRINT("emexOS", cyan());
@@ -136,12 +141,8 @@ void _start(void)
 
     char buf[512]; //for all string operations
 
-    klime_t *klime = NULL;
-    #if ENABLE_GLIME
-        glime_t *glime = NULL;
-    #endif
     #if ENABLE_ULIME
-        ulime_t *ulime = NULL;
+        //ulime_t *ulime = NULL;
         //scheduler_t *scheduler = NULL;
         //proc_manager_t *proc_mgr = NULL;
         scheduler = scheduler_init(ulime, 10);  // 10 tick quantum
@@ -238,6 +239,13 @@ void _start(void)
 
         //BOOTUP_PRINT("\n", GFX_WHITE);
     }
+
+    // KERNEL SLOT subsystem
+    {
+        dualslotvalidating();
+
+    }
+
     #if ENABLE_ATA == 1
     ata_init();{
         // Initialize partition system
@@ -333,77 +341,11 @@ void _start(void)
                 __asm__ volatile("nop");
             }
         #endif
-        #if ENABLE_ULIME && RUNTESTS // set to 1 to enable test
-        //BOOTUP_PRINT("test RUNTESTS block\n", white());
-            if (proc_mgr){
-                ulime_proc_t *p1 = proc_create_proc(proc_mgr, (u8*)KERNELPROC, KERNELSPACE, KERNELPRIORITY);
-                ulime_proc_t *p2 = proc_create_proc(proc_mgr, (u8*)"__rt", 0x40001000, 2); // run tests
-                ulime_proc_t *p4 = proc_create_proc(proc_mgr, (u8*)USERPROC, USERSPACE, USERPRIORITY);
-
-                //log("[TEST]", "creating test processes\n", d);
-                //if (p1) log("[TEST]", "created runp\n", d);
-                //if (p2) log("[TEST]", "created __runp\n", d);
-
-                proc_list_procs(proc_mgr);
-
-                // let cpu rest
-                for (volatile int i = 0; i < 10000; i++) {
-                    __asm__ volatile("nop");
-                }
-
-                //log("[TEST_CODE]", "loading test code:\n", d);
-                //ulime_load_program(p4, test_code, sizeof(test_code));
-                //log("[TEST_CODE]", "test code loaded successfully\n", d);
-                //JumpToUserspace(p4);
-            }
-            /*if (proc_mgr && ulime && module_request.response && module_request.response->module_count > 0) {
-
-                struct limine_module_response *mod_resp = module_request.response;
-                struct limine_file *hello_mod = NULL;
-
-                for (u64 i = 0; i < mod_resp->module_count; i++) {
-                    const char *path = mod_resp->modules[i]->path;
-                    if (str_contains((char*)path, "hello.elf")) {
-                        hello_mod = mod_resp->modules[i];
-                        break;
-                    }
-                }
-
-                if (hello_mod) {
-                    log("[ELF]", "found hello.elf module\n", d);
-
-                    ulime_proc_t *proc = proc_create_proc(proc_mgr, (u8*)"hello", 0, 1);
-                    if (proc) {
-                        u8 *elf_data = (u8*)hello_mod->address;
-                        u64 elf_size = hello_mod->size;
-
-                        if (elf_load(proc, elf_data, elf_size) == 0) {
-                            ulime->ptr_proc_curr = proc;
-                            log("[ELF]", "jumping to userspace\n", d);
-                            JumpToUserspace(proc);
-                        }
-                    }
-                } else {
-                    log("[ELF]", "hello.elf not found in modules\n", error);
-                }
-            }*/
-        #endif
     }
-
     //hcf();
 
-    /*#if ENABLE_ULIME
-        if (ulime) {
-            //usermodeinit(ulime);
-        } else {
-            hcf();
-            panic("USE_HCF; FAILED --> USING PANIC");
-            //console_init();
-        }
-    #else
-        console_init();
-    #endif*/
-
+    extern void kproc(void);
+    kproc();
     DEinit();
 
     //should not reach here
@@ -413,4 +355,5 @@ void _start(void)
     #else
         panic("USE_HCF; FAILED --> USING PANIC");
     #endif
+
 };

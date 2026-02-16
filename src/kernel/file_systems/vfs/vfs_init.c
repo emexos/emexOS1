@@ -65,7 +65,7 @@ static void load_limine_module(void) {
     struct limine_module_response *response = (struct limine_module_response *)module_request.response;
 
     log("[FS]", "setting UI config...\n", d);
-    //("/boot/ui");
+    fs_mkdir("/boot/ui");
     fs_mkdir("/boot/ui/assets");
 
     log("[FS]", "copying limine modules to VFS:\n", d);
@@ -93,7 +93,7 @@ static void load_limine_module(void) {
 
         int fd = fs_open(vfs_path, O_CREAT | O_WRONLY);
         if (fd < 0) {
-            BOOTUP_PRINT("    ERROR: cannot create ", red());
+            log("[FS]", "ERROR: cannot create ", warning);
             BOOTUP_PRINT(vfs_path, white());
             BOOTUP_PRINT("\n", white());
             continue;
@@ -103,7 +103,7 @@ static void load_limine_module(void) {
         fs_close(fd);
 
         if (written > 0) {
-            BOOTUP_PRINT("    ", white());
+            BOOTUP_PRINT("     ", white());
             BOOTUP_PRINT(module->path, white());
             BOOTUP_PRINT(" : ", white());
             BOOTUP_PRINT(vfs_path, white());

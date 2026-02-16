@@ -22,11 +22,11 @@ void keymaps_load(void)
 
 void logos_load(void) {
     limine_module_load("bootlogo.bin", "/boot/ui/assets/bootlogo.bin");
-    limine_module_load("logo.bmp", "/emr/assets/logo.bmp");
+    //limine_module_load("logo.bmp", "/emr/assets/logo.bmp");
     //limine_module_load("console_icon.bmp", "/images/iconsole.bmp");
     //limine_module_load("desktop_icon.bmp", "/images/idesktop.bmp");
     //fs_mkdir("/emr/images/");
-    limine_module_load("background.bmp", "/emr/assets/bg.bmp");
+    //limine_module_load("background.bmp", "/emr/assets/bg.bmp");
     limine_module_load("frog.bmp", "/emr/assets/frog.bmp");
 }
 
@@ -53,7 +53,7 @@ void users_load(void) {
         fs_write(fd_system, system_config, str_len(system_config));
         fs_close(fd_system);
     }
-    //fs_mkdir("/users");
-    //fs_mkdir("/users/bin");
-    //fs_mkdir("/users/apps");
+    //fs_mkdir("/user");
+    //fs_mkdir("/user/bin");
+    //fs_mkdir("/user/apps");
 }

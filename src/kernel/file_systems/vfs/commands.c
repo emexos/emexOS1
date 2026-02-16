@@ -122,9 +122,9 @@ int fs_mkdir(const char *path) {
     int ret = parent->ops->mkdir(parent, dname);
 
     if (ret == 0) {
-        BOOTUP_PRINT("     ", GFX_GRAY_70);
-        BOOTUP_PRINT("mkdir ", GFX_ST_WHITE);
-        BOOTUP_PRINT(path, GFX_ST_CYAN);
+        BOOTUP_PRINT("[FS]", green());
+        BOOTUP_PRINT(" mkdir ", GFX_ST_WHITE);
+        BOOTUP_PRINT(path, GFX_ST_WHITE);
         BOOTUP_PRINT("\n", GFX_ST_WHITE);
     }
 

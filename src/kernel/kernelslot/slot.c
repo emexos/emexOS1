@@ -3,17 +3,6 @@
 #include <string/log.h>
 #include <kernel/modules/limine.h>
 
-void dualslotvalidating(void)
-{
-    int fd = fs_open(SLOT_PATH, O_CREAT | O_WRONLY);
-    if (fd >= 0) {
-        const char *default_config = "A";
-        fs_write(fd, default_config, str_len(default_config));
-        fs_close(fd);
-    }
-    //limine_module_load("activeslot.cfg", "/boot/activeslot.cfg");
-}
-
 char readslot(void)
 {
     char buf[4];
@@ -57,4 +46,37 @@ int writeslot(char slot)
     cpu_poweroff(POWEROFF_REBOOT);
 
     return 0;
+}
+
+
+void dualslotvalidating(void)
+{
+    // looks for the slot file
+    int fd = fs_open(SLOT_PATH, O_RDONLY);
+    if (fd < 0) {
+        // if it doesnt exist write the file with content: "A"
+        log("[SLOT]","active slot file not found, creating activeslot.txt...\n", d);
+
+        fd = fs_open(SLOT_PATH, O_CREAT | O_WRONLY);
+        if (fd >= 0) {
+            const char *default_config = "A";
+            fs_write(fd, default_config, str_len(default_config));
+            fs_close(fd);
+            log("[SLOT]","Default slot 'A' was set.\n", d);
+        } else {
+            log("[SLOT]","Error: Could not create slot file!\n", error);
+            return; // abort if the file can't be created
+        }
+    } else {
+        fs_close(fd);
+        log("[SLOT]","Slot file found, checking contents...\n", d);
+    }
+
+    char active_slot = readslot();
+    char buf[16];
+    str_append_uint(buf, active_slot);
+    log("[SLOT]","read active slot... \n", d);
+    log("[SLOT]","active slot: ", d);
+    BOOTUP_PRINT(buf, cyan());
+    BOOTUP_PRINT("\n", white());
 }

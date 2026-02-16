@@ -38,7 +38,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 #@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_a.elf
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_b.elf
-	@cp activeslot.txt $(ISODIR)/boot/activeslot.cfg # slot system
+#@cp activeslot.txt $(ISODIR)/boot/activeslot.cfg # slot system
 
 	@cp $< $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
@@ -56,24 +56,22 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 	@echo "[MOD] creating executables..."
 	@cp src/userspace/hello.elf $(ISODIR)/boot/programs/hello.elf
 
-	@echo "[MOD] copying configs..."
-	@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
-	@cp shared/theme/font8x15.bin $(ISODIR)/boot/liminefont.f15
+#@echo "[MOD] copying configs..."
+#@cp shared/theme/bootconf.emcg $(ISODIR)/boot/bootconf.emcg
+#@cp shared/theme/font8x15.bin $(ISODIR)/boot/liminefont.f15
 
 	@echo "[MOD] copying assets..."
 	@cp shared/ui/assets/bootlogo.bin $(ISODIR)/boot/ui/assets/
-	@cp shared/images/logo.bmp $(ISODIR)/boot/images/
-	@cp shared/images/desktop_icon.bmp $(ISODIR)/boot/images/
-	@cp shared/images/console_icon.bmp $(ISODIR)/boot/images/
-	@cp shared/images/background.bmp $(ISODIR)/boot/images/
+#@cp shared/images/logo.bmp $(ISODIR)/boot/images/
+#@cp shared/images/background.bmp $(ISODIR)/boot/images/
 	@cp shared/images/frog.bmp $(ISODIR)/boot/images/
 
-	@cp shared/images/bg.jpg $(ISODIR)/boot/
+#@cp shared/images/bg.jpg $(ISODIR)/boot/
 
 	@echo "[MOD] copying keymaps..."
 	@cp shared/keymaps/US.map $(ISODIR)/boot/keymaps/
 	@cp shared/keymaps/DE.map $(ISODIR)/boot/keymaps/
-	@cp shared/keymaps/PL.map $(ISODIR)/boot/keymaps/
+#@cp shared/keymaps/PL.map $(ISODIR)/boot/keymaps/
 
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \

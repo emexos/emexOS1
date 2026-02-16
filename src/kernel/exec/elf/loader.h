@@ -2,6 +2,11 @@
 #include <types.h>
 #include <kernel/user/ulime.h>
 
+
+#define PT_LOAD 1
+#define ELF_MAGIC 0x7F454C46
+
+
 typedef struct {
     u32 magic;
     u8  class;

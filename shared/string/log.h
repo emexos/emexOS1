@@ -22,8 +22,8 @@ typedef enum {
 #define LCOLOR_TAG     green()//GFX_GRAY_70
 #define LCOLOR_BRACKET GFX_GRAY_70
 #define LCOLOR_D       white()
-#define LCOLOR_SCS     green()
-#define LCOLOR_WAR     yellow()
+#define LCOLOR_SCS     white()//green()
+#define LCOLOR_WAR     white()//yellow()
 #define LCOLOR_ERR     red()
 // optional macro
 #define log(tag, message, ...) log_message(tag, message, _LOG_LEVEL(__VA_ARGS__))
