@@ -5,7 +5,7 @@
 
 void DEinit(void)
 {
-    log("[DE]", "init Desktop Enviroment...", d);
+    log("[DE]", "init Desktop Enviroment...\n", d);
     /*
     input_pos = 0;
     font_scale = 1;
@@ -21,11 +21,11 @@ void DEinit(void)
         hcf();
     }
 
-
+*/
     // smth like desktop enviroment and userswitch are here
 
     console_init();
     keyboard_poll();
-    */
+
 
 }

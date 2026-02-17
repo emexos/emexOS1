@@ -17,6 +17,8 @@ fetchDeps:
 	@echo "[DEPS] Fetching Limine"
 	@rm -rf $(INCLUDE_DIR)/limine
 	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
+	@echo "[DEPS] Building limine binary"
+	@$(MAKE) -C $(INCLUDE_DIR)/limine
 
 disk:
 	@mkdir -p $(DISK_DIR)
@@ -78,6 +80,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 		--efi-boot boot/limine/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISODIR) -o $@ 2>/dev/null
+	@$(INCLUDE_DIR)/limine/limine bios-install $@
 	@echo "------------------------"
 	@echo "[OK]  $@ created"
 
