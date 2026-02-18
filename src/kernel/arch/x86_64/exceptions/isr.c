@@ -12,16 +12,17 @@ void isr_install(void)
     }
 
     // set IDT Gates for ALL Exceptions
-    idt_set_gate(0, (u64)isr0, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(1, (u64)isr1, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(2, (u64)isr2, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(3, (u64)isr3, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(4, (u64)isr4, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(5, (u64)isr5, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(6, (u64)isr6, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(7, (u64)isr7, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(8, (u64)isr8, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
-    idt_set_gate(9, (u64)isr9, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(0,  (u64)isr0,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(1,  (u64)isr1,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(2,  (u64)isr2,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(3,  (u64)isr3,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(4,  (u64)isr4,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(5,  (u64)isr5,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(6,  (u64)isr6,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(7,  (u64)isr7,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+ idt_set_gate_ist(8, (u64)isr8,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT, 1);
+    //idt_set_gate(8, (u64)isr8, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
+    idt_set_gate(9,  (u64)isr9,  IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(10, (u64)isr10, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(11, (u64)isr11, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);
     idt_set_gate(12, (u64)isr12, IDT_FLAG_PRESENT | IDT_FLAG_RING0 | IDT_FLAG_GATE_INT);

@@ -35,6 +35,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_cyrillc_sumbol, "cyrillc-sumbol", "print cyrillic alphabet test", "cyrillc-sumbol"),
     CMDENTRY(cmd_latin_sumbol, "latin-sumbol", "print latin alphabet test", "latin-sumbol"),
     CMDENTRY(cmd_all_sumbol, "all-sumbol", "print latin and cyrillic alphabets", "all-sumbol"),
+    //CMDENTRY(cmd_edit, "edit", "edit any file", "edit <file>"),
     CMDENTRY(cmd_keymap, "loadkeys", "change keyboard layout", "loadkeys [keymap]"),
     CMDENTRY(cmd_whoami, "whoami", "display current user", "whoami"),
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),

@@ -8,10 +8,8 @@
 static gdt_entry_t gdt[GDT_ENTRIES];
 static tss_t tss;
 static gdt_ptr_t gdt_ptr;
-
-// Kernel stack for syscalls/interrupts (16KB, 16-byte aligned)
-static u8 kernel_stack[16384] __attribute__((aligned(16)));
-
+static u8 kernel_stack[16384] __attribute__((aligned(16))); // 16KB
+static u8 df_stack[8192] __attribute__((aligned(16))); // this time via ist1
 
 // TODO:
 // move tss to kernel/arch/x64/tss/tss.c
@@ -92,6 +90,7 @@ void tss_init(void)
     log("[TSS]", "init (Task State Segment)\n", d);
     memset(&tss, 0, sizeof(tss_t));
     tss.rsp0 = (u64)kernel_stack + sizeof(kernel_stack);
+    tss.ist1 = (u64)df_stack + sizeof(df_stack);
     tss.iopb_offset = sizeof(tss_t);
 }
 

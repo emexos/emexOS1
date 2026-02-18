@@ -46,9 +46,10 @@ typedef struct {
     u64 rip, cs, rflags, rsp, ss;
 } __attribute__((packed)) cpu_state_t;
 
-// Funktionen
+// funktions
 void idt_init(void);
 void idt_set_gate(u8 num, u64 handler, u8 flags);
+void idt_set_gate_ist(u8 num, u64 handler, u8 flags, u8 ist);
 void idt_load(void);
 
 #endif

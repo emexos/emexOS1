@@ -17,11 +17,12 @@ void DEinit(void)
     print("\n", white());
 
 
+    */
     if (!login_authenticate()) {
         hcf();
     }
 
-*/
+
     // smth like desktop enviroment and userswitch are here
 
     console_init();

@@ -6,7 +6,7 @@ build/
 !build/src/kernel/console/functions/edit.c.o
 
 # Libraries/Dependencies
-include/limine
+include/limine/*
 #!include/limine/limine.h
 
 .DS_Store
