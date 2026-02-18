@@ -7,7 +7,9 @@ FHDR(cmd_echo);
 FHDR(cmd_clear);
 FHDR(cmd_font);
 FHDR(cmd_fsize);
-FHDR(cmd_rus_sumbol);
+FHDR(cmd_cyrillc_sumbol);
+FHDR(cmd_latin_sumbol);
+FHDR(cmd_all_sumbol);
 
 // help.c
 FHDR(cmd_help);

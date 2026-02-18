@@ -8,6 +8,8 @@ void fm_init(void);
 int f_setcontext(font_type_t font_type);
 font_type_t fm_get_current_font(void);
 const u8* fm_get_glyph_cp(u32 codepoint);
+u32 fm_get_glyph_row_bytes(void);
+u32 fm_get_glyph_lsb_left(void);
 
 // get fm properties
 u32 fm_get_char_width(void);

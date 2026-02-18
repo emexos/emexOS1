@@ -95,11 +95,29 @@ FHDR(cmd_font) {
     }
 }
 
-FHDR(cmd_rus_sumbol)
+FHDR(cmd_cyrillc_sumbol)
 {
     (void)s;
     print("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
     print("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
+}
+
+FHDR(cmd_latin_sumbol)
+{
+    (void)s;
+    print("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", GFX_WHITE);
+    print("abcdefghijklmnopqrstuvwxyz\n", GFX_WHITE);
+}
+
+FHDR(cmd_all_sumbol)
+{
+    (void)s;
+    print("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", GFX_WHITE);
+    print("abcdefghijklmnopqrstuvwxyz\n", GFX_WHITE);
+    print("AEOEUESS: ÄÖÜ äöü ß\n", GFX_WHITE);
+    print("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
+    print("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
+    print("0123456789 !?.,:;+-*/=_()[]{}@#%&$\"'<>\\|`\n", GFX_WHITE);
 }
 
 /*FHDR(cmd_help)

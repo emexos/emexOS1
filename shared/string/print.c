@@ -103,15 +103,32 @@ static void putchar_at(u32 codepoint, u32 x, u32 y, u32 color)
 {
     u32 char_width = fm_get_char_width();
     u32 char_height = fm_get_char_height();
+    u32 row_bytes = fm_get_glyph_row_bytes();
+    u32 lsb_left = fm_get_glyph_lsb_left();
 
     const u8 *glyph = fm_get_glyph_cp(codepoint);
     if (!glyph) return;
     for (u32 dy = 0; dy < char_height; dy++)
     {
-        u8 row = glyph[dy];
+        u32 row = 0;
+        const u8 *row_ptr = glyph + (dy * row_bytes);
+        if (row_bytes == 1) {
+            row = row_ptr[0];
+        } else if (row_bytes == 2) {
+            row = (u32)((u16)row_ptr[0] | ((u16)row_ptr[1] << 8));
+        } else if (row_bytes == 4) {
+            row = (u32)row_ptr[0] |
+                  ((u32)row_ptr[1] << 8) |
+                  ((u32)row_ptr[2] << 16) |
+                  ((u32)row_ptr[3] << 24);
+        } else {
+            return;
+        }
+
         for (u32 dx = 0; dx < char_width; dx++)
         {
-            if (row & (1 << (7 - dx)))
+            u32 bit_index = lsb_left ? dx : ((char_width - 1u) - dx);
+            if (row & (1u << bit_index))
             {
                 for (u32 sy = 0; sy < font_scale; sy++) {
                     for (u32 sx = 0; sx < font_scale; sx++) {

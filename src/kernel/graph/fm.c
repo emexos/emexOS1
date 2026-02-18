@@ -69,12 +69,35 @@ font_type_t fm_get_current_font(void) {
 
 const u8* fm_get_glyph_cp(u32 codepoint) {
     if (!current_font || !current_font->data) return NULL;
-    u32 glyph_index = unicode_to_glyph_index(codepoint);
-    if (glyph_index > 0xFF) return NULL;
+    if (current_font->char_height == 0) return NULL;
+    if (current_font->row_bytes == 0 || current_font->row_bytes > 4) return NULL;
 
-    if (current_font->char_height != 8 || current_font->char_width != 8) return NULL;
-    const u8 (*font_data_8)[256][8] = current_font->data;
-    return (*font_data_8)[glyph_index];
+    u32 glyph_index = 0;
+    if (current_font->unicode_direct) {
+        glyph_index = codepoint;
+        if (glyph_index >= current_font->glyph_count) {
+            glyph_index = (u32)'?';
+        }
+    } else {
+        glyph_index = unicode_to_glyph_index(codepoint);
+    }
+
+    if (glyph_index >= current_font->glyph_count) return NULL;
+
+    const u8 *font_data = (const u8 *)current_font->data;
+    u32 glyph_stride = current_font->char_height * current_font->row_bytes;
+    return &font_data[glyph_index * glyph_stride];
+}
+
+u32 fm_get_glyph_row_bytes(void) {
+    if (!current_font) return 1;
+    if (current_font->row_bytes == 0) return 1;
+    return current_font->row_bytes;
+}
+
+u32 fm_get_glyph_lsb_left(void) {
+    if (!current_font) return 0;
+    return current_font->lsb_left ? 1u : 0u;
 }
 u32 fm_get_char_width(void) {
     if (!current_font) return 8;
