@@ -8,7 +8,7 @@ char cwd[MAX_PATH_LEN] = "/";
 
 //----------------------------------
 // ! IMPORTANT FOR NEW COMMANDS !
-int cmd_count = 27;
+int cmd_count = 30;
 
 console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_echo, "echo", "prints text to console", "echo [text]"),
@@ -32,6 +32,9 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_tree, "tree", "shows every folder, file * content", "tree"),
     CMDENTRY(cmd_mkdir, "mkdir", "create directory", "mkdir <path>"),
     CMDENTRY(cmd_font, "font", "change console font", "font [0-1]"),
+    CMDENTRY(cmd_cyrillc_sumbol, "cyrillc-sumbol", "print cyrillic alphabet test", "cyrillc-sumbol"),
+    CMDENTRY(cmd_latin_sumbol, "latin-sumbol", "print latin alphabet test", "latin-sumbol"),
+    CMDENTRY(cmd_all_sumbol, "all-sumbol", "print latin and cyrillic alphabets", "all-sumbol"),
     CMDENTRY(cmd_keymap, "loadkeys", "change keyboard layout", "loadkeys [keymap]"),
     CMDENTRY(cmd_whoami, "whoami", "display current user", "whoami"),
     CMDENTRY(cmd_source, "source", "reload configuration", "source console"),

@@ -1,4 +1,6 @@
 include common.mk
+LIMINE_DIR := $(INCLUDE_DIR)/limine
+LIMINE_TOOL := $(LIMINE_DIR)/limine
 
 # Find all C, C++ and Assembly files
 SRCS = $(shell find $(SRC_DIR) shared \
@@ -32,8 +34,12 @@ $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 userspace:
 	@$(MAKE) -C src/userspace
 
+# Ensure host limine tool exists (Linux/macOS binary).
+$(LIMINE_TOOL):
+	@$(MAKE) -C $(LIMINE_DIR)
+
 # Create bootable ISO
-$(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
+$(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 	@echo "[ISO] Creating bootable image..."
 	@rm -rf $(ISODIR)
 	@mkdir -p $(ISODIR)/boot/limine $(ISODIR)/EFI/BOOT
@@ -80,7 +86,7 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace
 		--efi-boot boot/limine/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		$(ISODIR) -o $@ 2>/dev/null
-	@$(INCLUDE_DIR)/limine/limine bios-install $@
+	@$(LIMINE_TOOL) bios-install $@
 	@echo "------------------------"
 	@echo "[OK]  $@ created"
 
