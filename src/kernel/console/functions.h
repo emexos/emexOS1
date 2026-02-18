@@ -50,6 +50,8 @@ FHDR(cmd_keymap);
 FHDR(cmd_reboot);
 FHDR(cmd_shutdown);
 
+//edit.c
+//FHDR(cmd_edit);
 
 // view.c
 FHDR(cmd_view);

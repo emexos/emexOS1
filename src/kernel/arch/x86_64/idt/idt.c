@@ -23,6 +23,12 @@ void idt_set_gate(u8 num, u64 handler, u8 flags)
     idt[num].reserved = 0;
 }
 
+void idt_set_gate_ist(u8 num, u64 handler, u8 flags, u8 ist)
+{
+    idt_set_gate(num, handler, flags);
+    idt[num].ist = ist & 0x07;
+}
+
 void idt_load(void)
 {
     idt_ptr.limit = sizeof(idt) - 1;

@@ -90,7 +90,7 @@ klime_t *klime = NULL;
 
 void _start(void)
 {
-    if (framebuffer_request.response != NULL &&
+    /*if (framebuffer_request.response != NULL &&
         framebuffer_request.response->framebuffer_count > 0) {
         struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
         u32 *pixels = (u32 *)fb->address;
@@ -98,7 +98,7 @@ void _start(void)
         for (u64 i = 0; i < total; i++) {
             pixels[i] = 0x00FF0000; // red = kernel alive
         }
-    }
+    }*/
     { // Initializing Boot screen
         theme_init();
         setcontext(THEME_BOOTUP); // gets loaded over sbootup_theme until, sbootup == FLU
@@ -109,11 +109,11 @@ void _start(void)
         // Temporaly before switchin to glime_t
         // emexOS start
         // Ensure that Limine base revision is supported and that we have a framebuffer
-        /*if (framebuffer_request.response == NULL ||
+        if (framebuffer_request.response == NULL ||
             framebuffer_request.response->framebuffer_count < 1) {
                 printf("no response");
             hcf(); // enable text mode
-        }*/
+        }
 
         // Initialize framebuffer graphics
         struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
