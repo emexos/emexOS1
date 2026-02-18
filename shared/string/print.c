@@ -1,6 +1,6 @@
 #include "print.h"
 #include <kernel/graph/graphics.h>
-#include <kernel/graph/fm.h>
+#include <kernel/kernel_processes/fm/fm.h>
 #include <kernel/communication/serial.h>
 //#include <ui/fonts/font_8x8.h>
 

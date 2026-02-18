@@ -5,6 +5,7 @@
 
 void DEinit(void)
 {
+    //dump_kprocesses();
     log("[DE]", "init Desktop Enviroment...\n", d);
     /*
     input_pos = 0;

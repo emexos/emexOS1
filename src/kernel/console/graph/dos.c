@@ -1,7 +1,7 @@
 #include "dos.h"
 #include "uno.h"
 #include <kernel/graph/graphics.h>
-#include <kernel/graph/fm.h>
+#include <kernel/kernel_processes/fm/fm.h>
 
 void console_window_init(void) {
     cursor_x = CONSOLE_PADDING_X;

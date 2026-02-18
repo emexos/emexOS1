@@ -1,17 +1,14 @@
 #include <kernel/include/assembly.h>
 #include <kernel/include/reqs.h>
-#include <kernel/graph/fm.h>
 #include <kernel/include/logo.h>
 #include <kernel/graph/theme.h>
+#include <kernel/communication/serial.h>
 #include <math/math.h>
 #include <theme/doccr.h>
 #include <kernel/data/images/bmp.h>
 //int init_boot_log = -1; // boot logs
 
-
-// Drivers
 #include <drivers/drivers.h>
-
 
 // Dual Slot Kernel System
 #include <kernel/kernelslot/slot.h>
@@ -39,8 +36,6 @@
 #include <kernel/user/user.h>
 //Desktop Enviroment
 #include <kernel/user/gen.h>
-
-
 // executables
 #include <kernel/exec/elf/loader.h>
 
@@ -55,15 +50,15 @@ klime_t *klime = NULL;
 #if ENABLE_ULIME
     #include <kernel/proc/scheduler.h>
     #include <kernel/proc/proc_manager.h>
+    #include <kernel/kernel_processes/kernel/gen.h>
+    #include <kernel/kernel_processes/loader.h>
+    #include <kernel/kernel_processes/bootscreen/boot.h>
+    #include <kernel/kernel_processes/fm/fm.h>
     scheduler_t *scheduler = NULL;
     #define SCHEDQUANT 20
     proc_manager_t *proc_mgr = NULL;
     ulime_t *ulime = NULL;
 #endif
-
-
-//debug
-#include <kernel/communication/serial.h>
 
 //vFS & fs
 #include <kernel/file_systems/vfs/vfs.h>
@@ -118,9 +113,10 @@ void _start(void)
         // Initialize framebuffer graphics
         struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
         graphics_init(fb);
-        printf("\ninit graphics, draw logo\n");
         //draw_logo();
 
+        kproc_loader_init();
+        init_bootscreen();
         fm_init();
         clear(bg());
         cursor_x = 0;
@@ -353,8 +349,10 @@ void _start(void)
     }
     //hcf();
 
-    extern void kproc(void);
-    kproc();
+    //extern void kproc(void);
+    genprocs();
+    proc_list_procs(proc_mgr);
+    dump_kprocesses();
     DEinit();
 
     //should not reach here
