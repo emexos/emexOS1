@@ -34,7 +34,7 @@ console_cmd_t commands[MAX_CMDS] = {
     CMDENTRY(cmd_font, "font", "change console font", "font [0-1]"),
     CMDENTRY(cmd_cyrillc_sumbol, "cyrillc-sumbol", "print cyrillic alphabet test", "cyrillc-sumbol"),
     CMDENTRY(cmd_latin_sumbol, "latin-sumbol", "print latin alphabet test", "latin-sumbol"),
-    CMDENTRY(cmd_all_sumbol, "all-sumbol", "print latin and cyrillic alphabets", "all-sumbol"),
+    CMDENTRY(cmd_all_sumbol, "symbols", "print latin and cyrillic alphabets", "symbols"),
     //CMDENTRY(cmd_edit, "edit", "edit any file", "edit <file>"),
     CMDENTRY(cmd_keymap, "loadkeys", "change keyboard layout", "loadkeys [keymap]"),
     CMDENTRY(cmd_whoami, "whoami", "display current user", "whoami"),

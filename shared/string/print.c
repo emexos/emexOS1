@@ -6,6 +6,7 @@
 
 #include <kernel/console/graph/dos.h>
 
+// made by Dexoron Feb. 18, 2026
 // Decode one UTF-8 sequence and return pointer to next byte.
 // On invalid data, returns '?' and advances by one byte.
 static const char *utf8_next_codepoint(const char *p, u32 *codepoint)
@@ -203,6 +204,12 @@ void string(const char *str, u32 color)
         putcodepoint(cp, color);
     }
     printf("%s", str); // prints everything from the os terminal to the host-terminal
+}
+
+// console print
+void cprintf(const char *str, u32 color)
+{
+    string(str, color);
 }
 
 void IntToString(int value, char *buffer)

@@ -33,6 +33,12 @@ int keymap_init(void) {
         return 0;
     }
 
+    if (keymap_load_from_module("RU", &current_keymap) == 0) {
+        str_copy(current_keymap_name, "RU");
+        log("[KEYMAP]", "Loaded default: RU\n", d);
+        return 0;
+    }
+
     log("[KEYMAP]", "ERROR: No keymap could be loaded!\n", warning);
     return -1;
 }

@@ -16,7 +16,8 @@ void keymaps_load(void)
     // load all keymaps
     limine_module_load("US.map", "/emr/config/keymaps/US.map");
     limine_module_load("DE.map", "/emr/config/keymaps/DE.map");
-    //limine_module_load("PL.map", "/emr/config/keymaps/PL.map");
+    limine_module_load("PL.map", "/emr/config/keymaps/PL.map");
+    limine_module_load("RU.map", "/emr/config/keymaps/RU.map");
 
 }
 

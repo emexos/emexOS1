@@ -7,6 +7,7 @@
 #include <theme/stdclrs.h>
 #include <kernel/graph/theme.h>
 #include <string/string.h>
+#include <memory/main.h>
 
 extern u32 *framebuffer;
 extern u32 fb_width;
