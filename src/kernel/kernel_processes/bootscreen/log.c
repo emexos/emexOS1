@@ -20,7 +20,6 @@ static u32 get_log_color(log_level_t level) {
 }
 
 
-
 void log_message(const char *tag, const char *message, log_level_t level) {
     if (!tag || !message) return;
 

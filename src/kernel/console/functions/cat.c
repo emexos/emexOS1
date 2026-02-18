@@ -6,7 +6,7 @@ extern char cwd[];
 FHDR(cmd_cat) {
     (void)s;
     if (!s || *s == '\0') {
-        print("error: no file specified\n", GFX_RED);
+        cprintf("error: no file specified\n", GFX_RED);
         return;
     }
 
@@ -27,7 +27,7 @@ FHDR(cmd_cat) {
     // opens in read only (RDONLY)
     int fd = fs_open(path, O_RDONLY);
     if (fd < 0) {
-        print("error: cannot open file\n", GFX_RED);
+        cprintf("error: cannot open file\n", GFX_RED);
         return;
     }
 
@@ -36,11 +36,11 @@ FHDR(cmd_cat) {
 
     while ((bytes = fs_read(fd, buf, sizeof(buf) - 1)) > 0) {
         buf[bytes] = '\0';
-        print(buf, GFX_WHITE);
+        cprintf(buf, GFX_WHITE);
     }
 
     fs_close(fd);
 
    // buf[0] = '\0';
-    print("\n", GFX_WHITE);
+    cprintf("\n", GFX_WHITE);
 }

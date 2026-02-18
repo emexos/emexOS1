@@ -2,10 +2,13 @@
 #define STRING_H
 
 #include <types.h>
-#include "print.h"
-#include "log.h"
+//#include "print.h"
+//#include "log.h"
 #include <theme/stdclrs.h>
 #include <theme/doccr.h>
+
+#include <kernel/kernel_processes/bootscreen/print.h>
+#include <kernel/kernel_processes/bootscreen/log.h>
 
 void str_copy(char *dest, const char *src);
 void str_append(char *dest, const char *src);

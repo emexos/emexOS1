@@ -5,7 +5,7 @@ FHDR(cmd_ps)
 #if ENABLE_ULIME && RUNTESTS
     if (!proc_mgr)
     {
-        print("proc_mgr not initialized\n", white());
+        cprintf("proc_mgr not initialized\n", white());
         return;
     }
 

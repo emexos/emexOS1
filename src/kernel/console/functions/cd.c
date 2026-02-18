@@ -46,12 +46,12 @@ FHDR(cmd_cd) {
     // if directory exists
     fs_node *dir = fs_resolve(new_path);
     if (!dir) {
-        print("error: directory not found\n", GFX_RED);
+        cprintf("error: directory not found\n", GFX_RED);
         return;
     }
 
     if (dir->type != FS_DIR) {
-        print("error: not a directory\n", GFX_RED);
+        cprintf("error: not a directory\n", GFX_RED);
         return;
     }
 

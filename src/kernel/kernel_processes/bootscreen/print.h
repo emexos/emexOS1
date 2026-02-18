@@ -14,7 +14,4 @@ void printInt(int value, u32 color);
 
 void reset_cursor(void);
 
-// i will slowly need to divide the bootscreen logs and console text...
-void cprintf(const char *str, u32 color);
-
 #endif

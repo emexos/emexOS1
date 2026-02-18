@@ -206,12 +206,6 @@ void string(const char *str, u32 color)
     printf("%s", str); // prints everything from the os terminal to the host-terminal
 }
 
-// console print
-void cprintf(const char *str, u32 color)
-{
-    string(str, color);
-}
-
 void IntToString(int value, char *buffer)
 {
     char temp[11];

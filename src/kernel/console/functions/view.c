@@ -4,13 +4,13 @@
 
 FHDR(cmd_view) {
     if (!s || *s == '\0') {
-        print("usage: view <image.bmp>\n", GFX_RED);
+        cprintf("usage: view <image.bmp>\n", GFX_RED);
         return;
     }
 
     bmp_image_t img;
     if (bmp_load(s, &img) != 0) {
-        print("error: cannot load image\n", GFX_RED);
+        cprintf("error: cannot load image\n", GFX_RED);
         return;
     }
 
@@ -23,7 +23,7 @@ FHDR(cmd_view) {
     bmp_draw(&img, x, y);
      banner_draw();
 
-    //print("\nPress any key to continue...\n", GFX_GRAY_50);
+    //cprintf("\nPress any key to continue...\n", GFX_GRAY_50);
 
     while (1) {
         if (keyboard_has_key()) {

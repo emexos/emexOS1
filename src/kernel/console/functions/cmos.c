@@ -6,7 +6,7 @@ FHDR(cmd_cal) {
     (void)s;
 
     GetCMOSDate();
-    print(" ", GFX_WHITE);
+    cprintf(" ", GFX_WHITE);
     GetCMOSTime();
 
 }
@@ -26,6 +26,6 @@ FHDR(cmd_time) {
 FHDR(cmd_uptime) {
     (void)s;
 
-    print("Uptime: ", GFX_WHITE);
+    cprintf("Uptime: ", GFX_WHITE);
     timer_print_uptime();
 }

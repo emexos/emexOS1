@@ -4,10 +4,10 @@
 FHDR(cmd_keymap) {
     if (!s || *s == '\0') {
         // Show current keymap
-        print("you use keymap: ", GFX_WHITE);
-        print(keymap_get_current_name(), GFX_WHITE);
-        print("\nuse: keymap <name>\n", GFX_WHITE);
-        print("\nnote that only DE & US are correctly supported by now.\n", GFX_WHITE);
+        cprintf("you use keymap: ", GFX_WHITE);
+        cprintf(keymap_get_current_name(), GFX_WHITE);
+        cprintf("\nuse: keymap <name>\n", GFX_WHITE);
+        cprintf("\nnote that only DE & US are correctly supported by now.\n", GFX_WHITE);
         return;
     }
 
@@ -27,14 +27,14 @@ FHDR(cmd_keymap) {
 
     // trys to set the keymap
     if (keymap_set(keymap_name) != 0) {
-        print("error: keymap '", GFX_RED);
-        print(keymap_name, GFX_RED);
-        print("' not found\n", GFX_RED);
-        print("try: US, DE\n", GFX_RED);
+        cprintf("error: keymap '", GFX_RED);
+        cprintf(keymap_name, GFX_RED);
+        cprintf("' not found\n", GFX_RED);
+        cprintf("try: US, DE\n", GFX_RED);
         return;
     }
 
-    print("keymap changed to: ", GFX_WHITE);
-    print(keymap_name, GFX_WHITE);
-    print("\n", GFX_WHITE);
+    cprintf("keymap changed to: ", GFX_WHITE);
+    cprintf(keymap_name, GFX_WHITE);
+    cprintf("\n", GFX_WHITE);
 }

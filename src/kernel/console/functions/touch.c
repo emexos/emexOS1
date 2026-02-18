@@ -6,7 +6,7 @@ extern char cwd[];
 FHDR(cmd_touch)
 {
     if (!s || *s == '\0') {
-        print("usage: touch <file>\n", GFX_RED);
+        cprintf("usage: touch <file>\n", GFX_RED);
         return;
     }
 
@@ -22,7 +22,7 @@ FHDR(cmd_touch)
 
     int fd = fs_open(path, O_CREAT | O_WRONLY);
     if (fd < 0) {
-        print("error: cannot create file\n", GFX_RED);
+        cprintf("error: cannot create file\n", GFX_RED);
         return;
     }
 

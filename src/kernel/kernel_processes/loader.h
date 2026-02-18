@@ -4,7 +4,7 @@
 #include <types.h>
 
 #define KPROC_MAX       255
-#define KPROC_NAME_LEN  64
+#define KPROC_NAME_LEN  15
 
 // states
 #define KPROC_STATE_EMPTY   0

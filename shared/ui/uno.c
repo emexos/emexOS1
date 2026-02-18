@@ -1,6 +1,5 @@
 #include "uno.h"
 #include <string/string.h>
-#include <string/print.h>
 
 static u32 calculate_text_width(const char *text, u16 font_size) {
     if (!text) return 0;
