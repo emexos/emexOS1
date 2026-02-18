@@ -7,6 +7,14 @@
 static font_type_t current_font_type = FONT_8X8_BOLD; // default font
 static const font_t *current_font = NULL;
 
+/*
+ * the font manager doesnt use the kernel process manager
+ * but its still a 'process' in kinda way... like its used for graphics
+ */
+
+ /*
+  * unicode_to_glyph_index made by dexoron 18.2.2026
+  */
 static u32 unicode_to_glyph_index(u32 cp)
 {
     if (cp == 0x00A0) return (u32)' '; // NBSP
