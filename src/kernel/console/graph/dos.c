@@ -47,18 +47,20 @@ void console_window_check_scroll(void)
         u32 fb_w = get_fb_width();
         u32 pitch_dwords = get_fb_pitch() / 4;
         u32 *fb = get_framebuffer();
+        u32 bytes_per_row = fb_w * sizeof(u32);
 
-        // move content up by line_height
+        // fast scroll: copy row-by-row with memcpy instead of pixel loop (huge speedup on amd)
         for (u32 y = banner_h + line_height; y < fb_h; y++) {
-            for (u32 x = 0; x < fb_w; x++) {
-                fb[(y - line_height) * pitch_dwords + x] = fb[y * pitch_dwords + x];
-            }
+            memcpy(fb + (y - line_height) * pitch_dwords,
+                   fb + y * pitch_dwords,
+                   bytes_per_row);
         }
 
-        // cls bottom line
+        // clear bottom lines
         for (u32 y = fb_h - line_height; y < fb_h; y++) {
+            u32 *row = fb + y * pitch_dwords;
             for (u32 x = 0; x < fb_w; x++) {
-                fb[y * pitch_dwords + x] = CONSOLESCREEN_BG_COLOR;
+                row[x] = CONSOLESCREEN_BG_COLOR;
             }
         }
 

@@ -7,5 +7,6 @@
 #include <kernel/mem/klime/klime.h>
 #include <kernel/mem/glime/glime.h>
 #include <kernel/user/ulime.h>
+#include "sfence.h"
 
 #endif

@@ -57,19 +57,22 @@ void scroll_up(u32 lines)
 {
     u32 pixels_to_scroll = lines;
     u32 pitch_dwords = fb_pitch / 4;
+    u32 bytes_per_row = fb_width * sizeof(u32);
+    u32 bg_color = bg();
 
-    // Move framebuffer content up
+    // move framebuffer content up
     for (u32 y = pixels_to_scroll; y < fb_height; y++) {
-        for (u32 x = 0; x < fb_width; x++) {
-            framebuffer[(y - pixels_to_scroll) * pitch_dwords + x] =
-                framebuffer[y * pitch_dwords + x];
-        }
+        memcpy(framebuffer + (y - pixels_to_scroll) * pitch_dwords,
+               framebuffer + y * pitch_dwords,
+               bytes_per_row);
     }
 
-    // Clear bottom lines
+    // clear bottom lines
     for (u32 y = fb_height - pixels_to_scroll; y < fb_height; y++) {
+        u32 *row = framebuffer + y * pitch_dwords;
         for (u32 x = 0; x < fb_width; x++) {
-            framebuffer[y * pitch_dwords + x] = bg();
+            //framebuffer[y * pitch_dwords + x] = bg();
+            row[x] = bg_color;
         }
     }
 }

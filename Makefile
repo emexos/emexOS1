@@ -79,7 +79,8 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 	@echo "[MOD] copying keymaps..."
 	@cp shared/keymaps/US.map $(ISODIR)/boot/keymaps/
 	@cp shared/keymaps/DE.map $(ISODIR)/boot/keymaps/
-#@cp shared/keymaps/PL.map $(ISODIR)/boot/keymaps/
+	@cp shared/keymaps/PL.map $(ISODIR)/boot/keymaps/
+	@cp shared/keymaps/RU.map $(ISODIR)/boot/keymaps/
 
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
