@@ -58,17 +58,17 @@ void cpu_poweroff(int operation)
     }
     else
     {
-        print("Power operation not supported.\n");
+        print("Power operation not supported.\n", white());
         return;
     }
 
-    print("Power operation failed or not supported by hardware.\n");
+    print("Power operation failed or not supported by hardware.\n", white());
     return;
 
     //while (1)
     //    __asm__ volatile("hlt" ::: "memory");
 #else
-    print("Power management not supported on this architecture.\n");
+    print("Power management not supported on this architecture.\n", white());
     return;
 #endif
 }

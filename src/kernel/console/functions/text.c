@@ -95,6 +95,13 @@ FHDR(cmd_font) {
     }
 }
 
+FHDR(cmd_rus_sumbol)
+{
+    (void)s;
+    print("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
+    print("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
+}
+
 /*FHDR(cmd_help)
 {
     if (*s == '\0') {
