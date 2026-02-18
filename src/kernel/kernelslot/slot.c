@@ -1,6 +1,5 @@
 #include <kernel/kernelslot/slot.h>
 #include <string/string.h>
-#include <string/log.h>
 #include <kernel/modules/limine.h>
 
 char readslot(void)

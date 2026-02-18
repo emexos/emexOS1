@@ -14,7 +14,6 @@
 #include <kernel/arch/x86_64/gdt/gdt.h>
 #include <kernel/include/reqs.h>
 #include <string/string.h>
-#include <string/log.h>
 
 #include <theme/doccr.h>
 #include <config/system.h>

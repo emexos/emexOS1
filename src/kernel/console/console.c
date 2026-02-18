@@ -377,9 +377,9 @@ void console_execute(const char *input)
         // for PC_NAME and USER_NAME
         uci_reload();
     } else {
-        print(CONSOLE_NAME, WRONG_COMMAND_CL);
-        print(": command not found:", WRONG_COMMAND_CL);
-        print(cmd_name, WRONG_COMMAND_CL);
+        cprintf(CONSOLE_NAME, WRONG_COMMAND_CL);
+        cprintf(": command not found:", WRONG_COMMAND_CL);
+        cprintf(cmd_name, WRONG_COMMAND_CL);
     }
 }
 

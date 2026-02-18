@@ -26,7 +26,7 @@ FHDR(cmd_slot)
         str_append(msg, slot_str);
         str_append(msg, "\n");
 
-        print(msg, GFX_GREEN);
+        cprintf(msg, GFX_GREEN);
         return;
     }
 
@@ -36,11 +36,11 @@ FHDR(cmd_slot)
 
         if (slot != 'A' && slot != 'B' &&
             slot != 'a' && slot != 'b') {
-            print("wrong slot num, use \"A\" or \"B\"\n", GFX_RED);
+            cprintf("wrong slot num, use \"A\" or \"B\"\n", GFX_RED);
             return;
         }
 
-        print("this does currently not switch the real kernel slot!\n", GFX_YELLOW);
+        cprintf("this does currently not switch the real kernel slot!\n", GFX_YELLOW);
 
         if (slot == 'a') slot = 'A';
         if (slot == 'b') slot = 'B';
@@ -48,19 +48,19 @@ FHDR(cmd_slot)
         char current = readslot();
 
         if (current == slot) {
-            print("slot is already active\n", GFX_YELLOW);
+            cprintf("slot is already active\n", GFX_YELLOW);
             return;
         }
 
         if (writeslot(slot) == 0) {
-            print("switch slot and reboot...\n", GFX_YELLOW);
+            cprintf("switch slot and reboot...\n", GFX_YELLOW);
 
             for (volatile int i = 0; i < 5000000; i++)
                 __asm__ volatile("nop");
 
             cpu_poweroff(POWEROFF_REBOOT);
         } else {
-            print("failed to switch slot\n", GFX_RED);
+            cprintf("failed to switch slot\n", GFX_RED);
         }
 
         return;

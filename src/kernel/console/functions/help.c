@@ -3,7 +3,7 @@
 #define GEN "[GENERIC]"
 #define FS "[FILESYSTEM]"
 #define GUI "[GRAPHICS]"
-#define PADDING 12
+#define PADDING 15
 
 FHDR(cmd_help)
 {
@@ -12,7 +12,7 @@ FHDR(cmd_help)
 
     if (*s == '\0') {
         // these are COMMON commands, soon i will split all comands
-        print("[COMMON]\n", GFX_YELLOW);
+        cprintf(GEN, GFX_YELLOW);
 
         for (int i = 0; i < cmd_count; i++) {
             char buf[128];
@@ -28,10 +28,10 @@ FHDR(cmd_help)
             str_append(buf, "- ");
             str_append(buf, commands[i].description);
             str_append(buf, "\n");
-            print(buf, GFX_WHITE);
+            cprintf(buf, GFX_WHITE);
         }
 
-        print("Type 'help <command>' for details", GFX_GRAY_50);
+        cprintf("Type 'help <command>' for details", GFX_GRAY_50);
     } else {
         // specific commands
         const char *p = s;
@@ -43,14 +43,14 @@ FHDR(cmd_help)
 
             str_copy(buf, "\n");
             str_append(buf, cmd->description);
-            print(buf, GFX_WHITE);
+            cprintf(buf, GFX_WHITE);
 
             str_copy(buf, "\nUsage: ");
             str_append(buf, cmd->usage);
-            print(buf, GFX_YELLOW);
-            print("\n", GFX_WHITE);
+            cprintf(buf, GFX_YELLOW);
+            cprintf("\n", GFX_WHITE);
         } else {
-            print("\nCommand not found", GFX_RED);
+            cprintf("\nCommand not found", GFX_RED);
         }
     }
 }

@@ -6,7 +6,7 @@ FHDR(cmd_source) {
     // reloads the shell
 
     if (!s || *s == '\0') {
-        print("usage: source <file>\n", GFX_RED);
+        cprintf("usage: source <file>\n", GFX_RED);
         return;
     }
 
@@ -22,10 +22,10 @@ FHDR(cmd_source) {
         banner_draw();
         console_window_init();
 
-        print("Console reloaded\n", GFX_GREEN);
+        cprintf("Console reloaded\n", GFX_GREEN);
         //shell_print_prompt();
         return;
     }
 
-    print("source: only 'console' is supported\n", GFX_RED);
+    cprintf("source: only 'console' is supported\n", GFX_RED);
 }

@@ -5,7 +5,7 @@ extern char cwd[];
 
 FHDR(cmd_mkdir) {
     if (!s || *s == '\0') {
-        print("usage: mkdir <directory>\n", GFX_RED);
+        cprintf("usage: mkdir <directory>\n", GFX_RED);
         return;
     }
 
@@ -26,11 +26,11 @@ FHDR(cmd_mkdir) {
 
     // Create the directory
     if (fs_mkdir(full_path) != 0) {
-        print("error: could not create directory\n", GFX_RED);
+        cprintf("error: could not create directory\n", GFX_RED);
         return;
     }
 
-    print("directory created: ", GFX_GREEN);
-    print(full_path, GFX_WHITE);
-    print("\n", GFX_WHITE);
+    cprintf("directory created: ", GFX_GREEN);
+    cprintf(full_path, GFX_WHITE);
+    cprintf("\n", GFX_WHITE);
 }

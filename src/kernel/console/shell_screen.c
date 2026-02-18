@@ -56,47 +56,47 @@ void shell_print_prompt(void)
     const char *format = conf_get(prompt_conf, prompt_conf_count, "format");
 
     if (!format) {
-        printf("using standard");
-        string("\n[", GFX_WHITE);
-        string(uci_get_pc_name(), GFX_WHITE);
-        string("@", GFX_WHITE);
-        string(uci_get_user_name(), GFX_WHITE);
-        string("]", GFX_WHITE);
+        //printf("using standard");
+        cprintf("\n[", GFX_WHITE);
+        cprintf(uci_get_pc_name(), GFX_WHITE);
+        cprintf("@", GFX_WHITE);
+        cprintf(uci_get_user_name(), GFX_WHITE);
+        cprintf("]", white());
 
         if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
             char prompt_cwd[MAX_PATH_LEN];
             str_copy(prompt_cwd, cwd);
             prompt_cwd[str_len(cwd) - 1] = '\0';
-            string(prompt_cwd, GFX_WHITE);
+            cprintf(prompt_cwd, white());
         } else {
-            string(cwd, GFX_WHITE);
+            cprintf(cwd, white());
         }
 
-        string("# ", GFX_BLUE);
+        cprintf("# ", blue());
         return;
     }
 
-    string("\n", GFX_WHITE);
+    cprintf("\n", white());
 
     for (const char *p = format; *p; p++) {
         if (*p == '%') {
             p++;
-            if (*p == 'u') string(uci_get_user_name(), GFX_WHITE);
-            else if (*p == 'h') string(uci_get_pc_name(), GFX_WHITE);
+            if (*p == 'u') cprintf(uci_get_user_name(), white());
+            else if (*p == 'h') cprintf(uci_get_pc_name(), white());
             else if (*p == 'w') {
                 if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
                     char prompt_cwd[MAX_PATH_LEN];
                     str_copy(prompt_cwd, cwd);
                     prompt_cwd[str_len(cwd) - 1] = '\0';
-                    string(prompt_cwd, GFX_WHITE);
+                    cprintf(prompt_cwd, white());
                 } else {
-                    string(cwd, GFX_WHITE);
+                    cprintf(cwd, white());
                 }
             }
-            else if (*p == '%') string("%", GFX_WHITE);
+            else if (*p == '%') cprintf("%", white());
         } else {
             char c[2] = {*p, '\0'};
-            string(c, GFX_WHITE);
+            cprintf(c, white());
         }
     }
 }

@@ -4,6 +4,6 @@
 FHDR(cmd_whoami) {
     (void)s;
 
-    print(uci_get_user_name(), GFX_WHITE);
-    print("\n", GFX_WHITE);
+    cprintf(uci_get_user_name(), GFX_WHITE);
+    cprintf("\n", GFX_WHITE);
 }

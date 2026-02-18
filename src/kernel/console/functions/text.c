@@ -3,11 +3,11 @@
 FHDR(cmd_echo)
 {
     if (*s == '\0') {
-        print("\n", GFX_WHITE);
+        cprintf("\n", GFX_WHITE);
         return;
     }
 
-    print(s, GFX_WHITE);
+    cprintf(s, GFX_WHITE);
 }
 
 FHDR(cmd_clear)
@@ -17,7 +17,7 @@ FHDR(cmd_clear)
     /*
     if (*s != '\0') {
         if (!parse_color(s, &color)) {
-            print("wrong color\n", GFX_RED);
+            cprintf("wrong color\n", GFX_RED);
             return;
         }
     }
@@ -37,7 +37,7 @@ FHDR(cmd_fsize)
         char buf[64];
         str_copy(buf, "Current font size: ");
         str_append_uint(buf, font_scale);
-        print(buf, GFX_WHITE);
+        cprintf(buf, GFX_WHITE);
         return;
     }
 
@@ -52,7 +52,7 @@ FHDR(cmd_fsize)
     }
 
     if (size < 1 || size > 4) {
-        print("Invalid size. Use 1-4\n", GFX_RED);
+        cprintf("Invalid size. Use 1-4\n", GFX_RED);
         return;
     }
 
@@ -61,7 +61,7 @@ FHDR(cmd_fsize)
     /*char buf[64];
     str_copy(buf, " Font size set to ");
     str_append_uint(buf, size);
-    print(buf, GFX_GREEN);
+    cprintf(buf, GFX_GREEN);
     */
     clear(CONSOLESCREEN_BG_COLOR);
     banner_force_update();
@@ -89,60 +89,60 @@ FHDR(cmd_font) {
     if (f_setcontext((font_type_t)font_num) == 0) {
         clear(CONSOLESCREEN_BG_COLOR);
         banner_force_update();
-        print("\n", GFX_GREEN);
+        cprintf("\n", GFX_GREEN);
     } else {
-        print("use: font <number>", GFX_RED);
+        cprintf("use: font <number>", GFX_RED);
     }
 }
 
 FHDR(cmd_cyrillc_sumbol)
 {
     (void)s;
-    print("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
-    print("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
+    cprintf("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
+    cprintf("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
 }
 
 FHDR(cmd_latin_sumbol)
 {
     (void)s;
-    print("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", GFX_WHITE);
-    print("abcdefghijklmnopqrstuvwxyz\n", GFX_WHITE);
+    cprintf("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", GFX_WHITE);
+    cprintf("abcdefghijklmnopqrstuvwxyz\n", GFX_WHITE);
 }
 
 FHDR(cmd_all_sumbol)
 {
     (void)s;
-    print("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", GFX_WHITE);
-    print("abcdefghijklmnopqrstuvwxyz\n", GFX_WHITE);
-    print("AEOEUESS: ÄÖÜ äöü ß\n", GFX_WHITE);
-    print("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
-    print("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
-    print("0123456789 !?.,:;+-*/=_()[]{}@#%&$°^\"'<>\\|~`§€\n", GFX_WHITE);
-    print("«∑€®†Ω¨⁄øπ•±å‚∂ƒ©ªº∆@œæ‘≤¥≈ç√∫~µ∞…–¡“¶¢≠¿'£\n", GFX_WHITE);
+    cprintf("ABCDEFGHIJKLMNOPQRSTUVWXYZ\n", GFX_WHITE);
+    cprintf("abcdefghijklmnopqrstuvwxyz\n", GFX_WHITE);
+    cprintf("AEOEUESS: ÄÖÜ äöü ß\n", GFX_WHITE);
+    cprintf("АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ\n", GFX_WHITE);
+    cprintf("абвгдеёжзийклмнопрстуфхцчшщъыьэюя\n", GFX_WHITE);
+    cprintf("0123456789 !?.,:;+-*/=_()[]{}@#%&$°^\"'<>\\|~`§€\n", GFX_WHITE);
+    cprintf("«∑€®†Ω¨⁄øπ•±å‚∂ƒ©ªº∆@œæ‘≤¥≈ç√∫~µ∞…–¡“¶¢≠¿'£\n", GFX_WHITE);
 }
 
 /*FHDR(cmd_help)
 {
     if (*s == '\0') {
         // show all commands
-        print("[COMMMON]\n", GFX_YELLOW);
-        print("  echo [text]    - echo [text]\n", GFX_WHITE);
-        print("  clear [color]  - clear screen\n", GFX_WHITE);
-        print("  help [command] - displays this list\n", GFX_WHITE);
-        print("  scale [1-4]    - change screen size\n", GFX_WHITE);
-        print("  font [0-1]     - switch fonts\n", GFX_WHITE);
-        print("  date           - show current date\n", GFX_WHITE);
-        print("  time           - show current time\n", GFX_WHITE);
-        print("  calendar       - show date & time\n", GFX_WHITE);
-        print("  uptime         - displays the uptime\n", GFX_WHITE);
-        print("  dofetch        - emexOS system fetch\n", GFX_WHITE);
-        print("  cat <file>     - show file content\n", GFX_WHITE);
-        print("  ls <path>      - list directory contents\n", GFX_WHITE);
-        print("  shut           - shuts down the system\n", GFX_WHITE);
-        //print("[SYSTEM]\n", GFX_YELLOW);
-        print("  meminfo        - heap memory information\n", GFX_WHITE);
-        print("  modules        - shows all modules in fs\n", GFX_WHITE);
-        print("Type 'help <command>' for details", GFX_GRAY_50);
+        cprintf("[COMMMON]\n", GFX_YELLOW);
+        cprintf("  echo [text]    - echo [text]\n", GFX_WHITE);
+        cprintf("  clear [color]  - clear screen\n", GFX_WHITE);
+        cprintf("  help [command] - displays this list\n", GFX_WHITE);
+        cprintf("  scale [1-4]    - change screen size\n", GFX_WHITE);
+        cprintf("  font [0-1]     - switch fonts\n", GFX_WHITE);
+        cprintf("  date           - show current date\n", GFX_WHITE);
+        cprintf("  time           - show current time\n", GFX_WHITE);
+        cprintf("  calendar       - show date & time\n", GFX_WHITE);
+        cprintf("  uptime         - displays the uptime\n", GFX_WHITE);
+        cprintf("  dofetch        - emexOS system fetch\n", GFX_WHITE);
+        cprintf("  cat <file>     - show file content\n", GFX_WHITE);
+        cprintf("  ls <path>      - list directory contents\n", GFX_WHITE);
+        cprintf("  shut           - shuts down the system\n", GFX_WHITE);
+        //cprintf("[SYSTEM]\n", GFX_YELLOW);
+        cprintf("  meminfo        - heap memory information\n", GFX_WHITE);
+        cprintf("  modules        - shows all modules in fs\n", GFX_WHITE);
+        cprintf("Type 'help <command>' for details", GFX_GRAY_50);
     } else {
         // show specific command help
         const char *p = s;
@@ -154,14 +154,14 @@ FHDR(cmd_all_sumbol)
 
             str_copy(buf, "\n");
             str_append(buf, cmd->description);
-            print(buf, GFX_WHITE);
+            cprintf(buf, GFX_WHITE);
 
             str_copy(buf, "\nUsage: ");
             str_append(buf, cmd->usage);
-            print(buf, GFX_YELLOW);
-            print("\n", GFX_WHITE);
+            cprintf(buf, GFX_YELLOW);
+            cprintf("\n", GFX_WHITE);
         } else {
-            print("\nCommand not found", GFX_RED);
+            cprintf("\nCommand not found", GFX_RED);
         }
     }
 }
