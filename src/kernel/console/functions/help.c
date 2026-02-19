@@ -13,6 +13,7 @@ FHDR(cmd_help)
     if (*s == '\0') {
         // these are COMMON commands, soon i will split all comands
         cprintf(GEN, GFX_YELLOW);
+        cprintf("\n", white());
 
         for (int i = 0; i < cmd_count; i++) {
             char buf[128];
