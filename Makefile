@@ -59,7 +59,8 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
 
 	@echo "[MOD] creating executables..."
-	@cp -r src/userspace/apps/hello.emx $(DISK_DIR)/rd/user/apps/
+	@mkdir -p $(DISK_DIR)/rd/user/apps
+	@cp -r src/userspace/apps/hello/hello.emx $(DISK_DIR)/rd/user/apps/
 
 	@echo "[MOD] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh
