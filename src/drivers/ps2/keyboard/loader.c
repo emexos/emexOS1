@@ -1,6 +1,6 @@
 // loader.c
 #include "loader.h"
-#include <kernel/include/reqs.h>
+//#include <kernel/include/reqs.h>
 #include <memory/main.h>
 #include <string/string.h>
 #include <kernel/communication/serial.h>
@@ -8,6 +8,8 @@
 #include <config/files.h>
 
 // Parse .map (emex keymap) file format
+#define KEYMAP_DIR "/emr/config/keymaps/"
+
 static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
     if (!data || !km || size == 0) return -1;
 
@@ -26,7 +28,7 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
         if (*line == '#' || *line == '\n') {
             // skip comments and empty lines
             while (line < end && *line != '\n') line++;
-            if (line < end && *line == '\n') line++;
+            if (line < end) line++;
             continue;
         }
 
@@ -38,21 +40,17 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
             // (2 digits)
             for (int i = 0; i < 2 && line < end; i++) {
                 scancode <<= 4;
-                if (*line >= '0' && *line <= '9') {
-                    scancode |= (*line - '0');
-                } else if (*line >= 'A' && *line <= 'F') {
-                    scancode |= (*line - 'A' + 10);
-                } else if (*line >= 'a' && *line <= 'f') {
-                    scancode |= (*line - 'a' + 10);
-                }
+                if      (*line >= '0' && *line <= '9') scancode |= (*line - '0');
+                else if (*line >= 'A' && *line <= 'F') scancode |= (*line - 'A' + 10);
+                else if (*line >= 'a' && *line <= 'f') scancode |= (*line - 'a' + 10);
                 line++;
             }
 
-            while (line < end && *line != '=') line++; // =
-            if (line < end && *line == '=') line++;
-            while (line < end && (*line == ' ' || *line == '\t')) line++; // space
+            while (line < end && *line != '=') line++;
+            if (line < end) line++; // skip '='
+            while (line < end && (*line == ' ' || *line == '\t')) line++;
 
-            // parse normal, between single quotes
+            // parse normal char
             if (line < end && *line == '\'') {
                 line++;
                 if (line < end) {
@@ -70,13 +68,9 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
                                     u8 hex = 0;
                                     for (int i = 0; i < 2 && line < end; i++) {
                                         hex <<= 4;
-                                        if (*line >= '0' && *line <= '9') {
-                                            hex |= (*line - '0');
-                                        } else if (*line >= 'A' && *line <= 'F') {
-                                            hex |= (*line - 'A' + 10);
-                                        } else if (*line >= 'a' && *line <= 'f') {
-                                            hex |= (*line - 'a' + 10);
-                                        }
+                                        if      (*line >= '0' && *line <= '9') hex |= (*line - '0');
+                                        else if (*line >= 'A' && *line <= 'F') hex |= (*line - 'A' + 10);
+                                        else if (*line >= 'a' && *line <= 'f') hex |= (*line - 'a' + 10);
                                         line++;
                                     }
                                     km->normal[scancode] = hex;
@@ -115,13 +109,9 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
                                     u8 hex = 0;
                                     for (int i = 0; i < 2 && line < end; i++) {
                                         hex <<= 4;
-                                        if (*line >= '0' && *line <= '9') {
-                                            hex |= (*line - '0');
-                                        } else if (*line >= 'A' && *line <= 'F') {
-                                            hex |= (*line - 'A' + 10);
-                                        } else if (*line >= 'a' && *line <= 'f') {
-                                            hex |= (*line - 'a' + 10);
-                                        }
+                                        if      (*line >= '0' && *line <= '9') hex |= (*line - '0');
+                                        else if (*line >= 'A' && *line <= 'F') hex |= (*line - 'A' + 10);
+                                        else if (*line >= 'a' && *line <= 'f') hex |= (*line - 'a' + 10);
                                         line++;
                                     }
                                     km->shift[scancode] = hex;
@@ -142,7 +132,7 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
 
         // skip to nect line
         while (line < end && *line != '\n') line++;
-        if (line < end && *line == '\n') line++;
+        if (line < end) line++;
     }
 
     return 0;
@@ -151,90 +141,32 @@ static int parse_keymap_data(const char *data, size_t size, keymap_t *km) {
 int keymap_load_from_module(const char *name, keymap_t *km) {
     if (!name || !km) return -1;
 
-    if (!module_request.response || module_request.response->module_count == 0) {
-        printf("[KEYMAP] No Limine modules available\n");
+    // build path with us keymap
+    char path[64];
+    str_copy(path, KEYMAP_DIR);
+    str_append(path, name);
+    str_append(path, KEYMAP_FORMAT);
+
+    int fd = fs_open(path, O_RDONLY);
+    if (fd < 0) {
+        log("[KEYMAP]", "not found: ", d);
+        BOOTUP_PRINT(path, white());
+        BOOTUP_PRINT("\n", white());
         return -1;
     }
 
-    struct limine_module_response *response =
-        (struct limine_module_response *)module_request.response;
+    // read the whole file into a stack buffer
+    // .map files are small (< 4KB)
+    char buf[4096];
+    ssize_t bytes = fs_read(fd, buf, sizeof(buf) - 1);
+    fs_close(fd);
 
-    // Builds the expected filename
-    char expected_name[64];
-    str_copy(expected_name, name);
-    str_append(expected_name, KEYMAP_FORMAT);
+    if (bytes <= 0) return -1;
+    buf[bytes] = '\0';
 
-    // search for keymap module
-    for (u64 i = 0; i < response->module_count; i++) {
-        struct limine_file *module = response->modules[i];
-
-        //Extract filename from path
-        const char *filename = module->path;
-        const char *last_slash = filename;
-        for (const char *p = filename; *p; p++) {
-            if (*p == '/') last_slash = p + 1;
-        }
-        filename = last_slash;
-
-        // checks if this is our keymap
-        if (str_equals(filename, expected_name)) {
-            printf("[KEYMAP] Loading %s from module (%lu bytes)\n",
-                   filename, module->size);
-
-            return parse_keymap_data((const char*)module->address,
-                                   module->size, km);
-        }
-    }
-
-    printf("[KEYMAP] Module %s not found\n", expected_name);
-    return -1;
+    return parse_keymap_data(buf, (size_t)bytes, km);
 }
 
 int keymap_modules_init(void) {
-    if (!module_request.response) {
-        printf("[KEYMAP] No module response available\n");
-        return -1;
-    }
-
-    struct limine_module_response *response =
-        (struct limine_module_response *)module_request.response;
-
-    log("[KEYMAP]", "Found ", d);
-    char buf[32];
-    str_from_int(buf, (int)response->module_count);
-    BOOTUP_PRINT(buf, white());
-    BOOTUP_PRINT(" Limine modules\n", white());
-
-
-    // lists all keymap modules
-    int keymap_count = 0;
-    for (u64 i = 0; i < response->module_count; i++) {
-        struct limine_file *module = response->modules[i];
-
-        const char *filename = module->path;
-        const char *last_slash = filename;
-        for (const char *p = filename; *p; p++) {
-            if (*p == '/') last_slash = p + 1;
-        }
-        filename = last_slash;
-
-        // check if this is a keymap file
-        if (str_contains(filename, KEYMAP_FORMAT)) {
-            printf("[KEYMAP] Available: %s\n", filename);
-            keymap_count++;
-        }
-    }
-
-    buf[0] = '\0';
-    //char buf[64];
-    char numbuf[32];
-
-    str_copy(buf, "Total keymaps found: ");
-    str_from_int(numbuf, keymap_count);
-    str_append(buf, numbuf);
-    str_append(buf, "\n");
-
-    log("[KEYMAP]", buf, d);
-
-    return keymap_count;
+    return 0;
 }

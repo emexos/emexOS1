@@ -57,10 +57,10 @@ void shell_print_prompt(void)
 
     if (!format) {
         //printf("using standard");
-        cprintf("\n[", GFX_WHITE);
-        cprintf(uci_get_pc_name(), GFX_WHITE);
-        cprintf("@", GFX_WHITE);
-        cprintf(uci_get_user_name(), GFX_WHITE);
+        cprintf("\n[", white());
+        cprintf(uci_get_pc_name(), white());
+        cprintf("@", white());
+        cprintf(uci_get_user_name(), white());
         cprintf("]", white());
 
         if (str_len(cwd) > 1 && cwd[str_len(cwd) - 1] == '/') {
@@ -72,7 +72,7 @@ void shell_print_prompt(void)
             cprintf(cwd, white());
         }
 
-        cprintf("# ", blue());
+        cprintf("# ", GFX_BLUE);
         return;
     }
 

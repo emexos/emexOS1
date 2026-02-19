@@ -32,6 +32,7 @@ extern driver_module console_module;
 #define MAX_CHAINED_CMDS 8
 
 #define CONSOLE_APP_NAME "console"
+#define CONSOLE_WINDOW "w1"
 #define CONSOLE_NAME "ekmsh" // emex-kernelmode-shell
 #define WRONG_COMMAND_CL GFX_RED
 

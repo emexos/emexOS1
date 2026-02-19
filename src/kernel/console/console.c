@@ -85,53 +85,19 @@ void console_init(void)
     f_setcontext(FONT_8X8);
     clear(CONSOLESCREEN_BG_COLOR);
     font_scale = 2;
-
-    buf[0] = '\0'; //reset
-    //reset_cursor();
-    /*
-    //module_register_driver(&console_module);
-
-    if (cursor_x == 0 && cursor_y == 0) {
-        clear(CONSOLESCREEN_COLOR);
-        reset_cursor();
-    }
-    */
-
     cursor_x = 0;
     cursor_y = 0;
 
-    //is_login_active = 1;
-    //if (!login_authenticate()) {
-        // Login failed - should never reach here due to lock
-        //panic("Login authentication failed");
-        //}
-    //is_login_active = 0;
-
-
-    //create config files for console:
-    /*fs_mkdir("/.config/ekmsh");
-    fs_mkdir("/.config/ekmsh/promts");
-    fs_open("/.config/ekmsh/promts/promt.conf", O_CREAT | O_WRONLY);*/
-
     console_config_init();
-
     clear(CONSOLESCREEN_BG_COLOR);
     banner_init();
-
-    // Initialize console window
     console_window_init();
     cursor_();
 
-    //string("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890+#,.-;:_'*`?=!\\\"$%&/()^°", GFX_WHITE);
-    // font testing
+    cprintf("\nWelcome to " KERNEL_BARENAME " " KERNEL_DEFRELEASE, white());
+    cprintf("\nyou're currently in " CONSOLE_APP_NAME " " CONSOLE_WINDOW "\n", white());
     shell_print_prompt();
-
-    console_execute("scale 1");
-    console_execute("tree");
-    console_execute("ls");
-    console_execute("view /user/images/frog.bmp");
     cursor_draw();
-
     console_run();
 
 }
