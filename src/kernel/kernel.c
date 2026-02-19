@@ -289,8 +289,12 @@ void _start(void)
             #endif
         }
         #if ENABLE_FAT32 == 1
-        log("[FAT32]", "mounting FAT32 file system\n", d);
-        fat32_init();
+            log("[FAT32]", "mounting FAT32 file system\n", d);
+            fat32_init();
+        #endif
+        #if ENABLE_FAT32
+            //fat32_mount("/dev/hda1", "/boot", "fat32");
+            //log("[BOOT]", "Boot partition mounted at /boot\n", d);
         #endif
     }
     #else
