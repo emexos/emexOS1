@@ -9,6 +9,7 @@
 #include <kernel/graph/graphics.h>
 #include <kernel/kernel_processes/fm/fm.h>
 #include <kernel/include/ports.h>
+#include <kernel/inits/console/gen.h>
 #include <kernel/communication/serial.h>
 #include <drivers/ps2/keyboard/keyboard.h>
 #include <kernel/graph/theme.h>
