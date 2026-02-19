@@ -1,0 +1,62 @@
+# Russian JCUKEN keyboard layout (CP1251 encoding)
+
+# row 1 - numbers
+0x02 = '1' '!'
+0x03 = '2' '@'
+0x04 = '3' '#'
+0x05 = '4' '$'
+0x06 = '5' '%'
+0x07 = '6' '^'
+0x08 = '7' '&'
+0x09 = '8' '*'
+0x0A = '9' '('
+0x0B = '0' ')'
+0x0C = '-' '_'
+0x0D = '=' '+'
+
+# row 2 - JCUKEN
+0x10 = '\xE9' '\xC9'
+0x11 = '\xF6' '\xD6'
+0x12 = '\xF3' '\xD3'
+0x13 = '\xEA' '\xCA'
+0x14 = '\xE5' '\xC5'
+0x15 = '\xED' '\xCD'
+0x16 = '\xE3' '\xC3'
+0x17 = '\xF8' '\xD8'
+0x18 = '\xF9' '\xD9'
+0x19 = '\xE7' '\xC7'
+0x1A = '\xF5' '\xD5'
+0x1B = '\xFA' '\xDA'
+
+# row 3
+0x1E = '\xF4' '\xD4'
+0x1F = '\xFB' '\xDB'
+0x20 = '\xE2' '\xC2'
+0x21 = '\xE0' '\xC0'
+0x22 = '\xEF' '\xCF'
+0x23 = '\xF0' '\xD0'
+0x24 = '\xEE' '\xCE'
+0x25 = '\xEB' '\xCB'
+0x26 = '\xE4' '\xC4'
+0x27 = '\xE6' '\xC6'
+0x28 = '\xFD' '\xDD'
+
+# row 4
+0x2C = '\xFF' '\xDF'
+0x2D = '\xF7' '\xD7'
+0x2E = '\xF1' '\xD1'
+0x2F = '\xEC' '\xCC'
+0x30 = '\xE8' '\xC8'
+0x31 = '\xF2' '\xD2'
+0x32 = '\xFC' '\xDC'
+0x33 = '\xE1' '\xC1'
+0x34 = '\xFE' '\xDE'
+
+# backtick = ё/Ё
+0x29 = '\xB8' '\xA8'
+
+# special keys
+0x0E = '\b' '\b'
+0x0F = '\t' '\t'
+0x1C = '\n' '\n'
+0x39 = ' ' ' '

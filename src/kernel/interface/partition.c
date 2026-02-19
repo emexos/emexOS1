@@ -55,7 +55,7 @@ int partition_init(void) {
         BOOTUP_PRINT("  Partition ", white());
         BOOTUP_PRINT_INT(partition_count, white());
         BOOTUP_PRINT(": ", white());
-        BOOTUP_PRINT(part->type_name, cyan());
+        BOOTUP_PRINT(part->type_name, white());
         BOOTUP_PRINT(" LBA: ", white());
         BOOTUP_PRINT_INT(part->start_lba, white());
         BOOTUP_PRINT(", sectors: ", white());
@@ -101,16 +101,16 @@ int partition_needs_format(void) {
 
 //not a real format rn but it works... so i don't touch it
 int partition_format_disk_fat32(void) {
-    BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-    BOOTUP_PRINT("formatting disk with FAT32...\n", yellow());
+    //BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
+    log("[PARTITION]","formatting disk with FAT32...\n", d);
 
 
     // NOTE:
     // this will overwrite everything withouth backups or other
     ATAdevice_t *device = ATAget_device(0);
     if (!device) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("nothing foun\n", red());
+        //BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
+        log("[PARTITION]","nothing foun\n", error);
         return -1;
     }
 
@@ -126,8 +126,7 @@ int partition_format_disk_fat32(void) {
     u32 partition_sectors ; //= total_sectors - start_lba - 2048;
 
     if (total_sectors_64 < (start_lba + 2048)) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("disk is too small\n", red());
+        log("[PARTITION]","disk is too small\n", error);
         return -1;
     }
     if (total_sectors_64 > 0xFFFFFFFF) {
@@ -139,8 +138,7 @@ int partition_format_disk_fat32(void) {
 
     partition_sectors = total_sectors - start_lba - 2048;
     if (partition_sectors < PARTSECSIZE) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("partition too small\n", red());
+        log("[PARTITION]","partition too small\n", error);
         return -1;
     }
 
@@ -155,18 +153,17 @@ int partition_format_disk_fat32(void) {
 
 
     if (mbr_create_partition(&mbr, 0, MBR_PARTITION_FAT32_LBA, start_lba, partition_sectors) != 0) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("failed to create partition entry\n", red());
+        log("[PARTITION]","failed to create partition entry\n", error);
         return -1;
     }
     if (mbr_write(&mbr) != 0) {
-        BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-        BOOTUP_PRINT("failed to write MBR\n", red());
+        //BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
+        log("[PARTITION]","failed to write MBR\n", error);
         return -1;
     }
 
-    BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
-    BOOTUP_PRINT("MBR created .\n", green());
+    //BOOTUP_PRINT("[PARTITION] ", GFX_GRAY_70);
+    log("[PARTITION]","MBR created \n", d);
 
     return 0;
 }

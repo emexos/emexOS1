@@ -126,7 +126,10 @@ void console_init(void)
     // font testing
     shell_print_prompt();
 
-    //console_execute("view /images/logo.bmp");
+    console_execute("scale 1");
+    console_execute("tree");
+    console_execute("ls");
+    console_execute("view /user/images/frog.bmp");
     cursor_draw();
 
     console_run();

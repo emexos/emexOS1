@@ -136,19 +136,22 @@ void fs_system_init(void *klime)
     fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS); // in future its just root so for (fat32,ext2,...)
     //fs_mount(NULL, "/", "/"); // or root
 
+    // only necessary dirs the rest comes from initrd.cpio
     // create standard dirs
     fs_mkdir(DEV_DIRECTORY);
     fs_mkdir(TMP_DIRECTORY);
+
     fs_mkdir(BOOT_DIRECTORY);
     //emx system requirement paths
     fs_mkdir(EMX_DIRECTORY); // /emr
     fs_mkdir(EMLOG_DIRECTORY);
-    fs_mkdir(EMAST_DIRECTORY);
-    fs_mkdir(EMCFG_DIRECTORY);
-    fs_mkdir(KEYMP_DIRECTORY);
-    fs_mkdir(EMDRV_DIRECTORY);
+    //fs_mkdir(EMAST_DIRECTORY);
+    //fs_mkdir(EMCFG_DIRECTORY);
+    //fs_mkdir(KEYMP_DIRECTORY);
+    //fs_mkdir(EMDRV_DIRECTORY);
 
-    fs_mkdir(CONF_DIRECTORY);
+    //fs_mkdir(CONF_DIRECTORY);
+
 
     init_boot_log = fs_open(logpath, O_CREAT | O_WRONLY);
     log("[FS]", "[FS] wrote", d);

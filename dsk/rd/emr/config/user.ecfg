@@ -1,0 +1,9 @@
+#
+# User config
+# user.emcg (emex config)
+#
+
+PC_NAME: "pc"
+USER_NAME: "emex"
+PASSWORD: "emex"
+DEFAULT_KM: US
