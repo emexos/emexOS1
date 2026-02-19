@@ -1,0 +1,7 @@
+#
+# System config
+# system.emcg (emex config)
+#
+
+OS_DEFNAME: "emexOS [x86_64] ";
+OS_DEFRELEASE: "v0.5";

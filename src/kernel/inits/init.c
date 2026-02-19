@@ -4,35 +4,35 @@ void keymaps_load(void)
 {
 
     // create keymap settings
-    int fd_keymap_cfg = fs_open("/emr/config/keymaps/keymap.cfg", O_CREAT | O_WRONLY);
+    /*int fd_keymap_cfg = fs_open("/emr/config/keymaps/keymap.cfg", O_CREAT | O_WRONLY);
     if (fd_keymap_cfg >= 0) {
         const char *default_config = "# US, PL, DE \nKEYMAP: US\n";
         fs_write(fd_keymap_cfg, default_config, str_len(default_config));
         fs_close(fd_keymap_cfg);
     }
 
-    log("[FS]","created keymap.cfg\n", d);
+    log("[FS]","created keymap.cfg\n", d);*/
 
     // load all keymaps
-    limine_module_load("US.map", "/emr/config/keymaps/US.map");
-    limine_module_load("DE.map", "/emr/config/keymaps/DE.map");
-    limine_module_load("PL.map", "/emr/config/keymaps/PL.map");
-    limine_module_load("RU.map", "/emr/config/keymaps/RU.map");
+    //limine_module_load("US.map", "/emr/config/keymaps/US.map");
+    //limine_module_load("DE.map", "/emr/config/keymaps/DE.map");
+    //limine_module_load("PL.map", "/emr/config/keymaps/PL.map");
+    //limine_module_load("RU.map", "/emr/config/keymaps/RU.map");
 
 }
 
 void logos_load(void) {
-    limine_module_load("bootlogo.bin", "/boot/ui/assets/bootlogo.bin");
+    //limine_module_load("bootlogo.bin", "/boot/ui/assets/bootlogo.bin");
     //limine_module_load("logo.bmp", "/emr/assets/logo.bmp");
     //limine_module_load("console_icon.bmp", "/images/iconsole.bmp");
     //limine_module_load("desktop_icon.bmp", "/images/idesktop.bmp");
     //fs_mkdir("/emr/images/");
     //limine_module_load("background.bmp", "/emr/assets/bg.bmp");
-    limine_module_load("frog.bmp", "/emr/assets/frog.bmp");
+    //limine_module_load("frog.bmp", "/emr/assets/frog.bmp");
 }
 
 void users_load(void) {
-    int fd_users = fs_open(USERINI_PATH  "", O_CREAT | O_WRONLY); // how can this be possible.....
+    /*int fd_users = fs_open(USERINI_PATH  "", O_CREAT | O_WRONLY); // how can this be possible.....
     int fd_system = fs_open(SYSTEMINI_PATH "",  O_CREAT | O_WRONLY); // if it works don't touch it!
 
     if (fd_users >= 0) {
@@ -53,7 +53,7 @@ void users_load(void) {
             "root_user=admin # from users.ini\n";
         fs_write(fd_system, system_config, str_len(system_config));
         fs_close(fd_system);
-    }
+    }*/
     //fs_mkdir("/user");
     //fs_mkdir("/user/bin");
     //fs_mkdir("/user/apps");

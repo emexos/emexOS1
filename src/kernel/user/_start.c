@@ -19,9 +19,9 @@ void DEinit(void)
 
 
     */
-    if (!login_authenticate()) {
-        hcf();
-    }
+    //if (!login_authenticate()) {
+    //    hcf();
+    //}
 
 
     // smth like desktop enviroment and userswitch are here

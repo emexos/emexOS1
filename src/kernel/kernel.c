@@ -37,7 +37,7 @@
 //Desktop Enviroment
 #include <kernel/user/gen.h>
 // executables
-#include <kernel/exec/elf/loader.h>
+#include <kernel/packages/elf/loader.h>
 
 
 // Memory
@@ -60,9 +60,11 @@ klime_t *klime = NULL;
     ulime_t *ulime = NULL;
 #endif
 
-//vFS & fs
+//vFS & fs & disk
 #include <kernel/file_systems/vfs/vfs.h>
 #include <kernel/file_systems/vfs/init.h>
+#include <kernel/module/module.h>
+#include <kernel/inits/initrd/initrd.h>
 #if ENABLE_FAT32
     #include <kernel/file_systems/fat32/fat32.h> // finally fat32!
     // interface
@@ -70,9 +72,6 @@ klime_t *klime = NULL;
     #include <kernel/interface/mbr.h>
     #include <config/disk.h>
 #endif
-
-// disk drivers
-#include <kernel/module/module.h>
 #if ENABLE_ATA
     #include <drivers/storage/ata/disk.h>
 #endif
@@ -113,17 +112,14 @@ void _start(void)
         // Initialize framebuffer graphics
         struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
         graphics_init(fb);
-        //draw_logo();
-
         kproc_loader_init();
         init_bootscreen();
         fm_init();
-        clear(bg());
         cursor_x = 0;
         cursor_y = 0;
         font_scale = 1;
-
         f_setcontext(FONT_8X8);
+        clear(bg());
 
         BOOTUP_PRINT("\n\n ======================\n", white());
         BOOTUP_PRINT(" | Welcome to ", white());
@@ -251,6 +247,15 @@ void _start(void)
 
     }
 
+    // initialize Limine modules
+    limine_modules_init(); {
+        initrd_load();
+        dualslotvalidating();
+        keymaps_load();
+        logos_load();
+        users_load();
+    }
+
     #if ENABLE_ATA == 1
     ata_init();{
         // Initialize partition system
@@ -292,13 +297,6 @@ void _start(void)
         log("[ATA]", "skipped (hardware compatibility)\n", warning);
     #endif
 
-    // Initialize Limine modules
-    limine_modules_init(); {
-        dualslotvalidating();
-        keymaps_load();
-        logos_load();
-        users_load();
-    }
     //logo_init();
     //draw_logo();
 
@@ -353,6 +351,7 @@ void _start(void)
     genprocs();
     proc_list_procs(proc_mgr);
     dump_kprocesses();
+    //hcf();
     DEinit();
 
     //should not reach here

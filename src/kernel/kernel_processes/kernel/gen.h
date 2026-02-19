@@ -8,7 +8,7 @@
 #include <kernel/user/user.h>
 #include <kernel/user/ulime.h>
 #include <kernel/proc/proc_manager.h>
-#include <kernel/exec/elf/loader.h>
+#include <kernel/packages/elf/loader.h>
 #include <kernel/mem/paging/paging.h>
 #include <kernel/communication/serial.h>
 #include <kernel/arch/x86_64/gdt/gdt.h>
