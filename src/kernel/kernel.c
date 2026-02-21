@@ -84,16 +84,7 @@ klime_t *klime = NULL;
 
 void _start(void)
 {
-    /*if (framebuffer_request.response != NULL &&
-        framebuffer_request.response->framebuffer_count > 0) {
-        struct limine_framebuffer *fb = framebuffer_request.response->framebuffers[0];
-        u32 *pixels = (u32 *)fb->address;
-        u64 total = fb->width * fb->height;
-        for (u64 i = 0; i < total; i++) {
-            pixels[i] = 0x00FF0000; // red = kernel alive
-        }
-    }*/
-    { // Initializing Boot screen
+    d_boot_screen: { // Initializing Boot screen
         theme_init();
         setcontext(THEME_BOOTUP); // gets loaded over sbootup_theme until, sbootup == FLU
         sbootup_theme(THEME_STD);
@@ -150,7 +141,7 @@ void _start(void)
         proc_mgr = proc_mng_init(ulime);
     #endif
 
-    { // MADE BY @TSARAKI (github)
+    memory_ss: { // MADE BY @TSARAKI (github)
 
         cpu_detect();
         #if X64 == 1
@@ -241,14 +232,13 @@ void _start(void)
         //BOOTUP_PRINT("\n", GFX_WHITE);
     }
 
-    // KERNEL SLOT subsystem
-    {
+    kernel_slot_ss: {
         dualslotvalidating();
 
     }
 
     // initialize Limine modules
-    limine_modules_init(); {
+    limine_module_ss: limine_modules_init(); {
         initrd_load();
         dualslotvalidating();
         keymaps_load();
@@ -311,7 +301,7 @@ void _start(void)
         }
     #endif
 
-    module_init(); {
+    module_ss: module_init(); {
         // Register driver modules
         log("[MOD]", "Init regs:\n", d);
         module_register(&console_module);
