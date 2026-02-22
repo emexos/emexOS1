@@ -23,7 +23,7 @@ void emex_print_info(emex_package_t *pkg)
     printf("[EMX] version:     %s\n", pkg->info.version);
     printf("[EMX] description: %s\n", pkg->info.description);
     printf("[EMX] has icon:    %s\n", pkg->has_icon ?  "yes" : "no");
-    printf("[EMX] resources:   %s\n", pkg->has_resources ?  "yes" : "no");
+    printf("[EMX] resources:   %s\n", pkg->has_resources ? "yes" : "no");
 }
 
 // opens the package, reads the elf, launches with process
@@ -103,7 +103,8 @@ int emex_launch_app(const char *path, ulime_proc_t **out_proc)
         return EMEX_ERR_BAD_ELF;
     }
 
-    printf("[EMX] '%s' ready at 0x%llX\n", pkg.info.title, proc->entry_point);
+    printf("[EMX] '%s' ready at entry=0x%llX (state=PROC_READY)\n",
+           pkg.info.title, proc->entry_point);
 
     if (out_proc) *out_proc = proc;
 

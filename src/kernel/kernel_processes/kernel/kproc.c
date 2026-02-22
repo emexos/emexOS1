@@ -6,6 +6,22 @@ extern ulime_t *ulime;
 #endif
 */
 
+static int kernelprocesses2_init(kproc_t *self) {
+    (void)self;
+    printf("[KERNELPROCESSES2] initialising...\n");
+    kproc();
+    return KPROC_EFINE;
+}
+
+static int kernelprocesses2_tick(kproc_t *self) {
+    (void)self;
+    return KPROC_EFINE;
+}
+
+static void kernelprocesses2_fini(kproc_t *self) {
+    (void)self;
+}
+
 
 /*
 // create a process for the kernel
@@ -54,3 +70,17 @@ void kproc(void ) {
 
 };
 //void kproc(void);
+//
+kproc_t kernelprocesses2_proc = {
+    .name     = "kproc_kernel",
+    .state    = KPROC_STATE_READY,
+    .flags    = KPROC_FLAG_EARLY | KPROC_FLAG_CRITICAL | KPROC_FLAG_PERMANENT,
+    .priority = 255,
+    .init     = kernelprocesses2_init,
+    .tick     = kernelprocesses2_tick,
+    .fini     = kernelprocesses2_fini,
+};
+
+void init_kernelprocesses2(void) {
+    kproc_register_and_start(&kernelprocesses2_proc);
+}

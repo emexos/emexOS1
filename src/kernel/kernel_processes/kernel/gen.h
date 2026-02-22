@@ -27,6 +27,7 @@ extern ulime_t *ulime;
 #endif
 
 void kproc(void);
+void init_kernelprocesses2(void);
 void uproc(void);
 void genprocs(void);
 

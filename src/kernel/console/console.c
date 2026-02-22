@@ -94,14 +94,14 @@ void console_init(void)
     console_window_init();
     cursor_();
 
+    console_execute("scale 1");
     cprintf("\nWelcome to " KERNEL_BARENAME " " KERNEL_DEFRELEASE, white());
     cprintf("\nyou're currently in " CONSOLE_APP_NAME " " CONSOLE_WINDOW "\n", white());
     shell_print_prompt();
     cursor_draw();
-    console_execute("scale 1");
-    console_execute("cd /.config");
-    console_execute("cd /ekmsh");
-    console_execute("tree");
+    //console_execute("cd /.config");
+    //console_execute("cd /ekmsh");
+    //console_execute("tree");
     console_run();
 }
 

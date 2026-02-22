@@ -60,7 +60,10 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 
 	@echo "[MOD] creating executables..."
 	@mkdir -p $(DISK_DIR)/rd/user/apps
-	@cp -r src/userspace/apps/hello/hello.emx $(DISK_DIR)/rd/user/apps/
+	@mkdir -p $(DISK_DIR)/rd/emr/system
+#@cp -r src/userspace/apps/hello/hello.emx $(DISK_DIR)/rd/user/apps/
+	@cp src/userspace/apps/hello/hello.elf $(ISODIR)/boot/hello.elf
+	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system
 
 	@echo "[MOD] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh

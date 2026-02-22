@@ -7,6 +7,8 @@
 #include <string/string.h>
 //#include <kernel/mem/paging/paging.h>
 #include <kernel/graph/theme.h>
+#include <kernel/console/graph/print.h>
+#include <kernel/packages/emex/emex.h>
 #include <theme/doccr.h>
 
 static ulime_t *g_ulime = NULL;
@@ -16,10 +18,17 @@ u64 scall_write(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
     (void)proc;
     if (fd != 1 && fd != 2) return (u64)-1;
 
+    // validate buf is in userspace range (basic sanity check)
+    if (buf == 0 || buf > 0x0000800000000000ULL) return (u64)-1;
+
     const char *str = (const char *)buf;
+
+    // write each char to screen using console output
     for (u64 i = 0; i < count; i++) {
-        //count ++;
-        printf("%c", str[i]);
+        char tmp[2];
+        tmp[0] = str[i];
+        tmp[1] = '\0';
+        cprintf(tmp, 0xFFFFFFFF); // white
     }
 
     return count;
@@ -33,6 +42,10 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3) {
     proc->state = PROC_ZOMBIE;
 
     //BOOTUP_PRINTF("[USERMODE] !!! RETURN !!!\n");
+    // clear current process so scheduler doesn't try to return to it
+    if (g_ulime) {
+        g_ulime->ptr_proc_curr = NULL;
+    }
 
     while(1) {
         __asm__ volatile("cli; hlt");
@@ -74,6 +87,31 @@ u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3) {
     return proc->heap_base + proc->heap_size;
 }
 
+u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
+    (void)proc;
+    (void)arg2;
+    (void)arg3;
+
+    // validate pointer
+    if (path_ptr == 0 || path_ptr > 0x0000800000000000ULL) return (u64)-1;
+
+    const char *path = (const char *)path_ptr;
+
+    printf("[SYSCALL] execve: '%s'\n", path);
+
+    // emex_launch_app creates the process as PROC_READY.
+    // the scheduler will switch to it on the next quantum.
+    ulime_proc_t *new_proc = NULL;
+    int result = emex_launch_app(path, &new_proc);
+    if (result != 0 || !new_proc) {
+        printf("[SYSCALL] execve failed with code %d\n", result);
+        return (u64)-1;
+    }
+
+    // return the new pid to the caller
+    return new_proc->pid;
+}
+
 void _init_syscalls_table(ulime_t *ulime) {
     if (!ulime) return;
 
@@ -86,6 +124,7 @@ void _init_syscalls_table(ulime_t *ulime) {
     ulime->syscalls[GETPID] = scall_getpid;
     ulime->syscalls[BRK]    = scall_brk;
     ulime->syscalls[EXIT]   = scall_exit;
+    ulime->syscalls[EXECVE] = scall_execve;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }

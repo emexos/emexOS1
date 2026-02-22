@@ -27,7 +27,8 @@ extern int init_boot_log;
 #define _EMX "/emr/" // mount point (/disk)
 #define EMCFG_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/config" // == system configs
 #define EMAST_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/assets"
-#define EMLOG_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/logs"
+#define EMSYS_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/system"
+#define EMLOG_DIRECTORY /*" /emr "*/EMSYS_DIRECTORY "/logs"
 #define KEYMP_DIRECTORY /*" /emr "*/EMCFG_DIRECTORY "/keymaps"
 #define EMDRV_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/drvs"
 

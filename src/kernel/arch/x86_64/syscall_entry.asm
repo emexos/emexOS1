@@ -8,13 +8,11 @@ extern syscall_handler
 syscall_entry:
     ; save user stack pointer
     mov [rel user_rsp], rsp
-
-    ; switch to kernel stack
-    mov rsp, [rel kernel_stack_top]
+    lea rsp, [rel kernel_stack_top] ; not mov
 
     ; save registers on kernel stack
-    push r11            ; rflags
-    push rcx            ; user rip
+    push r11 ; rflags
+    push rcx ; user rip
     push rbx
     push rbp
     push r12
@@ -22,18 +20,10 @@ syscall_entry:
     push r14
     push r15
 
-
-    mov r10, rdi        ; save arg1
-    mov rdi, rax        ; syscall number -> first param
-    mov rsi, r10        ; arg1 -> second param
-    ; rdx already has arg2
-    mov rcx, rdx        ; arg3
-    ; r8 already correct
-    mov r10, r8
-    mov r8, r10         ; arg4
-    ; r9 already correct
-
-
+    mov rcx, rdx ; rcx = arg3 (count)
+    mov rdx, rsi ; rdx = arg2 (buf)
+    mov rsi, rdi ; rsi = arg1 (fd)
+    mov rdi, rax ; rdi = syscall_num
 
     call syscall_handler ; from C
 
