@@ -1,5 +1,6 @@
 #include "user_config.h"
 #include <kernel/file_systems/vfs/vfs.h>
+#include <kernel/data/ini/ini.h>
 #include <string/string.h>
 #include <memory/main.h>
 

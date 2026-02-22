@@ -1,4 +1,5 @@
-#include "init.h"
+//#include "init.h"
+#include <kernel/inits/fs/init.h>
 int init_boot_log = -1;
 char *logpath = "/emr/system/logs/log1.txt";
 #include "vfs.h"
@@ -136,23 +137,7 @@ void fs_system_init(void *klime)
     fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS); // in future its just root so for (fat32,ext2,...)
     //fs_mount(NULL, "/", "/"); // or root
 
-    // only necessary dirs the rest comes from initrd.cpio
-    // create standard dirs
-    fs_mkdir(DEV_DIRECTORY);
-    fs_mkdir(TMP_DIRECTORY);
-
-    fs_mkdir(BOOT_DIRECTORY);
-    //emx system requirement paths
-    fs_mkdir(EMX_DIRECTORY); // /emr
-    fs_mkdir(EMSYS_DIRECTORY);
-    fs_mkdir(EMLOG_DIRECTORY);
-    //fs_mkdir(EMAST_DIRECTORY);
-    //fs_mkdir(EMCFG_DIRECTORY);
-    //fs_mkdir(KEYMP_DIRECTORY);
-    //fs_mkdir(EMDRV_DIRECTORY);
-
-    //fs_mkdir(CONF_DIRECTORY);
-
+    initrfs();
 
     init_boot_log = fs_open(logpath, O_CREAT | O_WRONLY);
     log("[FS]", "[FS] wrote", d);
@@ -161,18 +146,11 @@ void fs_system_init(void *klime)
         panic("Cannot open [logs]");
     }
     BOOTUP_PRINT("\n", white());
-    //TODO: bootconf loading from /boot/bootconf
-    // in shared/theme/bootconf file
-
-    //fs_check_bootconf();
-    //fs_load_bootconf();
-
     // mount devfs at /dev
     fs_mount(NULL, DEV_MOUNT_DEFAULT, DEVFS);
 
     //last thing for init is loading all limine modules
     load_limine_module(); // logo
-
 }
 
 void fs_register_mods()
