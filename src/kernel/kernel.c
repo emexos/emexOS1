@@ -31,13 +31,14 @@
 #endif
 
 
-
 // usermode stuff
 #include <kernel/user/user.h>
 //Desktop Enviroment
 #include <kernel/user/gen.h>
 // executables
 #include <kernel/packages/elf/loader.h>
+#include <kernel/packages/cpio/cpio.h>
+#include <kernel/packages/emex/emex.h>
 
 
 // Memory
@@ -62,7 +63,7 @@ klime_t *klime = NULL;
 
 //vFS & fs & disk
 #include <kernel/file_systems/vfs/vfs.h>
-#include <kernel/file_systems/vfs/init.h>
+#include <kernel/inits/fs/init.h>
 #include <kernel/module/module.h>
 #include <kernel/inits/initrd/initrd.h>
 #if ENABLE_FAT32

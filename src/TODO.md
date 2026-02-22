@@ -1,19 +1,13 @@
-move reqs (inline assembly, limine reqs) to /kernel/include/ports(.h&.c)
-with /kernel/include/reqs(.h&.c)
-
-
-remaking mem_manager with slab
-
-Make console to an app 
-make the top bar in console to an app
-make every command to an app
-
-
-if we have a fs the kernel should no longer load per keyboard_pull and so on,
-it should load the module system which searches for all modules which
-are all saved in the fs and then they get loaded and everything should work
-
-
-simple disk driver for fat32 (block reading)
-(sector reader, 512 b)
-bps parser , cluster size
+[ ] fix log system
+[ ] fix slow bootscreen
+[ ] fix user_config creates a already written file
+[ ] fix fat32 is not registered
+[ ] implement atapi support
+[x] implement bmp
+[ ] implement png
+[ ] implement mp4
+[ ] implement ahci
+[ ] implement a libc
+[ ] upgrade theme manager
+[ ] upgrade font manager
+[ ] upgrade bootscreen manager

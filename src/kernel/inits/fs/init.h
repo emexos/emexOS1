@@ -2,6 +2,8 @@
 extern char *logpath;
 extern int init_boot_log;
 
+void initrfs(void);
+
 #define DISK_NAME "hdd0"
 
 #define ROOTFS TMPFS // for now, soon its fat32/ext2
