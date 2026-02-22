@@ -1,7 +1,7 @@
 #include "gen.h"
 
 //mod
-#define USERLOCATE "/user/bin/login.elf"
+//#define USERLOCATE "/user/bin/login.elf"
 
 void DEinit(void)
 {

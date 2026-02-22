@@ -18,7 +18,7 @@
 
 // those cant be changed otherwise compatibility will brake
 #define EMEX_GEN_NAME  "app"
-#define EMEX_ELF_NAME  EMEX_GEN_NAME " "".elf"
+#define EMEX_ELF_NAME  EMEX_GEN_NAME "" ".elf"
 #define EMEX_INFO_NAME "package.info"
 #define EMEX_ICON_NAME "app_icon.bmp"
 #define EMEX_RES_DIR   "resources"

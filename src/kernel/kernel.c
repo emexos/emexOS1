@@ -236,7 +236,6 @@ void _start(void)
         dualslotvalidating();
 
     }
-
     // initialize Limine modules
     limine_module_ss: limine_modules_init(); {
         initrd_load();

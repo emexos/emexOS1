@@ -44,7 +44,7 @@ int initrd_load(void)
 
 
 
-    {
+    search_initrd: {
         char buf[48];
         str_copy(buf, "found at 0x");
         str_from_hex(buf + str_len(buf), (u64)initrd_file->address);
@@ -52,7 +52,7 @@ int initrd_load(void)
         str_append_uint(buf, (u32)initrd_file->size);
         str_append(buf, " bytes)\n");
         log("[INITRD]", buf, d);
-    }
+    };
 
 
     // CPIO newc magic

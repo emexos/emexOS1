@@ -41,28 +41,7 @@ on real hardware make sure your device does not have any existing data on the di
 ## Console
 After the bootup emexOS will ask you about a password to login. the password is "emex", but you can change that in shared/config/user.h
 
-## Commands
-
-### Common
-
-| command         | example         | output                       |
-|-----------------|-----------------|------------------------------|
-| echo            | echo text       | text                         |
-| clear           | clear           | [clears screen]              |
-| help <command>  | help echo       | [help menu/specific command] |
-| scale           | scale 3         | [font size from 1 to 4]      |
-| date            | date            | [shows current date]         |
-| calendar        | calendar        | [shows current date & time]  |
-| time            | time            | [shows current time]         |
-| uptime          | uptime          | [shows current uptime]       |
-
-### System
-
-| command         | example         | output                       |
-|-----------------|-----------------|------------------------------|
-| meminfo         | meminfo         | free memory: ...             |
-| dofetch         | dofetch         | [emexOS logo, user, ...]     |
-| date            | date            | [shows current date]         |
+currently there is no smp support btw so if you run emexOS just use one core
 
 ---
 

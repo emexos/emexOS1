@@ -1,6 +1,7 @@
 #include "gen.h"
 
 void genprocs(void) {
-    kproc();
+    //kproc();
+    init_kernelprocesses2();
     uproc();
 }

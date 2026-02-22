@@ -11,8 +11,8 @@ void JumpToUserspace(ulime_proc_t *proc) {
         return;
     }
 
-    u64 kernel_stack = proc->stack_base + 0x1000;
-    gdt_set_kernel_stack(kernel_stack);
+    //u64 kernel_stack = proc->stack_base + 0x1000;
+    //gdt_set_kernel_stack(kernel_stack);
 
     u64 user_rip = proc->entry_point;
     u64 user_rsp = (proc->stack_base + proc->stack_size - 16) & ~0xFULL;  // 16-byte aligned

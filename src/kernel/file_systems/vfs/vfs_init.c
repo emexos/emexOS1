@@ -1,6 +1,6 @@
 #include "init.h"
 int init_boot_log = -1;
-char *logpath = "/emr/logs/log1.txt";
+char *logpath = "/emr/system/logs/log1.txt";
 #include "vfs.h"
 #include <kernel/mem/klime/klime.h>
 #include <kernel/include/reqs.h>
@@ -144,6 +144,7 @@ void fs_system_init(void *klime)
     fs_mkdir(BOOT_DIRECTORY);
     //emx system requirement paths
     fs_mkdir(EMX_DIRECTORY); // /emr
+    fs_mkdir(EMSYS_DIRECTORY);
     fs_mkdir(EMLOG_DIRECTORY);
     //fs_mkdir(EMAST_DIRECTORY);
     //fs_mkdir(EMCFG_DIRECTORY);
