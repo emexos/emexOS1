@@ -2,7 +2,7 @@
 
 #include <kernel/file_systems/vfs/vfs.h>
 
-void initrfs(void){
+void initvfs(void){
     // only necessary dirs the rest comes from initrd.cpio
     // create standard dirs
     fs_mkdir(DEV_DIRECTORY);
