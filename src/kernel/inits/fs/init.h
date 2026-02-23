@@ -2,7 +2,7 @@
 extern char *logpath;
 extern int init_boot_log;
 
-void initrfs(void);
+void initvfs(void);
 
 #define DISK_NAME "hdd0"
 

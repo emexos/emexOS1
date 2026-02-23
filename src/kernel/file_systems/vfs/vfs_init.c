@@ -137,7 +137,7 @@ void fs_system_init(void *klime)
     fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS); // in future its just root so for (fat32,ext2,...)
     //fs_mount(NULL, "/", "/"); // or root
 
-    initrfs();
+    initvfs();
 
     init_boot_log = fs_open(logpath, O_CREAT | O_WRONLY);
     log("[FS]", "[FS] wrote", d);
