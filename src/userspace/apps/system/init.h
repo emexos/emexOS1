@@ -1,5 +1,9 @@
 #pragma once
 
+// esh will automatically load the shell after everything is finished
+#define EMX_SHELL "/user/bin/shell.emx"
+
+
 #define SEPERATOR "$SEPERATOR$"
 
 #define EMRHANDLERS { \

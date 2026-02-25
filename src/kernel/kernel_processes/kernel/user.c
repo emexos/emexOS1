@@ -27,6 +27,9 @@ void uproc(void) {
 
         log("[INIT]", "jumping to userspace\n", success);
 
+        //first clear screen
+        clear(0xff000000);
+
         dump_kprocesses();
         ulime->ptr_proc_curr = init_proc;
         JumpToUserspace(init_proc);
