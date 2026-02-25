@@ -1,0 +1,10 @@
+<html>
+  <head>
+    <title>shell</title>
+  </head>
+  <body>
+    <author>emex</author>
+    <version>v0.0.1a</version>
+    <description>esh userspace shell</description>
+  </body>
+</html>

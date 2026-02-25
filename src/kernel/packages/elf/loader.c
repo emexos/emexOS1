@@ -5,6 +5,7 @@
 #include <string/string.h>
 #include <memory/main.h>
 #include <kernel/communication/serial.h>
+#include <kernel/mem/paging/paging.h>
 
 int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     if (!proc || !elf_data || size < sizeof(elf_header_t)) {
@@ -30,7 +31,7 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
         return -1;
     }
 
-    if (ehdr->ident.endian != 1) { // 1 = little-endian
+    if (ehdr->ident.endian != 1) { // 1 == little-endian
         printf("[ELF] unsupported endianness\n");
         return -1;
     }
@@ -48,9 +49,12 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     elf_program_header_t *phdr = (elf_program_header_t*)(elf_data + ehdr->phoff);
 
     u64 min_vaddr = (u64)-1;
+    u64 max_vaddr = 0;
     for (u16 i = 0; i < ehdr->phnum; i++) {
-        if (phdr[i].type == PT_LOAD && phdr[i].vaddr < min_vaddr) {
-            min_vaddr = phdr[i].vaddr;
+        if (phdr[i].type == PT_LOAD) {
+            if (phdr[i].vaddr < min_vaddr) min_vaddr = phdr[i].vaddr;
+            u64 end = phdr[i].vaddr + phdr[i].memsz;
+            if (end > max_vaddr) max_vaddr = end;
         }
     }
     if (min_vaddr == (u64)-1) {
@@ -73,7 +77,7 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
         u64 vaddr = phdr[i].vaddr + load_offset;  // apply relocation
         u64 offset = phdr[i].offset;
         u64 filesz = phdr[i].filesz;
-        u64 memsz = phdr[i].memsz;
+        u64 memsz  = phdr[i].memsz;
 
         printf("  Segment %d:\n", i);
         printf("    Original vaddr: 0x%lX\n", phdr[i].vaddr);
@@ -114,6 +118,27 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     // relocate entry point
     proc->entry_point = ehdr->entry + load_offset;
     proc->state = PROC_READY;
+
+    // if the ELF was relocated (not loaded at its original VMA)
+    // map the original VMA to the SAME physical pages so that addresses in
+    // compiled code are avild
+    if (load_offset != 0) {
+        u64 total_size = (max_vaddr - min_vaddr + 0xFFF) & ~0xFFFULL;
+        u64 pages = total_size / 0x1000;
+        u64 heap_flags = PTE_PRESENT | PTE_WRITABLE | PTE_USER;
+
+        printf("[ELF] remapping original VMA 0x%lX (%lu pages) to same phys\n",
+               min_vaddr, pages);
+
+        for (u64 p = 0; p < pages; p++) {
+            // physical address of this page (from the process's allocated phys_heap)
+            u64 phys = proc->phys_heap + (p * 0x1000);
+            u64 orig_virt = min_vaddr + (p * 0x1000);
+            paging_map_page(proc->ulime->hpr, orig_virt, phys, heap_flags);
+        }
+
+        printf("[ELF] original VMA alias mapped\n");
+    }
 
     printf("[ELF] Relocated entry point: 0x%lX\n", proc->entry_point);
     printf("[ELF] Load successful\n");

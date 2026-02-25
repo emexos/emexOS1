@@ -11,6 +11,9 @@
 #include <kernel/packages/emex/emex.h>
 #include <theme/doccr.h>
 
+// read syscall
+#include <drivers/ps2/keyboard/keyboard.h>
+
 static ulime_t *g_ulime = NULL;
 
 // syscall handlers
@@ -56,11 +59,60 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3) {
 
 u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
     (void)proc;
-    (void)fd;
-    (void)buf;
-    (void)count;
+    //(void)fd;
+    //(void)buf;
+    //(void)count;
 
-    return 0;
+    // only stdin supported
+    if (fd != 0) return (u64)-1;
+    if (buf == 0 || count == 0) return 0;
+
+    char *out = (char *)buf;
+    u64 i = 0;
+
+    // reenable interrupts
+    __asm__ volatile("sti");
+
+    while (i < count - 1) {
+        // TODO:
+        // use semaphores or spinlocks NOT busywaits
+        while (!keyboard_has_key()) {
+            __asm__ volatile("hlt");
+        }
+
+        key_event_t event;
+        if (!keyboard_get_event(&event)) continue;
+        if (!event.pressed) continue;
+
+        char c = (char)(event.keycode & 0xFF);
+
+        if (c == '\n' || c == '\r') {
+            char nl[2] = {'\n', '\0'};
+            cprintf(nl, 0xFFFFFFFF);
+            out[i++] = '\n';
+            break;
+        }
+
+        if (c == '\b') {
+            if (i > 0) {
+                i--;
+                cprintf("\b", 0xFFFFFFFF);
+            }
+            continue;
+        }
+
+        if (c < 0x20 || c > 0x7E) continue;
+
+        char echo[2] = {c, '\0'};
+        cprintf(echo, 0xFFFFFFFF);
+        out[i++] = c;
+    }
+
+    // i think this is slow........ this read syscall :(
+    __asm__ volatile("cli");
+
+    out[i] = '\0';
+    return i;
 }
 
 u64 scall_getpid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3) {
@@ -88,7 +140,7 @@ u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3) {
 }
 
 u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
-    (void)proc;
+    //(void)proc;
     (void)arg2;
     (void)arg3;
 
@@ -99,7 +151,7 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
 
     printf("[SYSCALL] execve: '%s'\n", path);
 
-    // emex_launch_app creates the process as PROC_READY.
+    // emex_launch_app creates the process
     // the scheduler will switch to it on the next quantum.
     ulime_proc_t *new_proc = NULL;
     int result = emex_launch_app(path, &new_proc);
@@ -108,8 +160,14 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
         return (u64)-1;
     }
 
-    // return the new pid to the caller
-    return new_proc->pid;
+    // replace current process, mark it as zombie
+    proc->state = PROC_ZOMBIE;
+    g_ulime->ptr_proc_curr = new_proc;
+
+    // jump directly to the new process — never returns (iretq)
+    JumpToUserspace(new_proc);
+
+    __builtin_unreachable();
 }
 
 void _init_syscalls_table(ulime_t *ulime) {
