@@ -13,17 +13,25 @@ int main(void)
     printf("[ESH] launching programms:\n");
 
     // other initializations...
+    rc: {};
 
+
+    login: {
+        printf("     launching: %s\n", LOGINLOCATE);
+        //char *const argv[] = { (char *)LOGINLOCATE, (char *)0 };
+        //char *const envp[] = { (char *)0 };
+        //execve( LOGINLOCATE, argv, envp);
+    }
 
     emx_shell: {
-        printf("    - launching shell: %s\n", EMX_SHELL);
+        printf("     launching: %s\n", EMX_SHELL);
         // launch the shell as a new process via execve
         char *const argv[] = { (char *)EMX_SHELL, (char *)0 };
         char *const envp[] = { (char *)0 };
         execve(EMX_SHELL, argv, envp);
         goto error;
-    }
-
+    };
+    goto error;
 error:
     printf("[ESH] ERROR: failed to launch %s\n", EMX_SHELL);
     for (;;) __asm__ volatile("pause");

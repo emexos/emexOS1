@@ -39,4 +39,8 @@ int verify_page_permissions(limine_hhdm_response_t *hpr, u64 virtual_addr, const
 void* phys_to_virt(limine_hhdm_response_t *hpr, u64 phys_addr);
 u64 virt_to_phys(limine_hhdm_response_t *hpr, void* virt_addr);
 
+// perprocess page table support
+u64  paging_create_proc_pml4 (limine_hhdm_response_t *hpr);
+void paging_map_page_proc (limine_hhdm_response_t *hpr, u64 pml4_phys, u64 virtual_addr, u64 physical_addr, u64 flags);
+
 #endif

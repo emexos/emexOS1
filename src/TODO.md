@@ -7,7 +7,11 @@
 [ ] implement png
 [ ] implement mp4
 [ ] implement ahci
-[ ] implement a libc
+[x] implement a libc
+[ ] implement a stub system like vmlinux(virtual memory linux zipped), call it emez (emex's zipped kernel)
 [ ] upgrade theme manager
 [ ] upgrade font manager
 [ ] upgrade bootscreen manager
+
+
+⁠

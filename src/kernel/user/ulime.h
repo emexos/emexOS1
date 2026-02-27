@@ -19,6 +19,7 @@ typedef struct ulime_proc {
     u64 priority;
     u64 state;
     u64 *ptr_pagetable;
+    u64 pml4_phys;    // physical address of this process's PML4 (loaded into CR3)
     u64 entry_point;
     u64 heap_base;
     u64 heap_size;

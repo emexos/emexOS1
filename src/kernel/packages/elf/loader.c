@@ -63,6 +63,7 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     }
 
     u64 load_offset = proc->heap_base - min_vaddr;
+    u64 hhdm_offset = proc->ulime->hpr->offset;
 
     printf("[ELF] Loading '%s'\n", proc->name);
     printf("  ELF base addr: 0x%lX\n", min_vaddr);
@@ -70,11 +71,12 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     printf("  Load offset:   0x%lX\n", load_offset);
     printf("  Original entry: 0x%lX\n", ehdr->entry);
 
-    // load PT_LOAD segments with relocation
+    // load PT_LOAD segments
+    // writes via HHDM so kernel CR3 doesnt matter
     for (u16 i = 0; i < ehdr->phnum; i++) {
         if (phdr[i].type != PT_LOAD) continue;
 
-        u64 vaddr = phdr[i].vaddr + load_offset;  // apply relocation
+        u64 vaddr = phdr[i].vaddr + load_offset;  // relocated virtual address
         u64 offset = phdr[i].offset;
         u64 filesz = phdr[i].filesz;
         u64 memsz  = phdr[i].memsz;
@@ -85,7 +87,7 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
         printf("    File size:      %lu bytes\n", filesz);
         printf("    Mem size:       %lu bytes\n", memsz);
 
-        // check bounds
+        // bounds check against heap
         if (vaddr < proc->heap_base || vaddr + memsz > proc->heap_base + proc->heap_size) {
             printf("[ELF] ERROR: Segment outside heap bounds\n");
             printf("    Segment range: 0x%lX - 0x%lX\n", vaddr, vaddr + memsz);
@@ -97,17 +99,22 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
             printf("[ELF] Segment exceeds ELF size\n");
             return -1;
         }
+
+        // convert virtual address to kernel-accessible HHDM address
+        u64 phys_dest  = proc->phys_heap + (vaddr - proc->heap_base);
+        void *hhdm_dest = (void *)(phys_dest + hhdm_offset);
+
         if (filesz > 0) {
-            memcpy((void*)vaddr, elf_data + offset, filesz);
+            memcpy(hhdm_dest, elf_data + offset, filesz);
             printf("    Copied %lu bytes\n", filesz);
         }
         if (memsz > filesz) {
-            memset((void*)(vaddr + filesz), 0, memsz - filesz);
+            memset((u8 *)hhdm_dest + filesz, 0, memsz - filesz);
             printf("    Zeroed %lu bytes\n", memsz - filesz);
         }
 
-        // last verification
-        u8 *code = (u8*)vaddr;
+        // print first bytes for debug (read via HHDM too)
+        u8 *code = (u8 *)hhdm_dest;
         printf("    First bytes: ");
         for (int j = 0; j < 16 && j < (int)filesz; j++) {
             printf("%02X ", code[j]);
@@ -119,9 +126,8 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     proc->entry_point = ehdr->entry + load_offset;
     proc->state = PROC_READY;
 
-    // if the ELF was relocated (not loaded at its original VMA)
-    // map the original VMA to the SAME physical pages so that addresses in
-    // compiled code are avild
+    // if the ELF was relocated it also maps the original VMA into the process PML4
+    // so that absolute addresses baked into the binary still work at runtime
     if (load_offset != 0) {
         u64 total_size = (max_vaddr - min_vaddr + 0xFFF) & ~0xFFFULL;
         u64 pages = total_size / 0x1000;
@@ -131,10 +137,11 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
                min_vaddr, pages);
 
         for (u64 p = 0; p < pages; p++) {
-            // physical address of this page (from the process's allocated phys_heap)
-            u64 phys = proc->phys_heap + (p * 0x1000);
+            u64 phys      = proc->phys_heap + (p * 0x1000);
             u64 orig_virt = min_vaddr + (p * 0x1000);
-            paging_map_page(proc->ulime->hpr, orig_virt, phys, heap_flags);
+            // maps into the processes own PML4 NOT the global kernel one
+            paging_map_page_proc(proc->ulime->hpr, proc->pml4_phys,
+                                 orig_virt, phys, heap_flags);
         }
 
         printf("[ELF] original VMA alias mapped\n");

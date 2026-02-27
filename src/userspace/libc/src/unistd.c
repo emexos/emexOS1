@@ -37,6 +37,10 @@ int mkdir(const char *path) {
     return (int)_sc1(_SCAL_MKDIR, (long)path);
 }
 
+int unlink(const char *path) {
+    return (int)_sc1(_SCAL_UNLINK, (long)path);
+}
+
 char *getcwd(char *buf, size_t size) {
     long r = _sc2(_SCAL_GETCWD, (long)buf, (long)size);
     return (r > 0) ? buf : NULL;

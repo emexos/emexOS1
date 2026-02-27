@@ -12,6 +12,8 @@
 #define KERNELSPACE 0x40000000
 #define KERNELPRIORITY 255
 
+#define JUMPTOUSER 1
+
 #define USE_HCF 1
 #define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
 

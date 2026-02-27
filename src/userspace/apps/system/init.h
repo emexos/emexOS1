@@ -1,7 +1,8 @@
 #pragma once
 
 // esh will automatically load the shell after everything is finished
-#define EMX_SHELL "/user/bin/shell.emx"
+#define EMX_SHELL "/user/apps/shell.emx"
+#define LOGINLOCATE "/emr/system/login.emx"//user/apps/login.emx"
 
 
 #define SEPERATOR "$SEPERATOR$"
