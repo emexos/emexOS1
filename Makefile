@@ -58,13 +58,15 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
 
-	@echo "[MOD] creating executables..."
+	@echo "[MOD] creating & copying executables..."
 	@mkdir -p $(DISK_DIR)/rd/user/apps
 	@mkdir -p $(DISK_DIR)/rd/user/bin
+	@mkdir -p $(DISK_DIR)/rd/bin
 	@mkdir -p $(DISK_DIR)/rd/emr/system
-	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/bin/
-	@cp src/userspace/apps/hello/hello.elf $(ISODIR)/boot/hello.elf
+	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/apps/
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system
+	@cp src/userspace/bin/echo/echo.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/hello/hello.elf $(DISK_DIR)/rd/bin/
 
 	@echo "[MOD] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh

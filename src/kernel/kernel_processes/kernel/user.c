@@ -4,7 +4,7 @@
 // path to the init app in the VFS (loaded from initrd.cpio)
 #define SYSTEMLOCATE "/emr/system/system.emx"
 //mod
-#define LOGINLOCATE "/emr/bin/login.elf"
+//#define LOGINLOCATE "/emr/bin/login.elf"
 
 void uproc(void) {
     #if ENABLE_ULIME
@@ -32,7 +32,9 @@ void uproc(void) {
 
         dump_kprocesses();
         ulime->ptr_proc_curr = init_proc;
-        JumpToUserspace(init_proc);
+        #if JUMPTOUSER == 1
+            JumpToUserspace(init_proc);
+        #endif
 
 
         __builtin_unreachable();

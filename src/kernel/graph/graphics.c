@@ -61,7 +61,7 @@ void scroll_up(u32 lines)
     u32 pixels_to_scroll = lines;
     u32 pitch_dwords = fb_pitch / 4;
     u32 bytes_per_row = fb_width * sizeof(u32);
-    u32 bg_color = bg();
+    u32 bg_color = black();
 
     // move framebuffer content up
     for (u32 y = pixels_to_scroll; y < fb_height; y++) {

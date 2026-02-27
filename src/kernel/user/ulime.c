@@ -131,34 +131,35 @@ int ulime_proc_mmap(ulime_t *ulime, ulime_proc_t *proc) {
     printf("  Heap phys:  0x%llx (%llu pages)\n",
            (unsigned long long)phys_heap, (unsigned long long)heap_pages);
 
-    // stack pages: Non-Execute enabled  (security)
+    u64 pml4_phys = paging_create_proc_pml4(ulime->hpr);
+    proc->pml4_phys = pml4_phys;
+    printf("  PML4 phys:  0x%llx\n", (unsigned long long)pml4_phys);
+
     u64 stack_flags = PTE_PRESENT | PTE_WRITABLE | PTE_USER | PTE_NO_EXEC;
+    u64 heap_flags  = PTE_PRESENT | PTE_WRITABLE | PTE_USER;
 
-    // heap/code pages: Executable  (no NX bit)
-    u64 heap_flags = PTE_PRESENT | PTE_WRITABLE | PTE_USER;
-
-    // map heap (executable for code)
+    // map heap/code into the process's own PML4
     for (u64 i = 0; i < heap_pages; i++) {
         u64 virt = proc->heap_base + (i * PAGE_SIZE);
         u64 phys = phys_heap + (i * PAGE_SIZE);
-        paging_map_page(ulime->hpr, virt, phys, heap_flags);
+        paging_map_page_proc(ulime->hpr, pml4_phys, virt, phys, heap_flags);
     }
 
-    // map stack (with NX)
+    // map stack into the processes own PML4
     for (u64 i = 0; i < stack_pages; i++) {
         u64 virt = proc->stack_base + (i * PAGE_SIZE);
         u64 phys = phys_stack + (i * PAGE_SIZE);
-        paging_map_page(ulime->hpr, virt, phys, stack_flags);
+        paging_map_page_proc(ulime->hpr, pml4_phys, virt, phys, stack_flags);
     }
 
-    // clear memory via HHDM (physical + offset)
-    void *heap_clear = (void*)(phys_heap + ulime->hpr->offset);
-    void *stack_clear = (void*)(phys_stack + ulime->hpr->offset);
-    memset(heap_clear, 0, proc->heap_size);
+    // clear memory via HHDM
+    void *heap_clear  = (void *)(phys_heap  + ulime->hpr->offset);
+    void *stack_clear = (void *)(phys_stack + ulime->hpr->offset);
+    memset(heap_clear,  0, proc->heap_size);
     memset(stack_clear, 0, proc->stack_size);
 
     proc->phys_stack = phys_stack;
-    proc->phys_heap = phys_heap;
+    proc->phys_heap  = phys_heap;
     proc->state = PROC_READY;
 
     printf("[ULIME] memory mapped successfully\n");

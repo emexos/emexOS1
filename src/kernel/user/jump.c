@@ -26,56 +26,12 @@ void JumpToUserspace(ulime_proc_t *proc) {
     printf("[ULIME] Jumping to %s at RIP=0x%lX RSP=0x%lX\n",
            proc->name, user_rip, user_rsp);
 
-    if (user_rip < proc->heap_base || user_rip >= proc->heap_base + proc->heap_size) {
-        printf("[ULIME] ERROR: RIP 0x%lX outside process heap!\n", user_rip);
-        return;
-    }
-    if (user_rsp < proc->stack_base || user_rsp >= proc->stack_base + proc->stack_size) {
-        printf("[ULIME] ERROR: RSP 0x%lX outside process stack!\n", user_rsp);
-        return;
-    }
-
-    printf("[ULIME] Values: SS=0x%X CS=0x%X RFLAGS=0x%lX\n",
-           user_ss, user_cs, user_rflags);
-
-    printf("[ULIME] iretq frame will be:\n");
-    printf("  [RIP] = 0x%016lX\n", user_rip);
-    printf("  [CS]  = 0x%016lX\n", (u64)user_cs);
-    printf("  [RFLAGS] = 0x%016lX\n", user_rflags);
-    printf("  [RSP] = 0x%016lX\n", user_rsp);
-    printf("  [SS]  = 0x%016lX\n", (u64)user_ss);
-
-    u64 *test_rip = (u64*)user_rip;
-    u64 *test_rsp = (u64*)user_rsp;
-
-    printf("[ULIME] Testing memory access:\n");
-    printf("  Code at RIP: 0x%016lX\n", *test_rip);
-
-    // try writing to stack
-    *test_rsp = 0xDEADBEEF;
-    if (*test_rsp != 0xDEADBEEF) {
-        printf("[ULIME] ERROR: Stack not writable!\n");
-        return;
-    }
-    printf("  Stack test: PASS\n");
-
-    // page table permissions
-    printf("\n");
-    if (!verify_page_permissions(proc->ulime->hpr, user_rip, "Code page")) {
-        printf("[ULIME] ERROR: code page not properly mapped!\n");
-        return;
-    }
-    printf("\n");
-    if (!verify_page_permissions(proc->ulime->hpr, user_rsp, "Stack page")) {
-        printf("[ULIME] ERROR: stack page not properly mapped!\n");
-        return;
-    }
-    printf("\n");
-
+    // switch to the processes own PML4 BEFORE touching any userspace addresses
+    __asm__ volatile( "mov %0, %%cr3" : : "r"(proc->pml4_phys) : "memory");
     __asm__ volatile(
         "cli\n"
 
-        "subq $40, %%rsp\n"//$40 == (allocate) 40 bytes
+        "subq $40, %%rsp\n"//allocate 40 bytes
 
         "movq %0, 32(%%rsp)\n" // SS
         "movq %1, 24(%%rsp)\n" // user RSP
@@ -84,9 +40,9 @@ void JumpToUserspace(ulime_proc_t *proc) {
         "movq %4, 0(%%rsp)\n" // RIP
 
         // verifys what debug wrote (halt if after jump back doesnt got verified)
-        "movq 0(%%rsp), %%rax\n"
-        "cmp %4, %%rax\n"
-        "jne 1f\n"
+        //"movq 0(%%rsp), %%rax\n"
+        //"cmp %4, %%rax\n"
+        //"jne 1f\n"
 
         //"cli\n"
         // clears General Purpose Registers
@@ -109,8 +65,8 @@ void JumpToUserspace(ulime_proc_t *proc) {
         // even sysretq doesnt work
         "iretq\n"
 
-        "1:\n"  // corruption
-        "hlt\n"
+        //"1:\n"  // corruption
+        //"hlt\n"
         :
         : "r"((u64)user_ss),
           "r"(user_rsp),
