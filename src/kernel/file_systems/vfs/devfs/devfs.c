@@ -17,6 +17,8 @@ static int devfs_open(fs_node *node, fs_file *file) {
         if (!dev->handle) return -1;
     }
 
+	(void)file;
+
     return 0;
 }
 

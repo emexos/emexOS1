@@ -31,7 +31,7 @@ gsession_t *gsession_init(glime_t *glime, u8 *name, u64 width) {
 
 int gsession_attach(glime_t *glime, gsession_t *gsession, u8 *workspace_name) {
     if (!glime || !gsession || !workspace_name) return 1;
-    for (int i = 0; i < glime->workspaces_total; i++) {
+    for (u64 i = 0; i < glime->workspaces_total; i++) {
         gworkspace_t *ws = glime->workspaces[i];
         u8 *wsname = ws->name;
         int seek = 0;
@@ -64,7 +64,7 @@ int gsession_attach(glime_t *glime, gsession_t *gsession, u8 *workspace_name) {
 int gsession_detach(gworkspace_t *gworkspace, gsession_t *gsession) {
     if (!gworkspace || !gsession) return 1;
     u8 *ssname = gsession->name;
-    for (int i = 0; i < gworkspace->sessions_total; i++) {
+    for (u64 i = 0; i < gworkspace->sessions_total; i++) {
         gsession_t *session = gworkspace->sessions[i];
         u8 *ssname_loop = session->name;
         int seek = 0;

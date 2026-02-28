@@ -16,11 +16,14 @@ fetchDeps:
 	@echo "[DEPS] Fetching dependencies/libraries"
 	@mkdir -p $(INCLUDE_DIR)
 	#@mkdir -p $(BUILD_DIR)/src/kernel/console/functions
+
 	@echo "[DEPS] Fetching Limine"
-	@rm -rf $(INCLUDE_DIR)/limine
-	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
+	@rm -rf $(LIMINE_DIR)
+	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(LIMINE_DIR)
 	@echo "[DEPS] Building limine binary"
-	@$(MAKE) -C $(INCLUDE_DIR)/limine
+	@$(MAKE) -C $(LIMINE_DIR)
+	@echo "[DEPS] Fetching Limine protocol header file"
+	@wget https://codeberg.org/Limine/limine-protocol/raw/branch/trunk/include/limine.h -O $(LIMINE_DIR)/limine.h
 
 disk:
 	@mkdir -p $(DISK_DIR)

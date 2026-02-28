@@ -10,12 +10,6 @@ static void cpuid(u32 leaf, u32 *eax, u32 *ebx, u32 *ecx, u32 *edx) {
         : "a"(leaf), "c"(0));
 }
 
-static void cpuid_count(u32 leaf, u32 subleaf, u32 *eax, u32 *ebx, u32 *ecx, u32 *edx) {
-    __asm__ volatile("cpuid"
-        : "=a"(*eax), "=b"(*ebx), "=c"(*ecx), "=d"(*edx)
-        : "a"(leaf), "c"(subleaf));
-}
-
 void amd64_detect(amd64_info_t *info) {
     if (!info) return;
 

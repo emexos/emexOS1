@@ -12,7 +12,7 @@ int slot_write_limine_conf(char slot)
     if (slot != 'A' && slot != 'B') return -1;
 
     int target_entry = (slot == 'A') ? 0 : 1;
-
+	(void)target_entry;
 
     return 0;
 }
