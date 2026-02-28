@@ -12,23 +12,24 @@
     devShells = forEachSystem (system: {
       default = pkgs.${system}.mkShellNoCC {
         nativeBuildInputs = with pkgs.${system}; [
-					# Compiler and assembler
+          # Compiler and assembler
           pkgsCross.x86_64-embedded.stdenv.cc
-					gcc # Required only to build Limine
+          gcc # Required only to build Limine
           nasm
 
-					# Provides a lot of handy tools for C/C++ dev e.g. formatter (clang-format)
-					clang-tools
+          # Provides a lot of handy tools for C/C++ dev e.g. formatter (clang-format)
+          clang-tools
 
-					# For generating a `compile_commands.json` which can be used by clangd
-					# That file is used by the clangd lsp to figure out includes and all
-					compiledb
+          # For generating a `compile_commands.json` which can be used by clangd
+          # That file is used by the clangd lsp to figure out includes and all
+          compiledb
 
-					# Provides `xorriso` for creating the emexOS ISO
+          # Provides `xorriso` for creating the emexOS ISO
           libisoburn
 
-					# Git is required to fetch some dependencies
+          # Git and wget are required to fetch some dependencies
           git
+          wget
         ];
       };
     });
