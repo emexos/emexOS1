@@ -1,0 +1,8 @@
+//%random
+
+// let my code editor know which langs to use syntax
+(
+    %import gen.html::5;
+    %import gen.css::3;
+    %import gen.js::ES2024;
+)
