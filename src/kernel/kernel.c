@@ -156,7 +156,6 @@ void _start(void)
         paging_init(hhdm_request.response);
 
         // kernel lifetime
-        u64 phys_klime = map_region_alloc(hhdm_request.response, HEAP_START, HEAP_SIZE);
         klime_t *klime = klime_init((u64 *)HEAP_START, HEAP_SIZE);
 
         if (!framebuffer_request.response) {
@@ -168,8 +167,6 @@ void _start(void)
         }
 
         #if ENABLE_GLIME
-            u64 phys_glime = map_region_alloc(hhdm_request.response, GRAPHICS_START, GRAPHICS_SIZE);
-
             limine_framebuffer_t *fb = framebuffer_request.response->framebuffers[0];
 
             glime_response_t glres;
@@ -356,4 +353,4 @@ void _start(void)
         panic("USE_HCF; FAILED --> USING PANIC");
     #endif
 
-};
+}

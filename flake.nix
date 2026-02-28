@@ -14,6 +14,7 @@
         nativeBuildInputs = with pkgs.${system}; [
 					# Compiler and assembler
           pkgsCross.x86_64-embedded.stdenv.cc
+					gcc # Required only to build Limine
           nasm
 
 					# Provides a lot of handy tools for C/C++ dev e.g. formatter (clang-format)

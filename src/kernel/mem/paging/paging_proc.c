@@ -80,5 +80,5 @@ void paging_map_page_proc(
 
     pt->entries[pt_index] = (physical_addr & 0x000FFFFFFFFFF000) | flags;
 
-    asm volatile("invlpg (%0)" : : "r"(virtual_addr) : "memory");
+	__asm__ volatile("invlpg (%0)" : : "r"(virtual_addr) : "memory");
 }

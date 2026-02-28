@@ -1,7 +1,6 @@
 #ifndef CONSOLE_H
 #define CONSOLE_H
 
-
 #include "graph/uno.h"
 #include "graph/dos.h"
 #include "graph/print.h"
@@ -38,7 +37,7 @@ extern driver_module console_module;
 #define WRONG_COMMAND_CL GFX_RED
 
 // function header macro for command declarations it should be easier to port it to future syscalls
-#define FHDR(name) void name(const char* s)
+#define FHDR(name) void name()
 
 typedef struct {
     void (*func)(const char*);
