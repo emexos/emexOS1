@@ -1,18 +1,19 @@
 #pragma once
 
-#define _SCAL_READ    0
-#define _SCAL_WRITE   1
-#define _SCAL_OPEN    2
-#define _SCAL_CLOSE   3
-#define _SCAL_BRK     12
-#define _SCAL_GETPID  39
-#define _SCAL_FORK    57
-#define _SCAL_EXECVE  59
-#define _SCAL_EXIT    60
-#define _SCAL_GETCWD  79
-#define _SCAL_CHDIR   80
-#define _SCAL_MKDIR   83
-#define _SCAL_UNLINK  87  // (delete file)
+#define _SCAL_READ     0
+#define _SCAL_WRITE    1
+#define _SCAL_OPEN     2
+#define _SCAL_CLOSE    3
+#define _SCAL_BRK      12
+#define _SCAL_GETPID   39
+#define _SCAL_FORK     57
+#define _SCAL_EXECVE   59
+#define _SCAL_EXIT     60
+#define _SCAL_GETDENTS 78  // list directory entries (path, buf, max)
+#define _SCAL_GETCWD   79
+#define _SCAL_CHDIR    80
+#define _SCAL_MKDIR    83
+#define _SCAL_UNLINK   87  // (delete file)
 
 
 static inline long _sc1(long n, long a1) {

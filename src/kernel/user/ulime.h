@@ -29,6 +29,9 @@ typedef struct ulime_proc {
     u64 phys_heap;
     u64 phys_stack;
 
+    u64 brk;
+    u64 entry_rsp;
+
     struct ulime *ulime;
     struct ulime_proc *next;
     struct ulime_proc *prev;

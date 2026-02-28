@@ -65,8 +65,11 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 	@mkdir -p $(DISK_DIR)/rd/emr/system
 	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/apps/
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system
+	@cp src/userspace/apps/login/login.elf $(DISK_DIR)/rd/emr/system
 	@cp src/userspace/bin/echo/echo.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/hello/hello.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/ls/ls.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/tree/tree.elf $(DISK_DIR)/rd/bin/
 
 	@echo "[MOD] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh

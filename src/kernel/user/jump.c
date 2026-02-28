@@ -15,7 +15,15 @@ void JumpToUserspace(ulime_proc_t *proc) {
     //gdt_set_kernel_stack(kernel_stack);
 
     u64 user_rip = proc->entry_point;
-    u64 user_rsp = (proc->stack_base + proc->stack_size - 16) & ~0xFULL;  // 16-byte aligned
+
+    // use entry_rsp if it was set by execve argv
+    u64 user_rsp;
+    if (proc->entry_rsp != 0) {
+        user_rsp = proc->entry_rsp;
+    } else {
+        user_rsp = (proc->stack_base + proc->stack_size - 16) & ~0xFULL;  // 16-byte aligned
+    }
+
     u64 user_rflags = 0x202;  // IF=1 , reserved bit 1 set
 
     u16 user_cs = USER_CODE_SELECTOR | 3; // RPL=3

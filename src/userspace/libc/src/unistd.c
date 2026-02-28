@@ -25,8 +25,8 @@ void _exit(int status) {
 }
 
 int execve(const char *path, char *const argv[], char *const envp[]) {
-    (void)argv; (void)envp;
-    return (int)_sc1(_SCAL_EXECVE, (long)path);
+    (void)envp;
+    return (int)_sc2(_SCAL_EXECVE, (long)path, (long)argv);
 }
 
 int chdir(const char *path) {
