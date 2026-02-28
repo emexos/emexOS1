@@ -1,0 +1,54 @@
+name: Deploy website
+
+# Set permissions of the `GITHUB_TOKEN` to allow deployment to Github Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+# Workflow triggers
+on:
+  # Whenever any changes are made to `web/` from either a push or merging a pull request
+  push:
+    paths:
+      - "web/**"
+  pull_request:
+    paths:
+      - "web/**"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Workflow actions
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      # Clone repository
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Configure Github Pages
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      # Upload build - In this case it's just static files e.g. HTML and CSS
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload specific directory
+          path: './web'
+
+      # Deploy to Github Pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
