@@ -11,4 +11,4 @@ The easiest way to run emexOS is to run it in QEMU.
 - Choose either to enable storage or not to.
 - Keep the default options and select "finish".
 
-Learn how to install QEMU in [Arch](https://github.com/BloopBiMoz/emexOS1/blob/main/docs/QEMU_Arch.md) and [Debian](https://github.com/BloopBiMoz/emexOS1/blob/main/docs/QEMU_Debian.md) based distributions.
+Learn how to install QEMU in [Arch](./QEMU_Arch.md) and [Debian](./QEMU_Debian.md) based distributions.
