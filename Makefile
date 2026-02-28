@@ -15,11 +15,11 @@ all: $(ISO)
 fetchDeps:
 	@echo "[DEPS] Fetching dependencies/libraries"
 	@mkdir -p $(INCLUDE_DIR)
-	#@mkdir -p $(BUILD_DIR)/src/kernel/console/functions
 
 	@echo "[DEPS] Fetching Limine"
 	@rm -rf $(LIMINE_DIR)
 	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(LIMINE_DIR)
+	@rm -rf $(LIMINE_DIR)/.git
 	@echo "[DEPS] Building limine binary"
 	@$(MAKE) -C $(LIMINE_DIR)
 	@echo "[DEPS] Fetching Limine protocol header file"
