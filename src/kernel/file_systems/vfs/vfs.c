@@ -196,6 +196,33 @@ int fs_addchild(fs_node *parent, fs_node *child) {
     return 0;
 }
 
+int fs_listdir(const char *path, _emx_kdirent_t *buf, int max_entries) {
+    fs_node *node = fs_resolve(path);
+    if (!node || node->type != FS_DIR) return -1;
+
+    int count = 0;
+    fs_node *child = node->children;
+
+    while (child && count < max_entries) {
+        buf[count].type = child->type;
+        // FS_FILE=0x01
+        // FS_DIR=0x02
+        // FS_DEV=0x04
+
+        // copy name safely
+        int i = 0;
+        while (i < 63 && child->name[i]) {
+            buf[count].name[i] = child->name[i];
+            i++;
+        }
+        buf[count].name[i] = '\0';
+
+        count++;
+        child = child->next;
+    }
+
+    return count;
+}
 
 //
 // main init

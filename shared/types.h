@@ -1,6 +1,11 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+/*
+ * THIS IS ONLY THE KLIBC TYPES.H NOT FOR USERSPACE
+ *
+*/
+
 typedef unsigned char u8;
 typedef unsigned short u16, USHORT;
 typedef unsigned int u32;

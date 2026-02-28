@@ -58,6 +58,10 @@ struct fs_file {
     u64 pos;
     u32 flags;
 };
+typedef struct {
+    u8 type;
+    char name[64];
+} _emx_kdirent_t;
 
 // operations
 struct fs_ops {
@@ -116,6 +120,7 @@ int fs_close(int fd);
 ssize_t fs_read(int fd, void *buf, size_t cnt);
 ssize_t fs_write(int fd, const void *buf, size_t cnt);
 int fs_mkdir(const char *path);
+int fs_listdir(const char *path, _emx_kdirent_t *buf, int max_entries);
 
 // global klime pointer (shared by all fs types)
 extern void *fs_klime;

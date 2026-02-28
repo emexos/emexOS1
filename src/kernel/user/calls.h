@@ -36,9 +36,12 @@
     #define VFORK       58
     #define EXECVE      59
 
+    #define GETDENTS    78  // list directory entries (path, buf, max)
     #define CHDIR       80
     #define MKDIR       83
     #define FCHDIR     133
+
+    #define UNLINK      87  // delete file
 
 #elif ARM64 == 1
     #define EXIT       93
@@ -67,9 +70,12 @@
     #define VFORK     221
     #define EXECVE    221
 
+    #define GETDENTS   78  // list directory
     #define CHDIR      49
     #define MKDIR      80
     #define FCHDIR     50
+
+    #define UNLINK     87  // delete file
 
 #endif
 

@@ -17,6 +17,7 @@ tools/png
 tools/bmp
 tools/lg.py
 
+logo.txt
 
 src/kernel/console/functions/edit.c
 

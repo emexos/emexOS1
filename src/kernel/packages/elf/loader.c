@@ -126,6 +126,11 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     proc->entry_point = ehdr->entry + load_offset;
     proc->state = PROC_READY;
 
+    u64 code_end = proc->heap_base + (max_vaddr - min_vaddr);
+    proc->brk    = (code_end + 0xFFFULL) & ~0xFFFULL;  // round up to next page
+    printf("[ELF] Program break set to 0x%lX (code ends at 0x%lX)\n",
+           proc->brk, code_end);
+
     // if the ELF was relocated it also maps the original VMA into the process PML4
     // so that absolute addresses baked into the binary still work at runtime
     if (load_offset != 0) {

@@ -8,7 +8,7 @@ CFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-stack-protector \
           -mno-mmx -mno-red-zone -Wall -Wextra -std=gnu11             \
           -I$(INC) -Isrc
 
-SRCS := src/errno.c src/string.c src/stdlib.c src/unistd.c src/fcntl.c src/stdio.c
+SRCS := src/errno.c src/string.c src/stdlib.c src/unistd.c src/fcntl.c src/stdio.c src/dirent.c
 OBJS := $(patsubst src/%.c, $(BLD)/%.o, $(SRCS))
 
 all: $(BLD)/libc.a $(BLD)/crt0.o

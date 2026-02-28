@@ -80,14 +80,11 @@ ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point) {
     proc->state = PROC_CREATED;
     proc->entry_point = entry_point;
 
-    // align alocations
-    proc->heap_size = 64 * 1024;  // 64KB : CODE/DATA
-    proc->heap_base = (ulime->user_space_used + 0xFFF) & ~0xFFF;  // align to 4KB
+    proc->heap_size = 256 * 1024;
+    proc->heap_base = (ulime->user_space_used + 0xFFF) & ~0xFFF;
     ulime->user_space_used = proc->heap_base + proc->heap_size;
-
-    // stack separate from code / heap
-    proc->stack_size = 16 * 1024;  // 16KB
-    proc->stack_base = (ulime->user_space_used + 0xFFF) & ~0xFFF;  // align to 4KB
+    proc->stack_size = 64 * 1024;
+    proc->stack_base = (ulime->user_space_used + 0xFFF) & ~0xFFF;
     ulime->user_space_used = proc->stack_base + proc->stack_size;
 
     printf("[ULIME] Process '%s' created:\n", proc->name);
