@@ -1,0 +1,13 @@
+root = true
+
+[*]
+indent_style = tab
+trim_trailing_whitespaces = true
+insert_final_newline = false
+charset = utf-8
+
+[*.nix]
+indent_size = 2
+
+[*.{c,h,ld}]
+indent_size = 4
