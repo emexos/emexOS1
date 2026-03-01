@@ -19,4 +19,7 @@ void initvfs(void){
     //fs_mkdir(EMDRV_DIRECTORY);
 
     //fs_mkdir(CONF_DIRECTORY);
+    fs_mkdir(PROC_DIRECTORY);
+
+    //initrd.cpio....
 }

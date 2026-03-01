@@ -17,7 +17,7 @@
 #include <kernel/cpu/cpu.h>
 
 // read syscall
-#include <drivers/ps2/keyboard/keyboard.h>
+#include <drivers/drivers.h>
 
 
 static ulime_t *g_ulime = NULL;
@@ -27,6 +27,8 @@ extern ulime_t *ulime;
 #endif
 
 #define SCWRITE 0xFFFFFFFF
+#define KEYBOARD0 KBDPATH
+#define MOUSE0 MS0PATH
 
 extern char cwd[];
 
@@ -129,6 +131,9 @@ static void ansi_write_char(char c) {
 
 // syscall handlers
 u64 scall_write(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
+	//TODO:
+	// implement /dev/tty0 and the write commands just writes to it
+	// and the shell reads from /dev/tty0
     (void)proc;
     if (fd != 1 && fd != 2) return (u64)-1;
 
@@ -339,61 +344,70 @@ u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
     //(void)buf;
     //(void)count;
 
-    // only stdin supported
+    // only stdin (fd 0) supported
     if (fd != 0) return (u64)-1;
     if (buf == 0 || count == 0) return 0;
 
-    // file descriptor 0 = stdin tp keyboard input
-    if (fd == 0) {
-        char *out = (char *)buf;
-        u64 i = 0;
+    char *out = (char *)buf;
+    u64 i = 0;
 
-        // reenable interrupts
-        sti();
-
-        while (i < count - 1) {
-            // TODO:
-            // use semaphores or spinlocks NOT busywaits
-            while (!keyboard_has_key()) {
-            	halt();
-            }
-
-            key_event_t event;
-            if (!keyboard_get_event(&event)) continue;
-            if (!event.pressed) continue;
-
-            char c = (char)(event.keycode & 0xFF);
-
-            if (c == '\n' || c == '\r') {
-                char nl[2] = {'\n', '\0'};
-                cprintf(nl, SCWRITE);
-                out[i++] = '\n';
-                break;
-            }
-            if (c == '\b') {
-                if (i > 0) {
-                    i--;
-                    cprintf("\b", SCWRITE);
-                }
-                continue;
-            }
-
-            if (c < 0x20 || c > 0x7E) continue;
-
-            char echo[2] = {c, '\0'};
-            cprintf(echo, SCWRITE);
-            out[i++] = c;
+    // lazy-open KEYBOARD0 (/dev/input/keyboard0) once for the lifetime of the kernel
+    static int kbd_fd = -1;
+    if (kbd_fd < 0) {
+        kbd_fd = fs_open(KEYBOARD0, O_RDONLY);
+        if (kbd_fd < 0) {
+            printf("[SYSCALL] read: cannot open " KEYBOARD0 "\n");
+            return (u64)-1;
         }
-
-        // i think this is slow........ this read syscall :(
-        cli();
-
-        out[i] = '\0';
-        return i;
     }
 
-    ssize_t r = fs_read((int)fd, (void *)buf, (size_t)count);
-    return (r < 0) ? (u64)-1 : (u64)r;
+    // reenable interrupts
+    __asm__ volatile("sti");
+
+    while (i < count - 1) {
+        key_event_t event;
+        int got = 0;
+
+        while (!got) {
+            __asm__ volatile("hlt");
+            int n = fs_read(kbd_fd, &event, sizeof(key_event_t));
+            if (n == (int)sizeof(key_event_t)) {
+                got = 1;
+            }
+        }
+
+        // skip release events
+        if (!event.pressed) continue;
+
+        char c = (char)(event.keycode & 0xFF);
+
+        if (c == '\n' || c == '\r') {
+            char nl[2] = {'\n', '\0'};
+            cprintf(nl, SCWRITE);
+            out[i++] = '\n';
+            break;
+        }
+
+        if (c == '\b') {
+            if (i > 0) {
+                i--;
+                cprintf("\b", SCWRITE);
+            }
+            continue;
+        }
+
+        if (c < 0x20 || c > 0x7E) continue;
+
+        char echo[2] = {c, '\0'};
+        cprintf(echo, SCWRITE);
+        out[i++] = c;
+    }
+
+    // i think this is slow........ this read syscall :(
+    __asm__ volatile("cli");
+
+    out[i] = '\0';
+    return i;
 }
 
 u64 scall_getpid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3) {

@@ -147,4 +147,6 @@ typedef struct {
 void devfs_register(void);
 int devfs_register_device(driver_module *mod);
 
+void procfs_register(void);
+
 #endif

@@ -30,6 +30,14 @@
     #include <kernel/arch/arm64/syscalls/syscall_init.h>
 #endif
 
+//Devices
+#include <kernel/devices/null/null.h>
+#include <kernel/devices/zero/zero.h>
+#include <kernel/devices/disks/hdd0.h>
+#include <kernel/devices/fb0/fb0.h>
+#include <kernel/devices/input/kbd.h>
+#include <kernel/devices/input/mouse0.h>
+
 
 // usermode stuff
 #include <kernel/user/user.h>
@@ -301,11 +309,18 @@ void _start(void)
     module_ss: module_init(); {
         // Register driver modules
         log("[MOD]", "Init regs:\n", d);
-        module_register(&console_module);
-        module_register(&keyboard_module);
+
         #if ENABLE_ATA
         module_register(&ata_module);
         #endif
+        module_register(&console_module);
+        //module_register(&keyboard_module);
+        module_register(&null_module);
+        module_register(&zero_module);
+        module_register(&fb0_module);
+        module_register(&kbd_dev_module);
+        module_register(&mouse0_module);
+
         log("[MOD]", "found ", d);
         int count = module_get_count();
         str_append_uint(buf, count);
@@ -332,11 +347,15 @@ void _start(void)
         #if HARDWARE_SC == 1
             // let the cpu rest a small time
             for (volatile int i = 0; i < 1000000; i++) {
-            	nop();
+           		__asm__ volatile("nop");
             }
         #endif
     }
     //hcf();
+
+    for (volatile int i = 0; i < 100000; i++) {
+   		__asm__ volatile("nop");
+    }
 
     //extern void kproc(void);
     genprocs();

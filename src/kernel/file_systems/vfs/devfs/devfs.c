@@ -17,8 +17,6 @@ static int devfs_open(fs_node *node, fs_file *file) {
         if (!dev->handle) return -1;
     }
 
-	(void)file;
-
     return 0;
 }
 
@@ -58,14 +56,27 @@ static fs_node* devfs_lookup(fs_node *dir, const char *name) {
     return NULL;
 }
 
+// create a subdir inside a devfs dir (like /dev/input and so on)
+static int devfs_mkdir_node(fs_node *dir, const char *name) {
+	fs_node *sub = fs_mknode(name, FS_DIR);
+    if (!dir || !name) return -1;
+    if (devfs_lookup(dir, name)) return 0;
+    if (!sub) return -1;
+
+    sub->ops = dir->ops; // inherit devfs ops
+    fs_addchild(dir, sub);
+
+    return 0;
+}
+
 static fs_ops devfs_ops = {
-    .open = devfs_open,
-    .close = devfs_close,
-    .read = devfs_read,
-    .write = devfs_write,
+    .open   = devfs_open,
+    .close  = devfs_close,
+    .read   = devfs_read,
+    .write  = devfs_write,
     .lookup = devfs_lookup,
     .create = NULL,
-    .mkdir = NULL,
+    .mkdir  = devfs_mkdir_node,
 };
 
 static int devfs_mount(const char *src, const char *tgt, fs_mnt *mnt) {
@@ -97,12 +108,14 @@ void devfs_register(void) {
 //cannot be alone standing
 
 // register a device driver module to devfs
+// "/dev/input/keyboard0" creates input/ subdir automatically
 int devfs_register_device(driver_module *mod)
 {
     if (!mod || !devfs_root) return -1;
 
     // extract device name from mount path
     // "/dev/console" -> "console"
+    // "/dev/input/keyboard0" -> "input/keyboard0"
     const char *path = mod->mount;
     const char *name = path;
 
@@ -110,8 +123,38 @@ int devfs_register_device(driver_module *mod)
         name = path + 5; // skip "/dev/"
     }
 
-    // check if already exists
-    if (devfs_lookup(devfs_root, name)) {
+    // check if there is a subdir
+    const char *slash = NULL;
+    for (const char *p = name; *p; p++) {
+        if (*p == '/') { slash = p; break; }
+    }
+
+    fs_node *parent = devfs_root;
+
+    if (slash) {
+        // extract subdir name ("input")
+        char subdir[64];
+        int slen = slash - name;
+        if (slen <= 0 || slen >= 64) return -1;
+
+        for (int i = 0; i < slen; i++) subdir[i] = name[i];
+        subdir[slen] = '\0';
+
+        // find or create the subdir inside devfs root
+        fs_node *sub = devfs_lookup(devfs_root, subdir);
+        if (!sub) {
+            sub = fs_mknode(subdir, FS_DIR);
+            if (!sub) return -1;
+            sub->ops = &devfs_ops;
+            fs_addchild(devfs_root, sub);
+        }
+
+        parent = sub;
+        name = slash + 1; // device name after the slash
+    }
+
+    // check if already exists in target parent
+    if (devfs_lookup(parent, name)) {
         return -1;
     }
 
@@ -130,13 +173,13 @@ int devfs_register_device(driver_module *mod)
     data->handle = NULL;
 
     node->priv = data;
-    node->ops = &devfs_ops;
+    node->ops  = &devfs_ops;
 
-    fs_addchild(devfs_root, node);
+    fs_addchild(parent, node);
 
     log("[DEVFS]", "registered ", d);
-    BOOTUP_PRINT(name,white());
-    BOOTUP_PRINT("\n",white());
+    BOOTUP_PRINT(mod->mount, white());
+    BOOTUP_PRINT("\n", white());
 
     return 0;
 }

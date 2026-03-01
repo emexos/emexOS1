@@ -6,8 +6,8 @@
 
 
 // i/o
-ssize_t read (int fd, void *buf, size_t n);
-ssize_t write (int fd, const void *buf, size_t n);
+ssize_t read(int fd, void *buf, size_t n);
+ssize_t write(int fd, const void *buf, size_t n);
 
 // filesystem
 int chdir (const char *path);
