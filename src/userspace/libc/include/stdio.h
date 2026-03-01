@@ -22,7 +22,7 @@ extern FILE *stderr;
 
 FILE *fopen(const char *path, const char *mode);
 
-int fclos(FILE *f);
+int fclose(FILE *f);
 size_t fread(void *buf, size_t sz, size_t n, FILE *f);
 size_t fwrite(const void *buf, size_t sz, size_t n, FILE *f);
 char *fgets(char *buf, int n, FILE *f);
@@ -33,7 +33,7 @@ int ferror(FILE *f);
 int fprintf(FILE *f, const char *fmt, ...);
 int vfprintf(FILE *f, const char *fmt, va_list ap);
 
-int puts   (const char *s);
+int puts(const char *s);
 int putchar(int c);
 
 int printf(const char *fmt, ...);

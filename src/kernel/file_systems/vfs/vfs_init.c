@@ -130,12 +130,14 @@ void fs_system_init(void *klime)
     // register fs types
     tmpfs_register();
     devfs_register();
+    procfs_register();
 
     log("[FS]", "mounting roots: \n", white());
 
-    // mount root as tmpfs
-    fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS); // in future its just root so for (fat32,ext2,...)
-    //fs_mount(NULL, "/", "/"); // or root
+    // mount file systems
+    fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS);
+    fs_mount(NULL, DEV_MOUNT_DEFAULT,  DEVFS);
+    fs_mount(NULL, PROC_MOUNT_DEFAULT, PROCFS);
 
     initvfs();
 
@@ -146,8 +148,6 @@ void fs_system_init(void *klime)
         panic("Cannot open [logs]");
     }
     BOOTUP_PRINT("\n", white());
-    // mount devfs at /dev
-    fs_mount(NULL, DEV_MOUNT_DEFAULT, DEVFS);
 
     //last thing for init is loading all limine modules
     load_limine_module(); // logo

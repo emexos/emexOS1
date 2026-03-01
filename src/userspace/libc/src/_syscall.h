@@ -14,6 +14,7 @@
 #define _SCAL_CHDIR    80
 #define _SCAL_MKDIR    83
 #define _SCAL_UNLINK   87  // (delete file)
+#define _SCAL_IOCTL    16
 
 
 static inline long _sc1(long n, long a1) {

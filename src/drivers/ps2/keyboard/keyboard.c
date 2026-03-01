@@ -4,6 +4,7 @@
 #include <kernel/arch/x86_64/exceptions/irq.h>
 #include <theme/doccr.h>
 #include <kernel/graph/theme.h>
+#include <drivers/drivers.h>
 
 static key_buffer_t key_buffer = {0};
 static int shift = 0;
@@ -194,9 +195,9 @@ static void keyboard_module_fini(void) {
 }
 
 driver_module keyboard_module = (driver_module) {
-    .name = "ps2_keyboard",
-    .mount = "/emr/drv/keyboard", // because its not the driver not the device
-    .version = VERSION_NUM(0, 3, 1, 0),
+    .name = KBDNAME,
+    .mount = KBDPATH, // because its the driver not the device
+    .version = KBDUNIVERSAL,
     .init = keyboard_module_init,
     .fini = keyboard_module_fini,
     .open = NULL,

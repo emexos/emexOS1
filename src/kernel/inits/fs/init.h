@@ -45,8 +45,12 @@ void initvfs(void);
 #define LOGO_DIRECTORY BOOT_DIRECTORY UI_DIRECTORY AST_DIRECTORY
 #define LOGO_NAME LOGO_DIRECTORY "/bootlogo.bin"
 
+#define PROCFS "procfs"
+#define PROC_MOUNT_DEFAULT "/proc"
+#define PROC_DIRECTORY "/proc"
+
 
 static inline void init_early_boot_log(void) {
     extern int init_boot_log;
-    init_boot_log = -1; // Noch nicht bereit
+    init_boot_log = -1;
 }

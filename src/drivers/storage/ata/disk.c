@@ -6,6 +6,7 @@
 #include <theme/stdclrs.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+//#include <drivers/drivers.h>
 
 //note:
 // this is not a perfect ata driver and will not work on real hardware, but for fat32 i need a disk driver so i chose this one
@@ -461,14 +462,14 @@ int ATAget_device_count(void) {
     return ATAdevice_count;
 }
 
-
+/*
 
 static int ATAmodule_init(void) {
     //ATAdetect_devices();
     // already done
     log("[ATA]", "Load ATA module...\n", d);
     return 0;
-}
+}*/
 
 // pub:
 void ata_init(void) {
@@ -482,18 +483,19 @@ void ata_init(void) {
     //ATAmodule_init();
     ATAdetect_devices();
 }
-
+/*
 static void ATAmodule_fini(void) {
     // cleanup if needed
 }
 
 driver_module ata_module = {
-    .name = "ata-hdd0",
-    .mount = "/emr/drv/hdd0",
-    .version = VERSION_NUM(0, 1, 0, 0),
+    .name = ATANAME,
+    .mount = ATAPATH,
+    .version = ATAUNIVERSAL,
     .init = ATAmodule_init,
     .fini = ATAmodule_fini,
     .open = NULL,
     .read = NULL,
     .write = NULL,
 };
+*/
