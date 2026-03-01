@@ -15,12 +15,13 @@ all: $(ISO)
 fetchDeps:
 	@echo "[DEPS] Fetching dependencies/libraries"
 	@mkdir -p $(INCLUDE_DIR)
-	#@mkdir -p $(BUILD_DIR)/src/kernel/console/functions
+
 	@echo "[DEPS] Fetching Limine"
-	@rm -rf $(INCLUDE_DIR)/limine
-	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.3.0-binary --depth=1 $(INCLUDE_DIR)/limine
-	@echo "[DEPS] Building limine binary"
-	@$(MAKE) -C $(INCLUDE_DIR)/limine
+	@rm -rf $(LIMINE_DIR)
+	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(LIMINE_DIR)
+	@rm -rf $(LIMINE_DIR)/.git
+	@echo "[DEPS] Fetching Limine protocol header file"
+	@wget https://codeberg.org/Limine/limine-protocol/raw/branch/trunk/include/limine.h -O $(LIMINE_DIR)/limine.h
 
 disk:
 	@mkdir -p $(DISK_DIR)
@@ -34,12 +35,12 @@ $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 userspace:
 	@$(MAKE) -C src/userspace
 
-# Ensure host limine tool exists (Linux/macOS binary).
+# Compile Limine
 $(LIMINE_TOOL):
 	@$(MAKE) -C $(LIMINE_DIR)
 
 # Create bootable ISO
-$(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
+$(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@echo "[ISO] Creating bootable image..."
 	@rm -rf $(ISODIR)
 	@rm -f $(DISK_DIR)/initrd.cpio
@@ -75,7 +76,6 @@ $(ISO): limine.conf $(BUILD_DIR)/kernel.elf disk userspace $(LIMINE_TOOL)
 	@chmod +x tools/initrd.sh
 	./tools/initrd.sh
 	@cp $(DISK_DIR)/initrd.cpio $(ISODIR)/boot/
-
 
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \

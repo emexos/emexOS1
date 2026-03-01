@@ -34,6 +34,7 @@ klime_t *klime_init(u64 *ptr, u64 size) {
 }
 
 void klime_setup_slab(klime_t *klime) {
+	(void)klime;
 }
 
 u64 *klime_create(klime_t *klime, u64 size) {

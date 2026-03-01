@@ -117,9 +117,9 @@ void glime_commit(glime_t *glime) {
 
     //clear all
 
-    for (int i = 0; i < glime->dirty_boxes_len; i++) {
+    for (u64 i = 0; i < glime->dirty_boxes_len; i++) {
         gbox_t db = glime->dirty_boxes[i];
-        for (int y = 0; y < db.height; y++) {
+        for (u64 y = 0; y < db.height; y++) {
             u32 src_offset = (db.y + y) * glime->glres.width + db.x;
             u32 dst_offset = (db.y + y) * pitch_pixels + db.x;
             memset(&fb[dst_offset], 0, db.width * sizeof(u32));

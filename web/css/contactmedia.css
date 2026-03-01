@@ -1,0 +1,34 @@
+@media (max-width: 968px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+
+    .contact-form-section,
+    .contact-team {
+        padding: 30px 20px;
+    }
+
+    .contact-form .downloadButton {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .contact-container {
+        padding: 20px 10px;
+    }
+
+    .section-title {
+        font-size: 24px;
+    }
+
+    .social-card {
+        padding: 16px;
+    }
+
+    .social-card img {
+        width: 32px;
+        height: 32px;
+    }
+}

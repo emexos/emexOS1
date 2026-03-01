@@ -461,7 +461,7 @@ int fat32_read(file_t* this_file, void* buffer, size_t size)
     uint32_t skipped_clusters = (uint32_t)(this_file->readPos /
                                 (bootSector.sectors_per_cluster * bootSector.bytes_per_sector));
 
-    for(int i = 0; i < skipped_clusters; i++)
+    for(uint32_t i = 0; i < skipped_clusters; i++)
         current_cluster = get_next_cluster(current_cluster);
 
     uint32_t offset = this_file->readPos -

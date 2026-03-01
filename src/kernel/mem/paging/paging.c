@@ -99,13 +99,13 @@ void paging_map_page(
         ((physical_addr & 0x000FFFFFFFFFF000) | flags) & ~PTE_NX;
 
     // Invalidate TLB entry
-    asm volatile("invlpg (%0)" : : "r" (virtual_addr) : "memory");
+    __asm__ volatile("invlpg (%0)" : : "r" (virtual_addr) : "memory");
 }
 
 
 void paging_init(limine_hhdm_response_t *hpr) {
     u64 current_cr3;
-    asm volatile("mov %%cr3, %0" : "=r" (current_cr3));
+    __asm__ volatile("mov %%cr3, %0" : "=r" (current_cr3));
 
     kernel_pml4 = (page_table_t*)((current_cr3 & 0x000FFFFFFFFFF000) + hpr->offset);
 }

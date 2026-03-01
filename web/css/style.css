@@ -1,0 +1,300 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("styles.css");
+@import url("first.css");
+@import url("s.css");
+@import url("media.css");
+@import url("theme.css");
+@import url("link.css");
+@import url("cursor.css");
+
+@font-face {
+    font-family: emexpixel;
+    src: url("../fonts/emexfont.ttf");
+    /*src: url("fonts/Habbo.ttf");*/
+}
+
+:root {
+    --color-bg: #ffffff;
+    --color-bg-soft: #fafafa;
+    --color-bg-muted: #f2f2f2;
+    --color-bg-highlight: #f0f0f0;
+    --color-text: #111111;
+    --color-text-strong: #000000;
+    --color-text-secondary: #333333;
+    --color-text-muted: #555555;
+    --color-text-subtle: #666666;
+    --color-text-placeholder: #999999;
+    --color-text-inverse: #ffffff;
+    --color-border-strong: #000000;
+    --color-border: #dcdcdc;
+    --color-border-soft: #e0e0e0;
+    --color-border-muted: #dddddd;
+    --color-surface-dark: #000000;
+    --shadow-hard: 8px 8px 0px var(--color-border-strong);
+    --font-base: "Newsreader", sans-serif;
+    --font-accent: "Poppins", sans-serif;
+    --font-ui: "Roboto", sans-serif;
+}
+
+:root[data-theme="dark"] {
+    --color-bg: #0f1115;
+    --color-bg-soft: #171a21;
+    --color-bg-muted: #1e222b;
+    --color-bg-highlight: #1b2028;
+    --color-text: #e9edf3;
+    --color-text-strong: #ffffff;
+    --color-text-secondary: #c6ced9;
+    --color-text-muted: #a7b1bf;
+    --color-text-subtle: #95a0ae;
+    --color-text-placeholder: #7f8a99;
+    --color-text-inverse: #e9edf3;
+    --color-border-strong: #c0c0c0;
+    --color-border: #2f3641;
+    --color-border-soft: #3a4350;
+    --color-border-muted: #303743;
+    --color-surface-dark: #060606;
+    --shadow-hard: 0px 0px 0px var(--color-border-strong);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.div1 {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+body {
+    font-family: var(--font-base);
+    background-color: var(--color-bg);
+    line-height: 1.55;
+    color: var(--color-text);
+    font-size: 15px;
+}
+
+.parallaxTop {
+    min-height: 5px;
+    background-attachment: fixed;
+    background-position: top;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.subtitle-main {
+    color: var(--color-text-strong);
+    font-family: var(--font-accent);
+    font-size: 35px;
+    text-align: center;
+    font-weight: 800;
+    margin-top: 8px;
+}
+
+.tech-details {
+    /*background-color: #1a1a1a;*/
+    color: var(--color-text-strong);
+    padding: 60px 80px;
+    margin-top: 40px;
+}
+
+.tech-details .intro-title {
+    color: var(--color-text-strong);
+}
+
+h1 {
+    margin-bottom: 16px;
+    position: relative;
+}
+
+h1::after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 1px;
+    background-color: var(--color-border);
+    margin-top: 10px;
+}
+
+.lineunder {
+    border-bottom: 1px solid var(--color-border-soft);
+    padding-bottom: 4px;
+    width: 100%;
+    display: block;
+}
+
+.button {
+    width: 200px;
+    height: 70px;
+    border: none;
+    color: var(--color-text-inverse);
+    padding: 14px 28px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 15px;
+    margin: 4px 2px;
+    transition-duration: 0.2s;
+    cursor: none;
+    border-radius: 0px;
+}
+
+.aboutSubtitle {
+    color: var(--color-text-strong);
+    font-size: 44px;
+    margin-bottom: 32px;
+    font-weight: 600;
+    text-align: left;
+}
+
+.about1 {
+    background-color: var(--color-bg);
+    font-size: 20px;
+    font-family: var(--font-accent);
+    margin-top: 70px;
+    padding: 80px;
+    text-align: left;
+}
+
+.about2 {
+    background-color: var(--color-bg);
+    font-size: 20px;
+    font-family: var(--font-accent);
+    padding: 80px;
+}
+
+.downloadDIV {
+    background-color: var(--color-bg);
+    font-size: 20px;
+    font-family: var(--font-accent);
+    padding: 80px;
+    padding-top: 20px;
+}
+
+.downloadTable {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.downloadTable thead tr {
+    background-color: var(--color-bg-muted);
+}
+
+.downloadTable th {
+    padding: 10px;
+    border-bottom: 2px solid var(--color-border-strong);
+    font-family: var(--font-accent);
+}
+
+.downloadTable td {
+    padding: 10px;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.downloadTable td:first-child {
+    width: 120px;
+    font-weight: 600;
+}
+
+.downloadTable td:nth-child(2) {
+    width: auto;
+}
+
+.downloadTable td:last-child {
+    width: 320px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.downloadButton {
+    width: auto;
+    min-width: 140px;
+    height: auto;
+    background-color: var(--color-bg);
+    color: var(--color-text-strong);
+    border: 3px solid var(--color-border-strong);
+    font-family: var(--font-accent);
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    padding: 12px 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition:
+        box-shadow 0.2s,
+        transform 0.15s;
+}
+
+.downloadButton:hover {
+    box-shadow: var(--shadow-hard);
+    transform: translate(-2px, -2px);
+}
+
+.placeholder {
+    padding: 5px;
+    color: var(--color-text-placeholder);
+    font-style: italic;
+}
+
+.placeholder2 {
+    padding: 15px;
+}
+
+.ibackButton {
+    top: 20px;
+    left: 20px;
+    font-size: 16px;
+    color: var(--color-text-inverse);
+    background-color: var(--color-surface-inverse);
+    padding: 10px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+    font-family: var(--font-ui);
+    width: fit-content;
+}
+
+.ibackButton:hover {
+    background-color: var(--color-surface-inverse);
+}
+
+.ibackButton i {
+    color: var(--color-text-inverse);
+    margin-right: 8px;
+}
+
+.stats-section {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: 50px 20px;
+    background-color: var(--color-surface-dark);
+    color: var(--color-text-inverse);
+    margin-top: 40px;
+}
+
+.stat-item {
+    text-align: center;
+    min-width: 150px;
+    margin: 10px;
+}
+
+.stat-number {
+    font-size: 48px;
+    font-weight: 700;
+    font-family: var(--font-accent);
+    display: block;
+    color: var(--color-text-inverse);
+}
+
+.stat-label {
+    font-size: 16px;
+    margin-top: 8px;
+    font-family: var(--font-accent);
+}

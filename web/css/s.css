@@ -1,0 +1,34 @@
+.secondgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.secondcards {
+    background-color: var(--color-bg-soft);
+    padding: 30px;
+    border: 2px solid var(--color-border-soft);
+    transition: all 0.3s ease;
+}
+
+.secondcards:hover {
+    border-color: var(--color-border-strong);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-hard);
+}
+
+.second-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    font-family: var(--font-accent);
+    color: var(--color-text-strong);
+}
+
+.second-description {
+    font-size: 16px;
+    color: var(--color-text-muted);
+    line-height: 1.6;
+    font-family: var(--font-accent);
+}
