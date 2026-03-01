@@ -38,7 +38,7 @@ int gworkspace_init(glime_t *glime, u8 *name, u64 pos) {
 gworkspace_t *gworkspace_get_name(glime_t *glime, u8 *workspace_name) {
     if (!glime) return NULL;
 
-    for (int i = 0; i < glime->workspaces_total; i++) {
+    for (u64 i = 0; i < glime->workspaces_total; i++) {
         gworkspace_t *ws = glime->workspaces[i];
         u8 *wsname = ws->name;
         int seek = 0;
@@ -64,7 +64,7 @@ gworkspace_t *gworkspace_get_name(glime_t *glime, u8 *workspace_name) {
 gworkspace_t *gworkspace_get_pos(glime_t *glime, u64 pos) {
     if (!glime) return NULL;
 
-    for (int i = 0; i < glime->workspaces_total; i++) {
+    for (u64 i = 0; i < glime->workspaces_total; i++) {
         gworkspace_t *ws = glime->workspaces[i];
         if (ws->pos_y == pos) return ws;
     }
@@ -83,11 +83,10 @@ int gworkspace_posx_get(gworkspace_t *gworkspace, u64 *out) {
     u64 list_len = gworkspace->sessions_len;
     u64 ret = 0;
 
-    for (int i = 0; i < list_len; i++) {
+    for (u64 i = 0; i < list_len; i++) {
         ret += gworkspace->sessions[i]->box.width + gworkspace->gap_x;
     }
 
     *out = ret;
     return 0;
 }
-

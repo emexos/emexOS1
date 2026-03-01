@@ -1,0 +1,30 @@
+/* Custom inverted cursor */
+body {
+    cursor: none;
+}
+
+.custom-cursor {
+    position: fixed;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background-color: white;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.2s ease;
+}
+
+.custom-cursor.hidden {
+    opacity: 0;
+}
+
+a:hover ~ .custom-cursor,
+button:hover ~ .custom-cursor {
+    width: 15px;
+    height: 15px;
+    transition:
+        width 0.2s ease,
+        height 0.2s ease;
+}

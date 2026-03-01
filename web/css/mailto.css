@@ -1,0 +1,46 @@
+.mailto-option {
+    text-align: center;
+    padding: 40px 30px;
+    background-color: var(--color-bg-highlight);
+    border-left: 4px solid var(--color-border-strong);
+}
+
+.mailto-description {
+    font-family: var(--font-accent);
+    font-size: 16px;
+    color: var(--color-text-muted);
+    margin-bottom: 30px;
+    line-height: 1.6;
+}
+
+.mailto-option .downloadButton {
+    margin: 0 auto 30px;
+}
+
+.email-display {
+    padding: 20px;
+    background-color: var(--color-bg-soft);
+    border: 1px solid var(--color-border);
+    margin-top: 20px;
+}
+
+.email-label {
+    font-family: var(--font-accent);
+    font-size: 14px;
+    color: var(--color-text-muted);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.email-address {
+    font-family: var(--font-accent);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-strong);
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.email-address:hover {
+    text-decoration: underline;
+}
