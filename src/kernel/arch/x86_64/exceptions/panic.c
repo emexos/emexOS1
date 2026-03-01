@@ -57,16 +57,17 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
     print("\n", white());
 
     // Print RIP
+    char hex[32];
     str_copy(buf, "RIP: 0x");
-    str_append_uint(buf, (u32)(state->rip >> 32));
-    str_append_uint(buf, (u32)(state->rip & 0xFFFFFFFF));
+    str_from_hex(hex, state->rip);
+    str_append(buf, hex);
     print(buf, white());
     print("\n", white());
 
     // Print RSP
     str_copy(buf, "RSP: 0x");
-    str_append_uint(buf, (u32)(state->rsp >> 32));
-    str_append_uint(buf, (u32)(state->rsp & 0xFFFFFFFF));
+    str_from_hex(hex, state->rsp);
+    str_append(buf, hex);
     print(buf, white());
     print("\n\n", white());
 

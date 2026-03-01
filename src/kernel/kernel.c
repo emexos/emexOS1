@@ -294,7 +294,7 @@ void _start(void)
     #if HARDWARE_SC == 1
         // let the cpu rest a small time
         for (volatile int i = 0; i < 1000000; i++) {
-            __asm__ volatile("nop");
+        	nop();
         }
     #endif
 
@@ -332,7 +332,7 @@ void _start(void)
         #if HARDWARE_SC == 1
             // let the cpu rest a small time
             for (volatile int i = 0; i < 1000000; i++) {
-                __asm__ volatile("nop");
+            	nop();
             }
         #endif
     }
