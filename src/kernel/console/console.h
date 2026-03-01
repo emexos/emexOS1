@@ -37,7 +37,7 @@ extern driver_module console_module;
 #define WRONG_COMMAND_CL GFX_RED
 
 // function header macro for command declarations it should be easier to port it to future syscalls
-#define FHDR(name) void name()
+#define FHDR(name) void name(const char *s)
 
 typedef struct {
     void (*func)(const char*);
