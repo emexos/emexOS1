@@ -14,6 +14,7 @@
 #include <kernel/proc/proc_manager.h>
 #include <theme/doccr.h>
 #include <kernel/arch/x86_64/gdt/gdt.h>
+#include <kernel/cpu/cpu.h>
 
 // read syscall
 #include <drivers/ps2/keyboard/keyboard.h>
@@ -26,6 +27,8 @@ extern ulime_t *ulime;
 #endif
 
 #define SCWRITE 0xFFFFFFFF
+
+extern char cwd[];
 
 // fromsyscall_entry.asm
 extern u64 user_rsp;
@@ -340,51 +343,57 @@ u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
     if (fd != 0) return (u64)-1;
     if (buf == 0 || count == 0) return 0;
 
-    char *out = (char *)buf;
-    u64 i = 0;
+    // file descriptor 0 = stdin tp keyboard input
+    if (fd == 0) {
+        char *out = (char *)buf;
+        u64 i = 0;
 
-    // reenable interrupts
-    __asm__ volatile("sti");
+        // reenable interrupts
+        sti();
 
-    while (i < count - 1) {
-        // TODO:
-        // use semaphores or spinlocks NOT busywaits
-        while (!keyboard_has_key()) {
-            __asm__ volatile("hlt");
-        }
-
-        key_event_t event;
-        if (!keyboard_get_event(&event)) continue;
-        if (!event.pressed) continue;
-
-        char c = (char)(event.keycode & 0xFF);
-
-        if (c == '\n' || c == '\r') {
-            char nl[2] = {'\n', '\0'};
-            cprintf(nl, SCWRITE);
-            out[i++] = '\n';
-            break;
-        }
-        if (c == '\b') {
-            if (i > 0) {
-                i--;
-                cprintf("\b", SCWRITE);
+        while (i < count - 1) {
+            // TODO:
+            // use semaphores or spinlocks NOT busywaits
+            while (!keyboard_has_key()) {
+            	halt();
             }
-            continue;
+
+            key_event_t event;
+            if (!keyboard_get_event(&event)) continue;
+            if (!event.pressed) continue;
+
+            char c = (char)(event.keycode & 0xFF);
+
+            if (c == '\n' || c == '\r') {
+                char nl[2] = {'\n', '\0'};
+                cprintf(nl, SCWRITE);
+                out[i++] = '\n';
+                break;
+            }
+            if (c == '\b') {
+                if (i > 0) {
+                    i--;
+                    cprintf("\b", SCWRITE);
+                }
+                continue;
+            }
+
+            if (c < 0x20 || c > 0x7E) continue;
+
+            char echo[2] = {c, '\0'};
+            cprintf(echo, SCWRITE);
+            out[i++] = c;
         }
 
-        if (c < 0x20 || c > 0x7E) continue;
+        // i think this is slow........ this read syscall :(
+        cli();
 
-        char echo[2] = {c, '\0'};
-        cprintf(echo, SCWRITE);
-        out[i++] = c;
+        out[i] = '\0';
+        return i;
     }
 
-    // i think this is slow........ this read syscall :(
-    __asm__ volatile("cli");
-
-    out[i] = '\0';
-    return i;
+    ssize_t r = fs_read((int)fd, (void *)buf, (size_t)count);
+    return (r < 0) ? (u64)-1 : (u64)r;
 }
 
 u64 scall_getpid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3) {
@@ -429,6 +438,78 @@ u64 scall_getdents(ulime_proc_t *proc, u64 path_ptr, u64 buf_ptr, u64 max_entrie
     return (n < 0) ? (u64)-1 : (u64)n;
 }
 
+u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
+    (void)proc; (void)arg2; (void)arg3;
+
+    if (!path_ptr || path_ptr > 0x0000800000000000ULL) return (u64)-1;
+
+    const char *s = (const char *)path_ptr;
+
+    // no argument then go to root
+    if (!s || *s == '\0') {
+        str_copy(cwd, "/");
+        return 0;
+    }
+
+    char new_path[FS_MAX_PATH];
+
+    // handle ".." (go back) before resolution
+    if (str_equals(s, "..")) {
+        int len = str_len(cwd);
+        if (len > 1 && cwd[len - 1] == '/') {
+            cwd[len - 1] = '\0';
+            len--;
+        }
+        for (int i = len - 1; i >= 0; i--) {
+            if (cwd[i] == '/') {
+                if (i == 0) str_copy(cwd, "/");
+                else cwd[i] = '\0';
+                return 0;
+            }
+        }
+        return 0;
+    }
+
+    // absolute vs relative path
+    if (s[0] == '/') {
+        str_copy(new_path, s);
+    } else {
+        str_copy(new_path, cwd);
+        if (cwd[str_len(cwd) - 1] != '/') str_append(new_path, "/");
+        str_append(new_path, s);
+    }
+
+    // verifyy the path exists and is a directory
+    fs_node *dir = fs_resolve(new_path);
+    if (!dir) return (u64)-1;
+    if (dir->type != FS_DIR) return (u64)-1;
+
+
+    // new cwd
+    str_copy(cwd, new_path);
+
+    // ensurey trailing slash (except for root)
+    int len = str_len(cwd);
+    if (len > 1 && cwd[len - 1] != '/') str_append(cwd, "/");
+
+    return 0;
+}
+
+u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
+    (void)proc;
+    (void)arg3;
+
+    if (!buf_ptr || size == 0 || buf_ptr > 0x0000800000000000ULL) return 0;
+
+    char *buf = (char *)buf_ptr;
+    int cwlen = str_len(cwd);
+
+    if ((u64)(cwlen + 1) > size) return 0; // buffer too small
+
+    str_copy(buf, cwd);
+    return (u64)(cwlen + 1); // return written byte count (> 0 = success)
+}
+
 void _init_syscalls_table(ulime_t *ulime_ptr) {
     if (!ulime_ptr) return;
 
@@ -445,6 +526,8 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     ulime_ptr->syscalls[EXIT]     = scall_exit;
     ulime_ptr->syscalls[EXECVE]   = scall_execve;
     ulime_ptr->syscalls[GETDENTS] = scall_getdents;
+    ulime_ptr->syscalls[CHDIR]    = scall_chdir;
+    ulime_ptr->syscalls[GETCWD]   = scall_getcwd;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }

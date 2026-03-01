@@ -48,27 +48,27 @@ static int dir_exists(const char *path) {
 int emex_open_app(const char *path, emex_package_t *pkg) {
     if (!path || !pkg) return EMEX_ERR_NOT_FOUND;
 
-    // wipe the package struct clean before filling it
+    // copy path to kernel buffer first, NEVER use the raw pointer again after this
     str_copy(pkg->path, path);
     pkg->has_icon = 0;
     pkg->has_resources = 0;
 
     // only if the path ends with .emx
-    if (!path_has_emx_ext(path)) {
-        printf("[EMX] '%s' doesn't end with .emx, not a valid emx package\n", path);
+    if (!path_has_emx_ext(pkg->path)) {
+        printf("[EMX] '%s' doesn't end with .emx, not a valid emx package\n", pkg->path);
         return EMEX_ERR_NOT_EMX;
     }
-    if (!dir_exists(path)) {
-        printf("[EMX] '%s' not found or isn't a directory\n", path);
+    if (!dir_exists(pkg->path)) {
+        printf("[EMX] '%s' not found or isn't a directory\n", pkg->path);
         return EMEX_ERR_NOT_FOUND;
     }
 
-    printf("[EMX] opening package: %s\n", path);
+    printf("[EMX] opening package: %s\n", pkg->path);
 
     char child_path[256];
 
     // app.elf is required otherwise
-    build_child_path(child_path, path, EMEX_ELF_NAME);
+    build_child_path(child_path, pkg->path, EMEX_ELF_NAME);
     if (!file_exists(child_path)) {
         printf("[EMX] %s is missing! can't launch without it\n", EMEX_ELF_NAME);
         return EMEX_ERR_NO_ELF;
@@ -76,7 +76,7 @@ int emex_open_app(const char *path, emex_package_t *pkg) {
     printf("[EMX] found %s\n", EMEX_ELF_NAME);
 
     // package.info is also required with title the other things not really but well
-    build_child_path(child_path, path, EMEX_INFO_NAME);
+    build_child_path(child_path, pkg->path, EMEX_INFO_NAME);
     if (!file_exists(child_path)) {
         printf("[EMX] %s is missing! package needs metadata\n", EMEX_INFO_NAME);
         return EMEX_ERR_NO_INFO;
@@ -91,7 +91,7 @@ int emex_open_app(const char *path, emex_package_t *pkg) {
     // optional icon
     // icon is later good for a taskbar or smth else but
     // then i probably delete it from the kernel and move the icon parser to the wm or smth
-    build_child_path(child_path, path, EMEX_ICON_NAME);
+    build_child_path(child_path, pkg->path, EMEX_ICON_NAME);
     if (file_exists(child_path)) {
         printf("[EMX] found %s, loading...\n", EMEX_ICON_NAME);
         if (emex_load_icon(child_path, &pkg->icon) == EMEX_OK) {
@@ -103,7 +103,7 @@ int emex_open_app(const char *path, emex_package_t *pkg) {
         printf("[EMX] no %s found\n", EMEX_ICON_NAME);
     }
 
-    build_child_path(child_path, path, EMEX_RES_DIR);
+    build_child_path(child_path, pkg->path, EMEX_RES_DIR);
     if (dir_exists(child_path)) {
         pkg->has_resources = 1; // optional to have
     }

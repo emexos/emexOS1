@@ -71,6 +71,9 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp src/userspace/bin/hello/hello.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/ls/ls.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/tree/tree.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/cat/cat.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/cd/cd.elf $(DISK_DIR)/rd/bin/
+
 
 	@echo "[MOD] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh

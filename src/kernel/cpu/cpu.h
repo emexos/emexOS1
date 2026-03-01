@@ -79,4 +79,11 @@ const char* cpu_get_brand(void);
 cpu_info_t* cpu_get_info(void);
 int cpu_has_feature(u32 feature);
 
+void cli(void);
+void sti(void);
+__attribute__((noreturn)) void halt(void);
+__attribute__((noreturn)) void idle(void);
+void wfi(void);
+void nop(void);
+
 #endif

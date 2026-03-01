@@ -1,0 +1,54 @@
+[ ] dofetch
+[ ] version
+[x] cat
+[x] ls
+[x] echo
+[x] cd
+[x] tree
+[ ] pwd
+[ ] touch
+[ ] mkdir
+[ ] rmdir
+[ ] rm
+[ ] cp
+[ ] ecc (emex c compiler)
+[ ] mv
+[ ] chmod
+[ ] chown
+[ ] find
+[ ] grep
+[ ] head
+[ ] tail
+[ ] less
+[ ] more
+[ ] wc
+[ ] man
+[ ] history
+[ ] alias
+[ ] uname
+[ ] whoami
+[ ] env
+[ ] export
+[ ] unset
+[ ] source
+[ ] df
+[ ] du
+[ ] dd
+[ ] ping
+[ ] top
+[ ] htop
+[ ] ps
+[ ] kill
+[ ] killall
+[ ] jobs
+[ ] bg
+[ ] fg
+[ ] sleep
+[ ] date
+[ ] cal
+[ ] mount
+[ ] umount
+[ ] unalias
+[ ] clear
+[ ] reboot
+[ ] shutdown
