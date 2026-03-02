@@ -37,6 +37,9 @@
 #include <kernel/devices/fb0/fb0.h>
 #include <kernel/devices/input/kbd.h>
 #include <kernel/devices/input/mouse0.h>
+#include <kernel/devices/tty/tty0.h>
+#include <kernel/devices/random/urandom.h>
+#include <kernel/devices/random/random.h>
 
 
 // usermode stuff
@@ -314,12 +317,14 @@ void _start(void)
         module_register(&ata_module);
         #endif
         module_register(&console_module);
-        //module_register(&keyboard_module);
         module_register(&null_module);
         module_register(&zero_module);
         module_register(&fb0_module);
         module_register(&kbd_dev_module);
         module_register(&mouse0_module);
+        module_register(&tty0_module);
+        module_register(&urandom_module);
+        module_register(&random_module);
 
         log("[MOD]", "found ", d);
         int count = module_get_count();

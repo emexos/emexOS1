@@ -19,6 +19,11 @@
 // read syscall
 #include <drivers/drivers.h>
 
+#include <kernel/devices/devices.h>
+
+//#include <kernel/devices/fb0/fb0.h>
+//#include <kernel/devices/tty/tty0.h>
+
 
 static ulime_t *g_ulime = NULL;
 
@@ -27,7 +32,7 @@ extern ulime_t *ulime;
 #endif
 
 #define SCWRITE 0xFFFFFFFF
-#define KEYBOARD0 KBDPATH
+//#define KEYBOARD0 KBDPATH
 #define MOUSE0 MS0PATH
 
 extern char cwd[];
@@ -104,23 +109,22 @@ static void ansi_write_char(char c) {
     switch (ansi_state) {
         case ANSI_STATE_NORMAL:
             if (c == '\033') { ansi_state = ANSI_STATE_ESC; }
-            else              { cprintf(tmp, ansi_fg_color); }
+            else { cprintf(tmp, ansi_fg_color); }
             break;
         case ANSI_STATE_ESC:
             if (c == '[') { ansi_state = ANSI_STATE_CSI; ansi_param = 0; }
-            else          { cprintf("\033", ansi_fg_color); cprintf(tmp, ansi_fg_color);
-                            ansi_state = ANSI_STATE_NORMAL; }
+            else {cprintf("\033", ansi_fg_color); cprintf(tmp, ansi_fg_color); ansi_state = ANSI_STATE_NORMAL;}
             break;
         case ANSI_STATE_CSI:
             if (c >= '0' && c <= '9') {
                 ansi_param = ansi_param * 10 + (c - '0');
             } else if (c == 'm') {
                 ansi_fg_color = ansi_code_to_color(ansi_param);
-                ansi_param    = 0;
-                ansi_state    = ANSI_STATE_NORMAL;
+                ansi_param = 0;
+                ansi_state = ANSI_STATE_NORMAL;
             } else if (c == ';') {
                 ansi_fg_color = ansi_code_to_color(ansi_param);
-                ansi_param    = 0;
+                ansi_param = 0;
             } else {
                 ansi_param = 0;
                 ansi_state = ANSI_STATE_NORMAL;
@@ -131,25 +135,29 @@ static void ansi_write_char(char c) {
 
 // syscall handlers
 u64 scall_write(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
-	//TODO:
-	// implement /dev/tty0 and the write commands just writes to it
-	// and the shell reads from /dev/tty0
     (void)proc;
-    if (fd != 1 && fd != 2) return (u64)-1;
-
-    // validate buf is in userspace range
     if (buf == 0 || buf > 0x0000800000000000ULL) return (u64)-1;
 
-    const char *str = (const char *)buf;
+    if (fd >= 3)
+        return (u64)fs_write((int)fd, (const void *)buf, (size_t)count);
 
-    // write each char to screen using console output
-    for (u64 i = 0; i < count; i++) {
-        ansi_write_char(str[i]);
+    if (fd != 1 && fd != 2) return (u64)-1;
+
+    // lazy-open /dev/tty0
+    static int tty_fd = -1;
+    if (tty_fd < 0) {
+        tty_fd = fs_open(TTY0PATH, O_WRONLY);
+        if (tty_fd < 0) {
+            const char *s = (const char *)buf;
+            for (u64 i = 0; i < count; i++) tty0_write_char(s[i]);
+            return count;
+        }
     }
-    return count;
+    return (u64)fs_write(tty_fd, (const void *)buf, (size_t)count);
 }
 
-u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3) {
+u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3)
+{
     (void)arg2;
     (void)arg3;
 
@@ -198,16 +206,17 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3) {
     return 0;
 }
 
-static void setup_argv_on_stack(ulime_proc_t *new_proc, char **user_argv, int argc) {
+static void setup_argv_on_stack(ulime_proc_t *new_proc, char **user_argv, int argc)
+{
     if (argc <= 0 || !user_argv) return;
 
-    u64 hhdm   = g_ulime->hpr->offset;
+    u64 hhdm = g_ulime->hpr->offset;
     u64 pstack = new_proc->phys_stack;
-    u64 ssize  = new_proc->stack_size;
-    u64 sbase  = new_proc->stack_base;
+    u64 ssize = new_proc->stack_size;
+    u64 sbase = new_proc->stack_base;
 
     u64 str_p_phys = pstack + ssize;
-    u64 str_p_virt = sbase  + ssize;
+    u64 str_p_virt = sbase + ssize;
 
     u64 str_vaddrs[32];
 
@@ -240,7 +249,8 @@ static void setup_argv_on_stack(ulime_proc_t *new_proc, char **user_argv, int ar
     new_proc->entry_rsp = rsp_virt;
 }
 
-u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3) {
+u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
+{
     (void)arg3;
 
     if (path_ptr == 0 || path_ptr > 0x0000800000000000ULL) return (u64)-1;
@@ -338,76 +348,27 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3) {
     __builtin_unreachable();
 }
 
-u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
+u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count)
+{
     (void)proc;
-    //(void)fd;
-    //(void)buf;
-    //(void)count;
-
-    // only stdin (fd 0) supported
-    if (fd != 0) return (u64)-1;
     if (buf == 0 || count == 0) return 0;
 
-    char *out = (char *)buf;
-    u64 i = 0;
+    // (urandom, zero, files, ...)
+    if (fd >= 3)
+        return (u64)fs_read((int)fd, (void *)buf, (size_t)count);
 
-    // lazy-open KEYBOARD0 (/dev/input/keyboard0) once for the lifetime of the kernel
-    static int kbd_fd = -1;
-    if (kbd_fd < 0) {
-        kbd_fd = fs_open(KEYBOARD0, O_RDONLY);
-        if (kbd_fd < 0) {
-            printf("[SYSCALL] read: cannot open " KEYBOARD0 "\n");
+    // fd 0 stdin to tty0
+    if (fd != 0) return (u64)-1;
+
+    static int tty_fd = -1;
+    if (tty_fd < 0) {
+        tty_fd = fs_open(TTY0PATH, O_RDONLY);
+        if (tty_fd < 0) {
+            printf("[SYSCALL] read: cannot open " TTY0PATH "\n");
             return (u64)-1;
         }
     }
-
-    // reenable interrupts
-    __asm__ volatile("sti");
-
-    while (i < count - 1) {
-        key_event_t event;
-        int got = 0;
-
-        while (!got) {
-            __asm__ volatile("hlt");
-            int n = fs_read(kbd_fd, &event, sizeof(key_event_t));
-            if (n == (int)sizeof(key_event_t)) {
-                got = 1;
-            }
-        }
-
-        // skip release events
-        if (!event.pressed) continue;
-
-        char c = (char)(event.keycode & 0xFF);
-
-        if (c == '\n' || c == '\r') {
-            char nl[2] = {'\n', '\0'};
-            cprintf(nl, SCWRITE);
-            out[i++] = '\n';
-            break;
-        }
-
-        if (c == '\b') {
-            if (i > 0) {
-                i--;
-                cprintf("\b", SCWRITE);
-            }
-            continue;
-        }
-
-        if (c < 0x20 || c > 0x7E) continue;
-
-        char echo[2] = {c, '\0'};
-        cprintf(echo, SCWRITE);
-        out[i++] = c;
-    }
-
-    // i think this is slow........ this read syscall :(
-    __asm__ volatile("cli");
-
-    out[i] = '\0';
-    return i;
+    return (u64)fs_read(tty_fd, (void *)buf, (size_t)count);
 }
 
 u64 scall_getpid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3) {
@@ -415,7 +376,8 @@ u64 scall_getpid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3) {
     return proc->pid;
 }
 
-u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3) {
+u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3)
+{
     (void)arg2; (void)arg3;
 
     if (addr == 0) return proc->brk;
@@ -452,7 +414,8 @@ u64 scall_getdents(ulime_proc_t *proc, u64 path_ptr, u64 buf_ptr, u64 max_entrie
     return (n < 0) ? (u64)-1 : (u64)n;
 }
 
-u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
+u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3)
+{
     (void)proc; (void)arg2; (void)arg3;
 
     if (!path_ptr || path_ptr > 0x0000800000000000ULL) return (u64)-1;
@@ -509,6 +472,37 @@ u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3) {
     return 0;
 }
 
+u64 scall_ioctl(ulime_proc_t *proc, u64 fd, u64 request, u64 arg_ptr)
+{
+    (void)proc;
+    if (arg_ptr > 0x0000800000000000ULL) return (u64)-1;
+
+    void *arg = (void *)arg_ptr;
+
+    // fb0:fb0_ioctl
+    if (fd >= 3) {
+        fs_file *f = fs_get_file((int)fd);
+        if (f && f->node) {
+            // fb0 ioctl
+            if (str_equals(f->node->name, "fb0")) {
+                return (u64)fb0_ioctl((int)request, arg);
+            }
+        }
+    }
+
+    // tty ioctl (fd 0, 1, 2)
+    if (fd <= 2) {
+        switch ((int)request) {
+            case 0: tty0_set_echo_mode(0); return 0; // TTY_ECHO
+            case 1: tty0_set_echo_mode(1); return 0; // TTY_NOECHO
+            case 2: tty0_set_echo_mode(2); return 0; // TTY_MASKECHO
+            default: return (u64)-1;
+        }
+    }
+
+    return (u64)-1;
+}
+
 u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
     (void)proc;
     (void)arg3;
@@ -542,6 +536,7 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     ulime_ptr->syscalls[GETDENTS] = scall_getdents;
     ulime_ptr->syscalls[CHDIR]    = scall_chdir;
     ulime_ptr->syscalls[GETCWD]   = scall_getcwd;
+    //ulime_ptr->syscalls[]   = scall_ioctl
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }

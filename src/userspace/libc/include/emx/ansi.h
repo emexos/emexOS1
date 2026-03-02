@@ -1,4 +1,10 @@
-// console colors (only in supported shells)
+#pragma once
+
+//
+// ansi lib
+//
+
+// console colors
 //ansi:                \esc[color
 #define A_GFX_RED     "\033[31m"
 #define A_GFX_GREEN   "\033[32m"

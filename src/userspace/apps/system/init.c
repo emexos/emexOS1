@@ -5,11 +5,14 @@
 //#include <string.h>
 #include <sys/types.h>
 
+#include <emx/sinfo.h>
+#include <emx/ansi.h>
+
 const char* handlers[] = EMRHANDLERS;
 
 int main(void)
 {
-    //printf("[ESH] starting...\n");
+    printf(__EMEXF_B1__);
     //printf("[ESH] launching programms:\n");
 
     // other initializations...
