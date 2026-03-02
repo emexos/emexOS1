@@ -9,6 +9,9 @@
 
 #include <drivers/drivers.h>
 
+static size_t fb_write_pos = 0;
+static size_t fb_read_pos  = 0;
+
 static int fb0_mod_init(void) {
     log("[FB0]", "init /dev/fb0\n", d);
     return 0;
@@ -18,37 +21,50 @@ static void fb0_mod_fini(void) {}
 
 static void *fb0_open(const char *path) {
     (void)path;
-    return (void *)1; // dummy handle
+    fb_write_pos = 0;
+    fb_read_pos = 0;
+    return (void *)1;
 }
 
 static int fb0_read(void *handle, void *buf, size_t count) {
     (void)handle;
     u32 *fb = get_framebuffer();
-    u32 w = get_fb_width();
-    u32 h = get_fb_height();
     u32 pitch = get_fb_pitch();
+    u32 h = get_fb_height();
 
     if (!fb) return -1;
 
     size_t fb_size = (size_t)pitch * h;
-    if (count > fb_size) count = fb_size;
 
-    memcpy(buf, (u8 *)fb, count);
+    // EOF
+    if (fb_read_pos >= fb_size) return 0;
+
+    size_t remaining = fb_size - fb_read_pos;
+    if (count > remaining) count = remaining;
+
+    memcpy(buf, (u8 *)fb + fb_read_pos, count);
+    fb_read_pos += count;
     return (int)count;
 }
 
 static int fb0_write(void *handle, const void *buf, size_t count) {
     (void)handle;
-    u32 *fb = get_framebuffer();
-    u32 pitch = get_fb_pitch();
-    u32 h = get_fb_height();
+    u32 *fb    = get_framebuffer();
+    u32  pitch = get_fb_pitch();
+    u32  h     = get_fb_height();
 
     if (!fb) return -1;
 
     size_t fb_size = (size_t)pitch * h;
-    if (count > fb_size) count = fb_size;
 
-    memcpy((u8 *)fb, buf, count);
+    // wrap around if we're on end
+    if (fb_write_pos >= fb_size) fb_write_pos = 0;
+
+    size_t remaining = fb_size - fb_write_pos;
+    if (count > remaining) count = remaining;
+
+    memcpy((u8 *)fb + fb_write_pos, buf, count);
+    fb_write_pos += count;
     return (int)count;
 }
 
@@ -71,15 +87,10 @@ int fb0_ioctl(int request, void *arg) {
             info->yoffset = 0;
             info->bits_per_pixel = 32;
             info->grayscale = 0;
-            // ARGB8888: blue at 0, green at 8, red at 16
-            info->blue_offset = 0;
-            info->blue_length = 8;
-            info->green_offset = 8;
-            info->green_length = 8;
-            info->red_offset = 16;
-            info->red_length = 8;
-            info->transp_offset = 24;
-            info->transp_length = 8;
+            info->blue_offset = 0; info->blue_length  = 8;
+            info->green_offset = 8; info->green_length = 8;
+            info->red_offset = 16; info->red_length   = 8;
+            info->transp_offset = 24; info->transp_length = 8;
             return 0;
         }
         case FBIOGET_FSCREENINFO: {

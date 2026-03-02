@@ -47,3 +47,10 @@
 #define X64 1
 #define RISCV 0
 #define ARM64 0
+
+#define EMEX  "emex"
+#define EMEX1 "EMEX"
+#define EMEX2 "[emex]"
+#define EMEX3 "[EMEX]"
+#define EMEX4 "emx"
+#define EMX   EMEX4

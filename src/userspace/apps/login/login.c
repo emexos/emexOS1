@@ -1,15 +1,20 @@
 #include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
+#include <stdio.h>
 
 #include "login.h"
+
+#include <emx/ansi.h>
 
 //TODO:
 // implement password hashing
 
+/*
 static void print_str(const char *s) {
-    size_t len = strlen(s);
-    write(STDOUT_FILENO, s, len);
-}
+    write(STDOUT_FILENO, s, strlen(s));
+}*/
+
 static int str_eq(const char *a, const char *b) {
     while (*a && *b) {
         if (*a != *b) return 0;
@@ -17,6 +22,7 @@ static int str_eq(const char *a, const char *b) {
     }
     return (*a == '\0' && *b == '\0');
 }
+
 static void strip_nl(char *buf, int len) {
     for (int i = 0; i < len; i++) {
         if (buf[i] == '\n' || buf[i] == '\r') {
@@ -31,19 +37,45 @@ int main(void)
     char user_buf[BUF_SIZE];
     char pass_buf[BUF_SIZE];
 
-    print_str("\n");
-    print_str("----------------------\n");
-    print_str(" [emexOS login]\n");
+    printf("\n");
+
+    print_logo: {
+    	#define LOGO_PATH "/emr/assets/logo.txt"
+     	#define LOGO_BUF 2048
+
+        int fd = open(LOGO_PATH, O_RDONLY);
+	    if (fd < 0) {
+	      	goto login;
+	    } else {
+	        char buf[LOGO_BUF];
+	        ssize_t n = read(fd, buf, LOGO_BUF - 1);
+	        close(fd);
+	        if (n > 0) {
+	            buf[n] = '\0';
+	            printf("\033[96m");
+	            write(STDOUT_FILENO, buf, (size_t)n);
+	            printf("\033[0m\n");
+	        }
+			goto login;
+	    }
+    }
+
+    printf("if this is reached this is bad :(");
+
+login:
+    printf("\n\n");
+    //printf("----------------------\n");
+    printf(" [emexOS login]\n");
 
     for (int attempt = 0; attempt < MAX_TRIES; attempt++)
     {
-        print_str("\033[34m login: ");
+        printf(A_GFX_YELLOW " login:\033[0m ");
         ssize_t n = read(STDIN_FILENO, user_buf, BUF_SIZE - 1);
         if (n <= 0) continue;
         user_buf[n] = '\0';
         strip_nl(user_buf, (int)n);
 
-        print_str("\033[34m password: ");
+        printf(A_GFX_YELLOW " password:\033[0m ");
         ssize_t m = read(STDIN_FILENO, pass_buf, BUF_SIZE - 1);
         if (m <= 0) continue;
         pass_buf[m] = '\0';
@@ -51,11 +83,11 @@ int main(void)
 
         if (str_eq(user_buf, LOGIN_USER) && str_eq(pass_buf, LOGIN_PASS))
         {
-            print_str("\033[0m----------------------\n");
-            print_str("\n\033[36mwelcome, ");
-            print_str(user_buf);
-            print_str("!\n");
-            print_str("\033[0m");
+            //printf("\033[0m----------------------\n");
+            //printf("\n");
+            printf("\n\033[36mwelcome, ");
+            printf(user_buf);
+            printf("!\n\033[0m");
 
             // launch the shell
             //char *const argv[] = { (char *)SHELL_PATH, (char *)0 };
@@ -67,10 +99,10 @@ int main(void)
             return 0;
         }
 
-        print_str("\033[0m[login incorrect]\n");
+        printf("\033[31m[login incorrect]\033[0m\n");
     }
-    print_str("\033[0m----------------------\n");
-    print_str("\033[0m\ntoo many failed attempts\n");
+    //printf("\033[0m----------------------\n");
+    printf("\033[0m\ntoo many failed attempts\n");
 
     return 2;
 }

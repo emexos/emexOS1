@@ -4,7 +4,9 @@
 #include <kernel/module/module.h>
 #include <types.h>
 
-#define FBN "emexfb0"
+#include <config/system.h>
+
+#define FBN EMEX "fb0"
 
 // fb_var_screeninfo
 typedef struct {
@@ -35,9 +37,9 @@ typedef struct {
 } fb_fix_screeninfo_t;
 
 // /dev/fb0 request codes
-#define FBIOGET_VSCREENINFO  0x4600
-#define FBIOPUT_VSCREENINFO  0x4601
-#define FBIOGET_FSCREENINFO  0x4602
+#define FBIOGET_VSCREENINFO 0x4600
+#define FBIOPUT_VSCREENINFO 0x4601
+#define FBIOGET_FSCREENINFO 0x4602
 
 // /dev/fb0 module
 extern driver_module fb0_module;
