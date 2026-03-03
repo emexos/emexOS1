@@ -21,6 +21,11 @@
 
 #include <kernel/devices/devices.h>
 
+// memory
+#include <syscalls/mmap.h>
+#include <kernel/mem/paging/paging.h>
+#include <kernel/mem/phys/physmem.h>
+
 //#include <kernel/devices/fb0/fb0.h>
 //#include <kernel/devices/tty/tty0.h>
 
@@ -518,6 +523,89 @@ u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
     return (u64)(cwlen + 1); // return written byte count (> 0 = success)
 }
 
+u64 scall_mmap(ulime_proc_t *proc, u64 args_ptr, u64 arg2, u64 arg3) {
+    (void)arg2; (void)arg3;
+
+    if (!args_ptr || args_ptr > 0x0000800000000000ULL) return (u64)MAP_FAILED;
+
+    mmap_args_t *a = (mmap_args_t *)args_ptr;
+
+    if (a->length == 0) return (u64)MAP_FAILED;
+
+    u64 len   = (a->length + 0xFFF) & ~0xFFFULL;
+    u64 pages = len / 4096;
+
+    if (a->flags & MAP_ANONYMOUS) {
+        u64 phys = physmem_alloc_to(pages);
+        if (!phys) return (u64)MAP_FAILED;
+
+        u64 virt = a->addr;
+        if (!virt || virt < 0x400000) {
+            virt = proc->mmap_base;
+            if (!virt) virt = proc->heap_base + proc->heap_size + 0x100000;
+        }
+        virt = (virt + 0xFFF) & ~0xFFFULL;
+
+        for (u64 i = 0; i < pages; i++) {
+            paging_map_page_proc(
+                g_ulime->hpr,
+                proc->pml4_phys,
+                virt + i * 4096,
+                phys + i * 4096,
+                USER_FLAGS
+            );
+        }
+
+        // zero via HHDM
+        u8 *p = (u8 *)(phys + g_ulime->hpr->offset);
+        for (u64 i = 0; i < len; i++) p[i] = 0;
+
+        proc->mmap_base = virt + len;
+        return virt;
+    }
+
+    // fb0 file mapping
+    if (a->fd >= 3) {
+        fs_file *f = fs_get_file(a->fd);
+        if (f && f->node && str_equals(f->node->name, "fb0")) {
+            u32 *fb    = get_framebuffer();
+            u64 fbphys = virt_to_phys(g_ulime->hpr, (void *)fb);
+            u64 fbsize = (u64)get_fb_pitch() * get_fb_height();
+
+            u64 fbpages = (fbsize + 0xFFF) / 4096;
+            u64 virt    = a->addr;
+            if (!virt) virt = proc->mmap_base;
+            if (!virt) virt = 0x3000000;
+            virt = (virt + 0xFFF) & ~0xFFFULL;
+
+            for (u64 i = 0; i < fbpages; i++) {
+                paging_map_page_proc(
+                    g_ulime->hpr,
+                    proc->pml4_phys,
+                    virt + i * 4096,
+                    fbphys + i * 4096,
+                    USER_FLAGS | PTE_PCD
+                );
+            }
+            proc->mmap_base = virt + fbpages * 4096;
+            return virt;
+        }
+    }
+    return (u64)MAP_FAILED;
+}
+u64 scall_munmap(ulime_proc_t *proc, u64 addr, u64 length, u64 arg3) {
+    (void)proc; (void)arg3;
+    if (!addr) return (u64)-1;
+
+    u64 len   = (length + 0xFFF) & ~0xFFFULL;
+    u64 pages = len / 4096;
+
+    for (u64 i = 0; i < pages; i++) {
+        paging_unmap_page(addr + i * 4096);
+    }
+    return 0;
+}
+
 void _init_syscalls_table(ulime_t *ulime_ptr) {
     if (!ulime_ptr) return;
 
@@ -536,7 +624,9 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     ulime_ptr->syscalls[GETDENTS] = scall_getdents;
     ulime_ptr->syscalls[CHDIR]    = scall_chdir;
     ulime_ptr->syscalls[GETCWD]   = scall_getcwd;
-    //ulime_ptr->syscalls[]   = scall_ioctl
+    ulime_ptr->syscalls[MMAP]     = scall_mmap;
+    ulime_ptr->syscalls[MUNMAP]   = scall_munmap;
+    ulime_ptr->syscalls[IOCTL]    = scall_ioctl;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }

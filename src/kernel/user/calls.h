@@ -41,6 +41,10 @@
     #define MKDIR       83
     #define FCHDIR     133
 
+    #define IOCTL       16
+    #define MMAP         9
+    #define MUNMAP      11
+
     #define UNLINK      87  // delete file
 
 #elif ARM64 == 1
@@ -74,6 +78,10 @@
     #define CHDIR      49
     #define MKDIR      80
     #define FCHDIR     50
+
+    #define IOCTL      16
+    #define MMAP        9
+    #define MUNMAP     11
 
     #define UNLINK     87  // delete file
 

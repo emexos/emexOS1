@@ -12,7 +12,10 @@ const char* handlers[] = EMRHANDLERS;
 
 int main(void)
 {
-    printf(__EMEXF_B1__);
+
+    //printf(__EMEXF_B1__);
+
+
     //printf("[ESH] launching programms:\n");
 
     // other initializations...

@@ -27,6 +27,7 @@ typedef struct {
 } page_table_t;
 
 extern page_table_t *kernel_pml4;
+extern u64 g_hhdm_offset;
 
 void paging_map_page(limine_hhdm_response_t *hpr, u64 virtual_addr, u64 physical_addr, u64 flags);
 void paging_unmap_page(u64 virtual_addr);

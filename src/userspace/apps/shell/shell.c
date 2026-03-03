@@ -3,7 +3,7 @@
 #include <string.h>
 
 #define BUFFER 256
-#define SHELL_PROMPT "[pc@emexos]$ "
+#define SHELL_PROMPT "\033[0m[pc@emexos]$ "
 #define BIN_PATH "/bin/"
 
 

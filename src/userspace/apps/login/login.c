@@ -85,9 +85,9 @@ login:
         {
             //printf("\033[0m----------------------\n");
             //printf("\n");
-            printf("\n\033[36mwelcome, ");
+            printf("\n \033[31m>\033[32m>\033[35m>\033[36m welcome, ");
             printf(user_buf);
-            printf("!\n\033[0m");
+            printf("!\n\n\033[0m");
 
             // launch the shell
             //char *const argv[] = { (char *)SHELL_PATH, (char *)0 };
@@ -99,10 +99,10 @@ login:
             return 0;
         }
 
-        printf("\033[31m[login incorrect]\033[0m\n");
+        printf("\033[31m [login incorrect]\033[0m\n");
     }
     //printf("\033[0m----------------------\n");
-    printf("\033[0m\ntoo many failed attempts\n");
+    printf("\033[0m\n too many failed attempts\n");
 
     return 2;
 }

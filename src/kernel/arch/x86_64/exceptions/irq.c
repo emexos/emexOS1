@@ -84,7 +84,8 @@ void irq_register_handler(u8 irq, irq_handler_t handler)
 {
     if (irq < 16) {
         irq_handlers[irq] = handler;
-        irq_set_mask(irq, 0); // enable
+        irq_set_mask(irq, 0);
+        if (irq >= 8) irq_set_mask(2, 0);
     }
 }
 
