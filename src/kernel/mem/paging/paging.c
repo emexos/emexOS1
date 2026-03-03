@@ -12,6 +12,8 @@
 
 extern u8 _kernel_start[];
 extern u8 _kernel_end[];
+u64 g_hhdm_offset = 0;
+
 
 page_table_t *kernel_pml4 = NULL;
 
@@ -102,12 +104,42 @@ void paging_map_page(
     __asm__ volatile("invlpg (%0)" : : "r" (virtual_addr) : "memory");
 }
 
+void paging_unmap_page(u64 virtual_addr) {
+    u64 pml4_index = (virtual_addr >> 39) & 0x1FF;
+    u64 pdp_index  = (virtual_addr >> 30) & 0x1FF;
+    u64 pd_index   = (virtual_addr >> 21) & 0x1FF;
+    u64 pt_index   = (virtual_addr >> 12) & 0x1FF;
+
+    if (!(kernel_pml4->entries[pml4_index] & PTE_PRESENT)) return;
+
+    u64 pdpt_phys = kernel_pml4->entries[pml4_index] & 0x000FFFFFFFFFF000;
+    page_table_t *pdpt = (page_table_t *)(pdpt_phys + kernel_pml4->entries[pml4_index]);
+
+    (void)pdpt_phys; (void)pdp_index; (void)pd_index; (void)pt_index;
+    (void)pdpt;
+
+    extern u64 g_hhdm_offset;
+
+    page_table_t *pdpt2 = (page_table_t *)(pdpt_phys + g_hhdm_offset);
+    if (!(pdpt2->entries[pdp_index] & PTE_PRESENT)) return;
+
+    u64 pd_phys = pdpt2->entries[pdp_index] & 0x000FFFFFFFFFF000;
+    page_table_t *pd = (page_table_t *)(pd_phys + g_hhdm_offset);
+    if (!(pd->entries[pd_index] & PTE_PRESENT)) return;
+
+    u64 pt_phys = pd->entries[pd_index] & 0x000FFFFFFFFFF000;
+    page_table_t *pt = (page_table_t *)(pt_phys + g_hhdm_offset);
+
+    pt->entries[pt_index] = 0;
+    __asm__ volatile("invlpg (%0)" : : "r"(virtual_addr) : "memory");
+}
 
 void paging_init(limine_hhdm_response_t *hpr) {
     u64 current_cr3;
     __asm__ volatile("mov %%cr3, %0" : "=r" (current_cr3));
 
     kernel_pml4 = (page_table_t*)((current_cr3 & 0x000FFFFFFFFFF000) + hpr->offset);
+    g_hhdm_offset = hpr->offset;  // save for paging_unmap_page
 }
 
 u64 map_region_alloc(limine_hhdm_response_t *hpr, u64 virt, u64 size) {
