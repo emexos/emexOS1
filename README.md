@@ -1,16 +1,19 @@
 <div align="center">
-	<h1>emexOS</h1>
-	<h5>a simple 64-bit os written in c</h5>
+	<h1>$${\Huge \color{white} \tilde{} emexOS \space \tilde{} \space \space \space }$$</h1>
 
-![Discord Badge](https://img.shields.io/badge/Join%20the%20Discord-Black?style=for-the-badge&logo=discord&logoColor=white&color=black)
+
+$${\LARGE \color{red}a \space simple \space x86 \textunderscore 64 \space operating \space system \space in \space c}$$
 
 ![GitHub License](https://img.shields.io/github/license/emexos/emexOS1?style=for-the-badge&label=License&labelColor=black&color=white)
 ![GitHub repo size](https://img.shields.io/github/repo-size/emexos/emexOS1?style=for-the-badge&label=size&labelColor=black&color=white)
 ![GitHub Repo stars](https://img.shields.io/github/stars/emexos/emexos1?style=for-the-badge&labelColor=black&color=white)
 
+
+![Discord Badge](https://img.shields.io/badge/Join%20the%20Discord-Black?style=for-the-badge&logo=discord&logoColor=white&color=black)
+
 </div>
 
-## Build Dependencies
+## $${\large Build \space Dependencies}$$
 For building and compiling emexOS, ensure you have the following installed,
 - x86_64 GCC cross-compiler - This is our preferred compiler for the source code. Currently, emexOS only supports 64-bit x86 machines, but we plan to support more architectures in the future.
 - [NASM](https://www.nasm.us/) - Assembler.
@@ -20,13 +23,13 @@ For building and compiling emexOS, ensure you have the following installed,
 
 You can use [Zig](https://ziglang.org/) instead of GCC if you prefer to.
 
-## For Nix Users
+## $${\large For \space Nix \space Users}$$
 Ensure you have flakes enabled first and then run `nix develop` to enter the provided development shell which will have all build dependencies and such installed for you. I'd recommend updating the flake using `nix flake update` as it's sometimes not updated for long periods of time.
 
-## Building and Compiling
+## $${\large Building \space and \space Compiling}$$
 With all build dependencies installed, you can finally build and run emexOS.
 > [!CAUTION]
-> If booting emexOS on real hardware, ensure your device has no existing data or else emexOS **WILL DELETE IT WITHOUT ASKING**
+> emexOS currently only supports ATA disks, if such a disk is detected emexOS **WILL/CAN DELETE IT WITHOUT ASKING** (if you have OVERWRITEALL set to 1 in the configs which is by default 0.)
 
 **Using gnu-make**
 - `make fetchDeps` - Fetch all libraries and such that emexOS depends on e.g. Limine. `git` and `wget` are used for this.
@@ -40,21 +43,20 @@ With all build dependencies installed, you can finally build and run emexOS.
 - `zig build -Dclean` - Remove (cache, output), fetch, build and run.
 - `zig build -Dnofetch -Dclean` - Remove (cache, output), build and run.
 
-## Console
+## $${Console}$$
 After booting, you will be asked for a password which is "emex" by default, to log in. The password can be changed in `shared/config/user.h`.
 
 Currently, no SMP support is available just yet so emexOS runs using only a single core.
 
 <div align="center">
-	<h2>Contributors</h2>
+	<h2>$${Contributors}$$</h2>
 	<a href="https://github.com/emexos/emexOS1/graphs/contributors">
 	  <img src="https://contrib.rocks/image?repo=emexos/emexOS1" />
 	</a>
-	<p>Made with [contrib.rocks](https://contrib.rocks).</p>
 </div>
 
----
+</br>
 
-<div align="center">
-	<p><bold>emexOS - by emexSW</bold></p>
+<div align="right">
+	<p>$\color{gray}{readme\ by\ emexSW,\ Voxi0\ and\ Bi\ Moz}$</p>
 </div>
