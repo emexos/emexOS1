@@ -6,6 +6,7 @@
 #include <drivers/cmos/cmos.h>
 #include <kernel/graph/theme.h>
 #include <kernel/proc/scheduler.h>
+//#include <kernel/multitasking/multitasking.h>
 #include <theme/doccr.h>
 
 // using PIT (8254)
@@ -17,12 +18,13 @@ static timer_callback_t timer_callbacks[MAX_TIMER_CALLBACKS];
 static int callback_count = 0;
 
 #if ENABLE_ULIME
-extern scheduler_t* scheduler;  // Zugriff auf globale Variable
+extern scheduler_t* scheduler;
+extern mt_t* mt;
 #endif
 
 void timer_handler(cpu_state_t* state)
 {
-    (void)state;
+    //(void)state;
 
     if (!timer_initialized) {
         return;
@@ -36,12 +38,10 @@ void timer_handler(cpu_state_t* state)
         }
     }
 
-    //banner_tick();
-
     // call schedule
     #if ENABLE_ULIME
-        if (scheduler) {
-            scheduler_tick(scheduler);
+        if (mt) {
+            mt_preempt(mt, state);  // real preemptive switch
         }
     #endif
 }
@@ -81,7 +81,7 @@ void timer_init(u32 frequency)
     timer_ticks = 0;
     timer_initialized = 1;
 
-    // Enable interrupts to start timer
+    // enable interrupts to start timer
     __asm__ volatile("sti");
 
     //TODO:

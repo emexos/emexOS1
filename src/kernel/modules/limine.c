@@ -113,3 +113,28 @@ int limine_module_load(const char *module_name, const char *vfs_path) {
 
     return 0;
 }
+
+/*
+int limine_module_find_raw(const char *module_name, void **out_addr, u64 *out_size) {
+    if (!module_request.response || module_request.response->module_count == 0) return -1;
+    if (!module_name || !out_addr || !out_size) return -1;
+
+    struct limine_module_response *response =
+        (struct limine_module_response *)module_request.response;
+
+    for (u64 i = 0; i < response->module_count; i++) {
+        const char *path = response->modules[i]->path;
+
+        const char *filename = path;
+        for (const char *p = path; *p; p++) {
+            if (*p == '/') filename = p + 1;
+        }
+
+        if (str_equals(filename, module_name)) {
+            *out_addr = (void *)response->modules[i]->address;
+            *out_size = response->modules[i]->size;
+            return 0;
+        }
+    }
+    return -1;
+}*/

@@ -41,11 +41,19 @@
     #define MKDIR       83
     #define FCHDIR     133
 
+    #define UNLINK      87
     #define IOCTL       16
     #define MMAP         9
     #define MUNMAP      11
+    #define FTRUNCATE   77
 
-    #define UNLINK      87  // delete file
+    #define MQ_OPEN    240
+    #define MQ_UNLINK  241
+    #define MQ_SEND    242
+    #define MQ_RECV    243
+
+
+    #define SHM_DESTROY 245
 
 #elif ARM64 == 1
     #define EXIT       93
@@ -67,23 +75,29 @@
     #define CLOSE      57
 
     #define STAT       80
-    //#define FSTAT    79
-    //#define LSTAT    79
+
+    #define MMAP      222
+    #define MUNMAP    215
+    #define FTRUNCATE  46
 
     #define FORK      220
     #define VFORK     221
     #define EXECVE    221
 
-    #define GETDENTS   78  // list directory
+    #define GETDENTS   78
     #define CHDIR      49
     #define MKDIR      80
     #define FCHDIR     50
 
+    #define UNLINK     87
     #define IOCTL      16
-    #define MMAP        9
-    #define MUNMAP     11
 
-    #define UNLINK     87  // delete file
+    #define MQ_OPEN   277
+    #define MQ_UNLINK 278
+    #define MQ_SEND   281
+    #define MQ_RECV   282
+
+    #define SHM_DESTROY 283
 
 #endif
 

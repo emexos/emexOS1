@@ -15,7 +15,7 @@
 #define JUMPTOUSER 1
 
 #define USE_HCF 1
-#define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
+#define BOOTUP_VISUALS 1 // verbose boot == 0, silent boot == 1
 
 // 1 == run tests like processes, scheduler which are in early developement and not finished
 // 0 == disable running those tests
@@ -33,15 +33,15 @@
 #define OVERWRITEALL 0
 
 #if HARDWARE_SC == 1
-    #define ENABLE_FAT32 0
-    #define ENABLE_ATA 0
-    #define ENABLE_ULIME 0
-    #define ENABLE_GLIME 0
+#	define ENABLE_FAT32 0
+#	define ENABLE_ATA 0
+#	define ENABLE_ULIME 0
+#	define ENABLE_GLIME 0
 #else
-    #define ENABLE_FAT32 1
-    #define ENABLE_ATA 1
-    #define ENABLE_ULIME 1
-    #define ENABLE_GLIME 1
+#	define ENABLE_FAT32 1
+#	define ENABLE_ATA 1
+#	define ENABLE_ULIME 1
+#	define ENABLE_GLIME 1
 #endif
 
 #define X64 1

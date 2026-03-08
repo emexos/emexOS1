@@ -73,9 +73,12 @@ void scroll_up(u32 lines)
     // clear bottom lines
     for (u32 y = fb_height - pixels_to_scroll; y < fb_height; y++) {
         u32 *row = framebuffer + y * pitch_dwords;
-        for (u32 x = 0; x < fb_width; x++) {
-            //framebuffer[y * pitch_dwords + x] = bg();
-            row[x] = bg_color;
+        if (bg_color == 0) {
+            memset(row, 0, bytes_per_row);
+        } else {
+            for (u32 x = 0; x < fb_width; x++) {
+                row[x] = bg_color;
+            }
         }
     }
 }

@@ -3,11 +3,11 @@
 
 void draw_rect(u32 x, u32 y, u32 width, u32 height, u32 color)
 {
-    for (u32 dy = 0; dy < height; dy++)
-    {
-        for (u32 dx = 0; dx < width; dx++)
-        {
-            putpixel(x + dx, y + dy, color);
+    u32 pitch_dwords = fb_pitch / 4;
+    for (u32 dy = 0; dy < height; dy++) {
+        u32 *row = framebuffer + (y + dy) * pitch_dwords + x;
+        for (u32 dx = 0; dx < width; dx++) {
+            row[dx] = color;
         }
     }
 }

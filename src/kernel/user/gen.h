@@ -19,7 +19,7 @@
 #include <kernel/proc/scheduler.h>
 #include <kernel/proc/proc_manager.h>
 #include <kernel/include/assembly.h>
-#include <kernel/console/console.h>
+//#include <kernel/console/console.h>
 
 #include <string/string.h>
 

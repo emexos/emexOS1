@@ -42,9 +42,9 @@ void fm_init(void) {
     BOOTUP_PRINTBS("[FM] ", GFX_GRAY_70);
     BOOTUP_PRINTBS("start font manager\n", white());
 
-    // default font is DOS font
-    current_font_type = FONT_8X8_BOLD;
-    current_font = &font_registry[FONT_8X8_BOLD];
+    // default font
+    current_font_type = CURRENT_FONT;
+    current_font = &font_registry[CURRENT_FONT];
 
     BOOTUP_PRINTBS("[FM] ", GFX_GRAY_70);
     BOOTUP_PRINTBS("default: ", white());

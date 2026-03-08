@@ -4,7 +4,7 @@
 #include <kernel/communication/serial.h>
 //#include <ui/fonts/font_8x8.h>
 
-#include <kernel/console/graph/dos.h>
+//#include <kernel/console/graph/dos.h>
 
 // made by Dexoron Feb. 18, 2026
 // Decode one UTF-8 sequence and return pointer to next byte.
@@ -102,42 +102,64 @@ static const char *utf8_next_codepoint(const char *p, u32 *codepoint)
 
 static void putchar_at(u32 codepoint, u32 x, u32 y, u32 color)
 {
-    u32 char_width = fm_get_char_width();
+    u32 char_width  = fm_get_char_width();
     u32 char_height = fm_get_char_height();
-    u32 row_bytes = fm_get_glyph_row_bytes();
-    u32 lsb_left = fm_get_glyph_lsb_left();
+    u32 row_bytes   = fm_get_glyph_row_bytes();
+    u32 lsb_left    = fm_get_glyph_lsb_left();
+    u32 pitch_dwords = fb_pitch / 4;
+    u32 bg_color    = bg();
 
     const u8 *glyph = fm_get_glyph_cp(codepoint);
     if (!glyph) return;
+
     for (u32 dy = 0; dy < char_height; dy++)
     {
-        u32 row = 0;
+        u32 row_bits = 0;
         const u8 *row_ptr = glyph + (dy * row_bytes);
         if (row_bytes == 1) {
-            row = row_ptr[0];
+            row_bits = row_ptr[0];
         } else if (row_bytes == 2) {
-            row = (u32)((u16)row_ptr[0] | ((u16)row_ptr[1] << 8));
+            row_bits = (u32)row_ptr[0] | ((u32)row_ptr[1] << 8);
         } else if (row_bytes == 4) {
-            row = (u32)row_ptr[0] |
-                  ((u32)row_ptr[1] << 8) |
-                  ((u32)row_ptr[2] << 16) |
-                  ((u32)row_ptr[3] << 24);
+            row_bits = (u32)row_ptr[0] | ((u32)row_ptr[1] << 8) |
+                       ((u32)row_ptr[2] << 16) | ((u32)row_ptr[3] << 24);
         } else {
             return;
         }
 
-        for (u32 dx = 0; dx < char_width; dx++)
-        {
-            u32 bit_index = lsb_left ? dx : ((char_width - 1u) - dx);
-            if (row & (1u << bit_index))
-            {
-                for (u32 sy = 0; sy < font_scale; sy++) {
-                    for (u32 sx = 0; sx < font_scale; sx++) {
-                        putpixel(x + dx * font_scale + sx, y + dy * font_scale + sy, color);
-                    }
+        for (u32 sy = 0; sy < font_scale; sy++) {
+            u32 *fb_row = framebuffer + (y + dy * font_scale + sy) * pitch_dwords + x;
+            for (u32 dx = 0; dx < char_width; dx++) {
+                u32 bit_index = lsb_left ? dx : ((char_width - 1u) - dx);
+                u32 pixel_color = (row_bits & (1u << bit_index)) ? color : bg_color;
+                for (u32 sx = 0; sx < font_scale; sx++) {
+                    fb_row[dx * font_scale + sx] = pixel_color;
                 }
             }
         }
+    }
+}
+
+static void bs_scroll(u32 line_height) {
+    u32 fb_w = get_fb_width();
+    u32 fb_h = get_fb_height();
+    u32 pitch_dwords = get_fb_pitch() / 4;
+    u32 *fb = get_framebuffer();
+    u32 bytes_per_row = fb_w * sizeof(u32);
+
+    // shift everything up by line_height rows
+    for (u32 y = line_height; y < fb_h; y++) {
+        memcpy(fb + (y - line_height) * pitch_dwords,
+               fb + y * pitch_dwords,
+               bytes_per_row);
+    }
+
+    // clear bottom lines
+    u32 clear_start = fb_h - line_height;
+    u32 *first_clear_row = fb + clear_start * pitch_dwords;
+    for (u32 x = 0; x < fb_w; x++) first_clear_row[x] = 0xFF000000;
+    for (u32 y = clear_start + 1; y < fb_h; y++) {
+        memcpy(fb + y * pitch_dwords, first_clear_row, bytes_per_row);
     }
 }
 
@@ -152,7 +174,10 @@ static void putcodepoint(u32 codepoint, u32 color)
     {
         cursor_x = 0;
         cursor_y += line_height;
-        console_window_check_scroll();
+        if (cursor_y + char_height > fb_height) {
+            bs_scroll(line_height);
+            cursor_y -= line_height;
+        }
         return;
     }
 
@@ -160,10 +185,11 @@ static void putcodepoint(u32 codepoint, u32 color)
     {
         cursor_x = 0;
         cursor_y += line_height;
-        console_window_check_scroll();
+        if (cursor_y + char_height > fb_height) {
+            bs_scroll(line_height);
+            cursor_y -= line_height;
+        }
     }
-
-    console_window_check_scroll();
 
     putchar_at(codepoint, cursor_x, cursor_y, color);
     cursor_x += char_spacing;
@@ -241,15 +267,19 @@ void IntToString(int value, char *buffer)
 
 void printInt(int value, u32 color)
 {
-    char buffer[12];
-    IntToString(value, buffer);
-    string(buffer, color);
+	#if BOOTUP_VISUALS == 0
+	    char buffer[12];
+	    IntToString(value, buffer);
+	    string(buffer, color);
+	#endif
 }
 
 void print(const char *str, u32 color)
 {
-    string(str, color);
-    //putchar('\n', color);
+	#if BOOTUP_VISUALS == 0
+    	string(str, color);
+     //putchar('\n', color);
+    #endif
 }
 
 void reset_cursor(void)

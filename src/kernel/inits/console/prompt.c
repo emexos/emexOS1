@@ -1,6 +1,6 @@
 #include "gen.h"
 
-#include <kernel/console/console.h>
+//#include <kernel/console/console.h>
 
 
 void promptdirs(void) {

@@ -26,8 +26,8 @@ void DEinit(void)
 
     // smth like desktop enviroment and userswitch are here
 
-    console_init();
-    keyboard_poll();
+    //console_init();
+    //keyboard_poll();
 
 
 }
