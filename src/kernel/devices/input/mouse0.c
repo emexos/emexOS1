@@ -21,8 +21,11 @@ static void *mouse0_open(const char *path) {
     return (void *)1;
 }
 
-static int mouse0_read(void *handle, void *buf, size_t count) {
+static int mouse0_read(void *handle, void *buf, size_t count, u64 offset) {
     (void)handle;
+    (void)buf;
+    (void)count;
+    (void)offset;
 
 /*
 	size_t ev_size = sizeof(mouse_event_t);
@@ -41,13 +44,11 @@ static int mouse0_read(void *handle, void *buf, size_t count) {
     }
 
     return (int)written; */
-
-	return 0;
+    return 0;
 }
 
-// no write for input devices
-static int mouse0_write(void *handle, const void *buf, size_t count) {
-    (void)handle; (void)buf; (void)count;
+static int mouse0_write(void *handle, const void *buf, size_t count, u64 offset) {
+    (void)handle; (void)buf; (void)count; (void)offset;
     return -1;
 }
 

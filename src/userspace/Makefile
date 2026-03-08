@@ -12,6 +12,7 @@ all:
 	@$(MAKE) -C bin/tree
 	@$(MAKE) -C bin/cd
 	@$(MAKE) -C bin/cat
+	@$(MAKE) -C bin/lsblk
 
 clean:
 	@$(MAKE) -C libc clean
@@ -27,5 +28,6 @@ clean:
 	@$(MAKE) -C bin/tree clean
 	@$(MAKE) -C bin/cd clean
 	@$(MAKE) -C bin/cat clean
+	@$(MAKE) -C bin/lsblk clean
 
 .PHONY: all clean

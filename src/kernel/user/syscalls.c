@@ -507,6 +507,7 @@ u64 scall_ioctl(ulime_proc_t *proc, u64 fd, u64 request, u64 arg_ptr)
             case 0: tty0_set_echo_mode(0); return 0; // TTY_ECHO
             case 1: tty0_set_echo_mode(1); return 0; // TTY_NOECHO
             case 2: tty0_set_echo_mode(2); return 0; // TTY_MASKECHO
+            case 3: tty0_set_echo_mode(3); return 0; // TTY_RAW
             default: return (u64)-1;
         }
     }

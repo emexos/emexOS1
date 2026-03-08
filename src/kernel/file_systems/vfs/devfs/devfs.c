@@ -32,14 +32,18 @@ static ssize_t devfs_read(fs_file *file, void *buf, size_t cnt) {
     devfs_data *dev = (devfs_data*)file->node->priv;
     if (!dev || !dev->mod || !dev->mod->read) return -1;
 
-    return dev->mod->read(dev->handle, buf, cnt);
+    ssize_t n = dev->mod->read(dev->handle, buf, cnt, file->pos);
+    if (n > 0) file->pos += (u64)n;
+    return n;
 }
 
 static ssize_t devfs_write(fs_file *file, const void *buf, size_t cnt) {
     devfs_data *dev = (devfs_data*)file->node->priv;
     if (!dev || !dev->mod || !dev->mod->write) return -1;
 
-    return dev->mod->write(dev->handle, buf, cnt);
+    ssize_t n = dev->mod->write(dev->handle, buf, cnt, file->pos);
+    if (n > 0) file->pos += (u64)n;
+    return n;
 }
 
 static fs_node* devfs_lookup(fs_node *dir, const char *name) {

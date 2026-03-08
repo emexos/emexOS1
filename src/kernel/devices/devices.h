@@ -11,7 +11,7 @@
 #include <kernel/devices/disks/hdd0.h>
 
 #define ATANAME "dev_atahdd0"
-#define ATAPATH "/dev/hdd0"
+#define ATAPATH "/dev/hda"
 #define ATAUNIVERSAL VERSION_NUM(0, 1, 2, 0)
 
 #define KBDNAME "dev_ps2_keyboard0"

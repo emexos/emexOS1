@@ -245,15 +245,72 @@ static fs_node *procfs_lookup(fs_node *dir, const char *name)
 
     return NULL;
 }
+static fs_ops procfs_ops;
+static fs_node* procfs_readdir(fs_node *dir) {
+    //(void)dir;
+
+    if (!dir || !dir->priv) return NULL;
+    procfs_data *data = (procfs_data *)dir->priv;
+
+    #if ENABLE_ULIME
+	    if (data->kind == PROCFS_KIND_ROOT)
+		{
+	        if (!ulime) return NULL;
+
+	        fs_node *head = NULL;
+	        fs_node *tail = NULL;
+	        ulime_proc_t *proc = ulime->ptr_proc_list;
+
+	        while (proc)
+			{
+	            char pidstr[24];
+	            u64 pid = proc->pid;
+	            int ti = 0;
+	            char tmp[24];
+
+	            if (pid == 0) { pidstr[0] = '0'; pidstr[1] = '\0'; }
+	            else {
+	                while (pid > 0) { tmp[ti++] = '0' + (int)(pid % 10); pid /= 10; }
+	                for (int i = 0; i < ti; i++) pidstr[i] = tmp[ti - 1 - i];
+	                pidstr[ti] = '\0';
+	            }
+
+	            fs_node *n = procfs_mknode(pidstr, FS_DIR, proc->pid, PROCFS_KIND_DIR);
+
+	            if (n) {
+	                n->ops = &procfs_ops;
+	                if (!head) head = n;
+	                else tail->next = n;
+	                tail = n;
+	            }
+	            proc = proc->next;
+	        }
+	        return head;
+	    }
+	    if (data->kind == PROCFS_KIND_DIR) {
+	        fs_node *status = procfs_mknode(STATUS_MSG, FS_FILE, data->pid, PROCFS_KIND_STATUS);
+	        fs_node *maps   = procfs_mknode(MAPS_MSG,   FS_FILE, data->pid, PROCFS_KIND_MAPS);
+
+	        if (status) status->ops = &procfs_ops;
+	        if (maps) maps->ops = &procfs_ops;
+	        if (status && maps) status->next = maps;
+
+	        return status ? status : maps;
+	    }
+    #endif
+
+    return NULL;
+}
 
 static fs_ops procfs_ops = {
-    .open = procfs_open,
-    .close = procfs_close,
-    .read = procfs_read,
-    .write = procfs_write,
-    .lookup = procfs_lookup,
-    .create = NULL,
-    .mkdir = NULL,
+    .open    = procfs_open,
+    .close   = procfs_close,
+    .read    = procfs_read,
+    .write   = procfs_write,
+    .lookup  = procfs_lookup,
+    .create  = NULL,
+    .mkdir   = NULL,
+    .readdir = procfs_readdir,
 };
 
 //

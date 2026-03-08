@@ -20,6 +20,7 @@ void initvfs(void){
 
     //fs_mkdir(CONF_DIRECTORY);
     fs_mkdir(PROC_DIRECTORY);
+    fs_mkdir(SYS_DIRECTORY);
 
-    //initrd.cpio....
+    //initrd.cpio does the rest :)
 }

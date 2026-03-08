@@ -1,5 +1,6 @@
 //#include "init.h"
 #include <kernel/inits/fs/init.h>
+#include <kernel/file_systems/vfs/sysfs/sysfs.h>
 int init_boot_log = -1;
 char *logpath = "/emr/system/logs/log1.txt";
 #include "vfs.h"
@@ -131,6 +132,7 @@ void fs_system_init(void *klime)
     tmpfs_register();
     devfs_register();
     procfs_register();
+    sysfs_register();
 
     log("[FS]", "mounting roots: \n", white());
 
@@ -138,6 +140,7 @@ void fs_system_init(void *klime)
     fs_mount(NULL, ROOT_MOUNT_DEFAULT, ROOTFS);
     fs_mount(NULL, DEV_MOUNT_DEFAULT,  DEVFS);
     fs_mount(NULL, PROC_MOUNT_DEFAULT, PROCFS);
+    //fs_mount(NULL, SYS_MOUNT_DEFAULT,  SYSFS);
 
     initvfs();
 

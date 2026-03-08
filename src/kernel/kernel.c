@@ -271,49 +271,29 @@ void _start(void)
     }
 
     #if ENABLE_ATA == 1
-    ata_init();{
-        // Initialize partition system
-        int part_result = partition_init();
+    	ata_init();{
+            // initialize partition system
+            int part_result = partition_init();
 
-        if (part_result != 0 || partition_needs_format()) {
-            //BOOTUP_PRINT("[DISK] ", GFX_GRAY_70);
+            if (part_result != 0 || partition_needs_format()) {
+                log("[DISK]", "no valid partition found\n", warning);
+                log("[DISK]", "run 'install' to set up the disk\n", warning);
+            }
 
-            #if OVERWRITEALL == 1
-                log("[DISK]", "(OVERWRITEALL=1)...\n", d);
-                if
-                    (partition_format_disk_fat32() == 0)
-                {
-                    log("[DISK]", "Creating FAT32 filesystem...\n", d);
-                    if
-                        (fat32_format_partition(2048, ATAget_device(0)->sectors - 4096) == 0)
-                    {
-                        log("[DISK]", "Disk formated successfully\n", success);
-                        partition_init();
-                    }  else
-                    {
-                        log("[DISK]", "FAT32 Format failed\n", error);
-                    }
-                } else
-                {
-                    log("[DISK]", "MBR creation failed\n", error);
-                }
-            #else
-                log("[DISK]", "Disk needs formatting\n", warning);
-                log("[DISK]", "set \"OVERWRITEALL=0\" to \"1\" in shared/config/disk.h\n", warning);
+            #if ENABLE_FAT32 == 1
+                log("[FAT32]", "mounting FAT32 file system\n", d);
+                fat32_init();
             #endif
         }
-        #if ENABLE_FAT32 == 1
-            log("[FAT32]", "mounting FAT32 file system\n", d);
-            fat32_init();
-        #endif
         #if ENABLE_FAT32
             //fat32_mount("/dev/hda1", "/boot", "fat32");
             //log("[BOOT]", "Boot partition mounted at /boot\n", d);
         #endif
-    }
     #else
-        log("[ATA]", "skipped (hardware compatibility)\n", warning);
+            log("[ATA]", "skipped (hardware compatibility)\n", warning);
     #endif
+
+    fs_mount(NULL, SYS_MOUNT_DEFAULT, SYSFS);
 
     //logo_init();
     //draw_logo();

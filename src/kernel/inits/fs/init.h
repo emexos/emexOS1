@@ -10,18 +10,21 @@ void initvfs(void);
 #define ROOT_MOUNT_DEFAULT "/"
 
 #define FAT32 "fat32"
-#define FAT32_DIRECTORY  "/"
+#define FAT32_DIRECTORY "/"
 
 #define EXT2 "ext2"
-#define EXT2_DIRECTORY  "/"
+#define EXT2_DIRECTORY "/"
 
 #define TMPFS "tmpfs"
-#define TMP_DIRECTORY  "/tmp"
+#define TMP_DIRECTORY "/tmp"
 
+#define SYSFS "sysfs"
+#define SYS_MOUNT_DEFAULT "/sys"
+#define SYS_DIRECTORY "/sys"
 
 #define DEVFS "devfs"
 #define DEV_MOUNT_DEFAULT "/dev"
-#define DEV_DIRECTORY  "/dev"
+#define DEV_DIRECTORY "/dev"
 #define _DEV  "/dev/"
 #define MOUNT_DEV "/dev/hda"
 
