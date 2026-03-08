@@ -1,10 +1,10 @@
 #include "gen.h"
 
-#include <kernel/console/console.h>
+//#include <kernel/console/console.h>
 
 
 void init_consoletheme(void) {
-    int fd = fs_open("/.config/ekmsh/theme.cfg", O_CREAT | O_WRONLY); // get read by graph/theme
+    int fd = fs_open(CONSOLECONFIG "/theme.cfg", O_CREAT | O_WRONLY); // get read by graph/theme
     if (fd >= 0) {
         const char *default_theme =
             "# use: 0xAARRGGBB\n"

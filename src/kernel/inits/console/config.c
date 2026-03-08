@@ -1,9 +1,9 @@
 #include "gen.h"
 
-#include <kernel/console/console.h>
+//#include <kernel/console/console.h>
 
 void running_console_config_init(void) {
-    int fd = fs_open("/.config/ekmsh/con.cfg", O_CREAT | O_WRONLY); // get read by graph/theme
+    int fd = fs_open(CONSOLECONFIG "/con.cfg", O_CREAT | O_WRONLY); // get read by graph/theme
     if (fd >= 0) {
         const char *Cconfiguration =
             "CONSOLE_PROG: \"ekmsh\"\n"

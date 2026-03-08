@@ -7,7 +7,6 @@
 #include <string/string.h>
 //#include <kernel/mem/paging/paging.h>
 #include <kernel/graph/theme.h>
-#include <kernel/console/graph/print.h>
 #include <kernel/packages/emex/emex.h>
 #include <kernel/packages/elf/loader.h>
 #include <kernel/file_systems/vfs/vfs.h>
@@ -21,10 +20,17 @@
 
 #include <kernel/devices/devices.h>
 
+#include <config/user.h>
+
 // memory
 #include <syscalls/mmap.h>
 #include <kernel/mem/paging/paging.h>
 #include <kernel/mem/phys/physmem.h>
+
+//ipc
+#include <kernel/multitasking/ipc/ipc.h>
+
+#include "scalls/scalls.h"
 
 //#include <kernel/devices/fb0/fb0.h>
 //#include <kernel/devices/tty/tty0.h>
@@ -523,7 +529,7 @@ u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
     return (u64)(cwlen + 1); // return written byte count (> 0 = success)
 }
 
-u64 scall_mmap(ulime_proc_t *proc, u64 args_ptr, u64 arg2, u64 arg3) {
+/*u64 scall_mmap(ulime_proc_t *proc, u64 args_ptr, u64 arg2, u64 arg3) {
     (void)arg2; (void)arg3;
 
     if (!args_ptr || args_ptr > 0x0000800000000000ULL) return (u64)MAP_FAILED;
@@ -604,7 +610,7 @@ u64 scall_munmap(ulime_proc_t *proc, u64 addr, u64 length, u64 arg3) {
         paging_unmap_page(addr + i * 4096);
     }
     return 0;
-}
+}*/
 
 void _init_syscalls_table(ulime_t *ulime_ptr) {
     if (!ulime_ptr) return;
@@ -612,24 +618,30 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     g_ulime = ulime_ptr;
     memset(ulime_ptr->syscalls, 0, sizeof(ulime_ptr->syscalls));
 
-    ulime_ptr->syscalls[READ]     = scall_read;
-    ulime_ptr->syscalls[WRITE]    = scall_write;
+    ulime_ptr->syscalls[READ]            = scall_read;
+    ulime_ptr->syscalls[WRITE]           = scall_write;
     //ulime->syscalls[READ]   = scall_read;
-    ulime_ptr->syscalls[OPEN]     = scall_open;
-    ulime_ptr->syscalls[CLOSE]    = scall_close;
-    ulime_ptr->syscalls[GETPID]   = scall_getpid;
-    ulime_ptr->syscalls[BRK]      = scall_brk;
-    ulime_ptr->syscalls[EXIT]     = scall_exit;
-    ulime_ptr->syscalls[EXECVE]   = scall_execve;
-    ulime_ptr->syscalls[GETDENTS] = scall_getdents;
-    ulime_ptr->syscalls[CHDIR]    = scall_chdir;
-    ulime_ptr->syscalls[GETCWD]   = scall_getcwd;
-    ulime_ptr->syscalls[MMAP]     = scall_mmap;
-    ulime_ptr->syscalls[MUNMAP]   = scall_munmap;
-    ulime_ptr->syscalls[IOCTL]    = scall_ioctl;
+    ulime_ptr->syscalls[OPEN]            = scall_open;
+    ulime_ptr->syscalls[CLOSE]           = scall_close;
+    ulime_ptr->syscalls[GETPID]          = scall_getpid;
+    ulime_ptr->syscalls[BRK]             = scall_brk;
+    ulime_ptr->syscalls[EXIT]            = scall_exit;
+    ulime_ptr->syscalls[EXECVE]          = scall_execve;
+    ulime_ptr->syscalls[GETDENTS]        = scall_getdents;
+    ulime_ptr->syscalls[CHDIR]           = scall_chdir;
+    ulime_ptr->syscalls[GETCWD]          = scall_getcwd;
+    ulime_ptr->syscalls[IOCTL]           = scall_ioctl;
+    ulime_ptr->syscalls[MQ_OPEN]         = scall_mq_open;
+    ulime_ptr->syscalls[MQ_UNLINK]       = scall_mq_unlink;
+    ulime_ptr->syscalls[MQ_SEND]         = scall_mq_send;
+    ulime_ptr->syscalls[MQ_RECV]         = scall_mq_recv;
+    //ulime_ptr->syscalls[SHM_DESTROY]       = scall_shm_destroy;
+    ulime_ptr->syscalls[MMAP]            = scall_mmap;
+    ulime_ptr->syscalls[MUNMAP]          = scall_munmap;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }
+
 
 // syscall handler (called from assembly) uses find_proc_by_cr3
 u64 syscall_handler(u64 syscall_num, u64 arg1, u64 arg2, u64 arg3) {

@@ -2,24 +2,25 @@
 #include <kernel/graph/graphics.h>
 #include <kernel/communication/serial.h>
 #include <ui/fonts/font_8x8_bold.h>
-#include <kernel/console/graph/dos.h>
 
 static void putchar_bootstrap_at(char c, u32 x, u32 y, u32 color)
 {
     const u8 *glyph = font_8x8_bold[(u8)c];
+    u32 pitch_dwords = fb_pitch / 4;
+    // bootstrap phase uses black background
+    u32 bg_color = 0x00000000;
 
     for (int dy = 0; dy < 8; dy++)
     {
         u8 row = glyph[dy];
-        for (int dx = 0; dx < 8; dx++)
-        {
-            if (row & (1 << (7 - dx)))
-            {
-                // Draw scaled pixel
-                for (u32 sy = 0; sy < font_scale; sy++) {
-                    for (u32 sx = 0; sx < font_scale; sx++) {
-                        putpixel(x + dx * font_scale + sx, y + dy * font_scale + sy, color);
-                    }
+        // draw font_scale scanlines per glyph row
+        for (u32 sy = 0; sy < font_scale; sy++) {
+            u32 *fb_row = framebuffer + (y + dy * font_scale + sy) * pitch_dwords + x;
+            for (int dx = 0; dx < 8; dx++) {
+                // draw both fg and bg in single pass
+                u32 pixel_color = (row & (1 << (7 - dx))) ? color : bg_color;
+                for (u32 sx = 0; sx < font_scale; sx++) {
+                    fb_row[dx * font_scale + sx] = pixel_color;
                 }
             }
         }
@@ -40,7 +41,7 @@ void putchar_bootstrap(char c, u32 color)
         return;
     }
 
-    // Check if we need to wrap to next line
+    // check if we need to wrap to next line
     if (cursor_x + char_width >= fb_width)
     {
         cursor_x = 0; // past was 20

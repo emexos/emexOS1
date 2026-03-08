@@ -2,7 +2,7 @@
 
 #include <kernel/module/module.h>
 #include <kernel/communication/serial.h>
-#include <kernel/console/graph/print.h>
+#include <string/string.h>
 #include <kernel/arch/x86_64/exceptions/irq.h>
 #include <drivers/ps2/keyboard/keyboard.h>
 #include <theme/doccr.h>

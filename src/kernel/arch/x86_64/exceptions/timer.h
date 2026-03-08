@@ -2,6 +2,7 @@
 #define TIMER_H
 
 #include <types.h>
+#include <kernel/multitasking/multitasking.h>
 
 #define TIMER_FREQUENCY 1000  // 1000 Hz = 1ms Ticks
 #define MAX_TIMER_CALLBACKS 8

@@ -66,10 +66,13 @@ klime_t *klime = NULL;
     #include <kernel/kernel_processes/loader.h>
     #include <kernel/kernel_processes/bootscreen/boot.h>
     #include <kernel/kernel_processes/fm/fm.h>
+    #include <kernel/multitasking/multitasking.h>
+    #include <kernel/multitasking/ipc/ipc.h>
     scheduler_t *scheduler = NULL;
     #define SCHEDQUANT 20
     proc_manager_t *proc_mgr = NULL;
     ulime_t *ulime = NULL;
+    mt_t *mt = NULL;
 #endif
 
 //vFS & fs & disk
@@ -107,8 +110,9 @@ void _start(void)
         // emexOS start
         // Ensure that Limine base revision is supported and that we have a framebuffer
         if (framebuffer_request.response == NULL ||
-            framebuffer_request.response->framebuffer_count < 1) {
-                printf("no response");
+            framebuffer_request.response->framebuffer_count < 1)
+        {
+            printf("no response");
             hcf(); // enable text mode
         }
 
@@ -121,7 +125,6 @@ void _start(void)
         cursor_x = 0;
         cursor_y = 0;
         font_scale = 1;
-        f_setcontext(FONT_8X8);
         clear(bg());
 
         BOOTUP_PRINT("\n\n ======================\n", white());
@@ -129,14 +132,12 @@ void _start(void)
         BOOTUP_PRINT("emexOS", cyan());
         BOOTUP_PRINT("! |\n", white());
         BOOTUP_PRINT(" ======================\n\n", white());
-        delay(2);
 
         #if BOOTUP_VISUALS == 1
             log("[BOOT]", "BOOTUP_VISUALS == 1\n", warning);
         #else
             log("[BOOT]", "BOOTUP_VISUALS == 0\n", warning);
         #endif
-        delay(3);
 
         //actually not needed but maybe later (e.g. for testing themes)
         //draw_rect(10, 10, fb_width - 20, fb_height - 20, blue());
@@ -210,6 +211,14 @@ void _start(void)
                 scheduler = scheduler_init(ulime, SCHEDQUANT);
                 proc_mgr = proc_mng_init(ulime);
 
+                mt = (mt_t*)klime_create(ulime->klime, sizeof(mt_t));
+                if (mt) {
+                    mt_init(mt, scheduler, ulime);
+                    //log("[MT]", "multitasking initialized\n", d);
+                    //ipc_init();
+                    //ipc_test();
+                }
+
                 if (scheduler) {
                     char buf[32];
                     str_append_uint(buf, SCHEDQUANT);
@@ -220,6 +229,13 @@ void _start(void)
                 if (proc_mgr) {
                     log("[PROCMGR]", "initialized\n", d);
                 }
+
+                init_ipc:
+            	{
+	                ipc_messages_init();
+	                ipc_shm_init();
+	                //ipc_test();
+                };
 
                 syscall_arch_init(); // SYSCALL/SYSRET
                 _init_syscalls_table(ulime);
@@ -313,10 +329,8 @@ void _start(void)
         // Register driver modules
         log("[MOD]", "Init regs:\n", d);
 
-        #if ENABLE_ATA
+        //module_register(&console_module);
         module_register(&ata_module);
-        #endif
-        module_register(&console_module);
         module_register(&null_module);
         module_register(&zero_module);
         module_register(&fb0_module);

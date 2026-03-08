@@ -59,13 +59,16 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
 
-	@echo "[MOD] creating & copying executables..."
+	@echo "[MK] copying executables..."
 	@mkdir -p $(DISK_DIR)/rd/user/apps
 	@mkdir -p $(DISK_DIR)/rd/user/bin
 	@mkdir -p $(DISK_DIR)/rd/bin
 	@mkdir -p $(DISK_DIR)/rd/emr/system
 	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/apps/
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system
+
+	@echo "[MK] copying files..."
+#@cp limine.conf $(DISK_DIR)/rd/boot/
 	@cp src/userspace/apps/login/login.elf $(DISK_DIR)/rd/emr/system
 	@cp src/userspace/bin/echo/echo.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/hello/hello.elf $(DISK_DIR)/rd/bin/
@@ -75,7 +78,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp src/userspace/bin/cd/cd.elf $(DISK_DIR)/rd/bin/
 
 
-	@echo "[MOD] creating initrd.cpio..."
+	@echo "[MK] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh
 	./tools/initrd.sh
 	@cp $(DISK_DIR)/initrd.cpio $(ISODIR)/boot/
