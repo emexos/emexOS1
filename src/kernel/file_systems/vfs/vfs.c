@@ -200,8 +200,14 @@ int fs_listdir(const char *path, _emx_kdirent_t *buf, int max_entries) {
     fs_node *node = fs_resolve(path);
     if (!node || node->type != FS_DIR) return -1;
 
+    fs_node *children = NULL;
+    if (node->ops && node->ops->readdir)
+        children = node->ops->readdir(node);
+    else
+        children = node->children;
+
     int count = 0;
-    fs_node *child = node->children;
+    fs_node *child = children;
 
     while (child && count < max_entries) {
         buf[count].type = child->type;

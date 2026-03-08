@@ -67,9 +67,8 @@ typedef struct {
 struct fs_ops {
     int (*open)(fs_node *node, fs_file *file);
     int (*close)(fs_file *file);
-    ssize_t (*read)(fs_file *file, void *buf, size_t cnt);        // read
-    ssize_t (*write)(fs_file *file, const void *buf, size_t cnt); // write
-                                                                  // could be used for syscalls
+    ssize_t (*read)(fs_file *file, void *buf, size_t cnt);
+    ssize_t (*write)(fs_file *file, const void *buf, size_t cnt);
 
     fs_node* (*lookup)(fs_node *dir, const char *name);
     int (*create)(fs_node *dir, const char *name);
@@ -78,6 +77,9 @@ struct fs_ops {
     //tmpfs using ram
     // devfs using modules/modules...
     // ... maybe writing on disk
+
+
+    fs_node* (*readdir)(fs_node *dir);
 };
 
 // filesystem type

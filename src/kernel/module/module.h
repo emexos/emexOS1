@@ -19,8 +19,8 @@ typedef struct driver_module {
     // not used just for the file system in future
     //
     void *(*open)(const char *path);
-    int (*read)(void *handle, void *buf, size_t count);
-    int (*write)(void *handle, const void *buf, size_t count);
+    int (*read)(void *handle, void *buf, size_t count, u64 offset);
+    int (*write)(void *handle, const void *buf, size_t count, u64 offset);
 
 } driver_module;
 

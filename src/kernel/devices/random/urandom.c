@@ -49,8 +49,9 @@ void *urandom_open_fn(const char *path) {
     return (void *)1;
 }
 
-int urandom_read_fn(void *handle, void *buf, size_t count) {
+int urandom_read_fn(void *handle, void *buf, size_t count, u64 offset) {
     (void)handle;
+    (void)offset;
     u8 *out = (u8 *)buf;
     size_t i = 0;
 
@@ -77,10 +78,11 @@ int urandom_read_fn(void *handle, void *buf, size_t count) {
     return (int)count;
 }
 
-int urandom_write_fn(void *handle, const void *buf, size_t count) {
+int urandom_write_fn(void *handle, const void *buf, size_t count, u64 offset) {
     // accept writes mb for future
     (void)handle;
     (void)buf;
+    (void)offset;
     return (int)count;
 }
 

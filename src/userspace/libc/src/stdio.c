@@ -18,12 +18,12 @@ FILE *fopen(const char *path, const char *mode)
 {
     if (!path || !mode) { errno = EINVAL; return NULL; }
 
-    int flags  = 0;
+    int flags = 0;
     int fflags = 0;
 
     // parse mode string
     char m = mode[0];
-    int  plus = (mode[1] == '+') || (mode[2] == '+');
+    int plus = (mode[1] == '+') || (mode[2] == '+');
 
     if (m == 'r') {
         flags  = plus ? O_RDWR : O_RDONLY;
@@ -290,4 +290,15 @@ int puts(const char *s) {
     write(STDOUT_FILENO, s, strlen(s));
     write(STDOUT_FILENO, "\n", 1);
     return 0;
+}
+
+void perror(const char *s) {
+    // "prefix: error message\n"
+    if (s && s[0] != '\0') {
+        write(STDERR_FILENO, s, strlen(s));
+        write(STDERR_FILENO, ": ", 2);
+    }
+    const char *msg = strerror(errno);
+    write(STDERR_FILENO, msg, strlen(msg));
+    write(STDERR_FILENO, "\n", 1);
 }

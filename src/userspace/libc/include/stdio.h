@@ -19,6 +19,7 @@ extern FILE *stdin;
 extern FILE *stdout;
 extern FILE *stderr;
 
+void perror(const char *s);
 
 FILE *fopen(const char *path, const char *mode);
 

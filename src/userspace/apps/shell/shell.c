@@ -2,8 +2,17 @@
 #include <unistd.h>
 #include <string.h>
 
+
+//-////////////////////////////////////////-//
+//-//                                    //-//
+//-//              SHELLY :)             //-//
+//-//       emex user-space shell        //-//
+//-//                                    //-//
+//-////////////////////////////////////////-//
+
 #define BUFFER 256
 #define SHELL_PROMPT "\033[0m[pc@emexos]$ "
+#define SHELL_CONFIG "/.config/shelly/"
 #define BIN_PATH "/bin/"
 
 
@@ -52,7 +61,7 @@ int main(void)
 
     for (;;)
     {
-        write(STDOUT_FILENO, SHELL_PROMPT, sizeof(SHELL_PROMPT) - 1);
+        printf(SHELL_PROMPT);
 
         // block until newline (\n)
         ssize_t n = read(STDIN_FILENO, buf, sizeof(buf) - 1);
@@ -69,8 +78,8 @@ int main(void)
 
         int ret = exec_from_bin(argv[0], argv);
         if (ret < 0) {
-            write(STDOUT_FILENO, argv[0], strlen(argv[0]));
-            write(STDOUT_FILENO, ": command not found\n", 20);
+            printf(argv[0]);
+            printf(": command not found\n");
         }
     }
 

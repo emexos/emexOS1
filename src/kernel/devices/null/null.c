@@ -16,14 +16,13 @@ static void *null_open(const char *path) {
     return (void *)1;
 }
 
-static int null_read(void *handle, void *buf, size_t count) {
-    (void)handle; (void)buf; (void)count;
+static int null_read(void *handle, void *buf, size_t count, u64 offset) {
+    (void)handle; (void)buf; (void)count; (void)offset;
     // eof
     return 0;
 }
-
-static int null_write(void *handle, const void *buf, size_t count) {
-    (void)handle; (void)buf;
+static int null_write(void *handle, const void *buf, size_t count, u64 offset) {
+    (void)handle; (void)buf; (void)offset;
     return (int)count;
 }
 

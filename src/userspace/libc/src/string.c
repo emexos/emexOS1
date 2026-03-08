@@ -1,5 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
+#include <errno.h>
 
 void *memcpy(void *dst, const void *src, size_t n) {
     unsigned char *d = dst; const unsigned char *s = src;
@@ -25,6 +26,31 @@ int memcmp(const void *a, const void *b, size_t n) {
 }
 // who designed this, shouldnt this be in stdlib.c......
 
+char *strerror(int errnum) {
+    switch (errnum) {
+        case 0:      return "success";
+        case EPERM:  return "operation not permitted";
+        case ENOENT: return "no such file or directory";
+        case ESRCH:  return "no such process";
+        case EINTR:  return "interrupted system call";
+        case EIO:    return "i/o error";
+        case EBADF:  return "bad file descriptor";
+        case ENOMEM: return "out of memory";
+        case EACCES: return "permission denied";
+        case EFAULT: return "bad address";
+        case EEXIST: return "file exists";
+        case ENODEV: return "no such device";
+        case ENOTDIR:return "not a directory";
+        case EISDIR: return "is a directory";
+        case EINVAL: return "invalid argument";
+        case EMFILE: return "too many open files";
+        case ENOSPC: return "no space left on device";
+        case EPIPE:  return "broken pipe";
+        case ERANGE: return "result too large";
+        case ENOSYS: return "function not implemented";
+        default:     return "unknown error";
+    }
+}
 
 size_t strlen(const char *s) {
     size_t n = 0; while (s[n]) n++; return n;

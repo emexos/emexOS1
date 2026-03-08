@@ -23,8 +23,9 @@ static void *kbd_dev_open(const char *path) {
     return (void *)1; // dummy handle
 }
 
-static int kbd_dev_read(void *handle, void *buf, size_t count) {
+static int kbd_dev_read(void *handle, void *buf, size_t count, u64 offset) {
     (void)handle;
+    (void)offset;
 
     size_t ev_size = sizeof(key_event_t);
     size_t written = 0;
@@ -46,8 +47,11 @@ static int kbd_dev_read(void *handle, void *buf, size_t count) {
 }
 
 // there is no write for input devices
-static int kbd_dev_write(void *handle, const void *buf, size_t count) {
-    (void)handle; (void)buf; (void)count;
+static int kbd_dev_write(void *handle, const void *buf, size_t count, u64 offset) {
+    (void)handle;
+    (void)buf;
+    (void)count;
+    (void)offset;
     return -1;
 }
 

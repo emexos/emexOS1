@@ -26,8 +26,9 @@ static void *fb0_open(const char *path) {
     return (void *)1;
 }
 
-static int fb0_read(void *handle, void *buf, size_t count) {
+static int fb0_read(void *handle, void *buf, size_t count, u64 offset) {
     (void)handle;
+    (void)offset;
     u32 *fb = get_framebuffer();
     u32 pitch = get_fb_pitch();
     u32 h = get_fb_height();
@@ -47,11 +48,12 @@ static int fb0_read(void *handle, void *buf, size_t count) {
     return (int)count;
 }
 
-static int fb0_write(void *handle, const void *buf, size_t count) {
+static int fb0_write(void *handle, const void *buf, size_t count, u64 offset) {
     (void)handle;
-    u32 *fb    = get_framebuffer();
-    u32  pitch = get_fb_pitch();
-    u32  h     = get_fb_height();
+    (void)offset;
+    u32 *fb = get_framebuffer();
+    u32 pitch = get_fb_pitch();
+    u32 h = get_fb_height();
 
     if (!fb) return -1;
 
@@ -98,7 +100,7 @@ int fb0_ioctl(int request, void *arg) {
             str_copy(fix->id, FBN);
             fix->smem_start = (u64)fb;
             fix->smem_len = pitch * h;
-            fix->type = 0; // FB_TYPE_PACKED_PIXELS
+            fix->type   = 0; // FB_TYPE_PACKED_PIXELS
             fix->visual = 2; // FB_VISUAL_TRUECOLOR
             fix->line_length = pitch;
             return 0;

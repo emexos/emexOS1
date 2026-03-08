@@ -8,7 +8,9 @@
 #include <theme/doccr.h>
 #include <drivers/drivers.h>
 #include <types.h>
-
+#include <kernel/graph/graphics.h>
+#include <kernel/kernel_processes/fm/fm.h>
+#include <kernel/graph/theme.h>
 
 typedef enum {
     ANSI_NORMAL = 0,
@@ -19,6 +21,7 @@ typedef enum {
 static tty0_ansi_state_t ansi_state = ANSI_NORMAL;
 static int ansi_param = 0;
 static u32 ansi_fg    = 0xFFFFFFFF; // default white
+static u32 ansi_bg    = 0xFF000000;
 
 static u32 tty0_ansi_color(int code) {
     switch (code) {
@@ -49,6 +52,14 @@ void tty0_write_char(char c) {
         case ANSI_NORMAL:
             if (c == '\033') {
                 ansi_state = ANSI_ESC;
+            } else if (c == '\b') {
+                u32 char_width  = fm_get_char_width()  * font_scale;
+                u32 char_height = fm_get_char_height() * font_scale;
+                if (cursor_x >= char_width) {
+                    cursor_x -= char_width;
+                    draw_rect(cursor_x, cursor_y, char_width, char_height, ansi_bg);
+                    // later the window-system/desktop-environment should handle that
+                }
             } else {
                 cprintf(tmp, ansi_fg);
             }
@@ -102,16 +113,18 @@ static void *tty0_open(const char *path) {
     return (void *)1; // dummy handle
 }
 
-static int tty0_dev_write(void *handle, const void *buf, size_t count) {
+static int tty0_dev_write(void *handle, const void *buf, size_t count, u64 offset) {
     (void)handle;
+    (void)offset;
     const char *p = (const char *)buf;
     for (size_t i = 0; i < count; i++) {
         tty0_write_char(p[i]);
     }
     return (int)count;
 }
-static int tty0_dev_read(void *handle, void *buf, size_t count) {
+static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
     (void)handle;
+    (void)offset;
     if (!buf || count == 0) return 0;
 
     char *out = (char *)buf;
@@ -128,6 +141,26 @@ static int tty0_dev_read(void *handle, void *buf, size_t count) {
     }
 
     __asm__ volatile("sti");
+
+    if (tty0_echo_mode == TTY_RAW) {
+        while (1) {
+            key_event_t event;
+            char c = (char)(event.keycode & 0xFF);
+            int n = fs_read(kbd_fd, &event, sizeof(key_event_t));
+
+            __asm__ volatile("hlt");
+            if (n != (int)sizeof(key_event_t)) continue;
+            if (!event.pressed) continue;
+            if (event.keycode == 0x09) c = '\t';
+            if (c == '\n' || c == '\r' || c == '\b' || c == '\t' ||
+                (c >= 0x20 && c <= 0x7E)) {
+                out[0] = (c == '\r') ? '\n' : c;
+
+                __asm__ volatile("cli");
+                return 1;
+            }
+        }
+    }
 
     while (i < count - 1) {
         key_event_t event;

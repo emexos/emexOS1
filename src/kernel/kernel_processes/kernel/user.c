@@ -31,6 +31,7 @@ void uproc(void) {
         clear(0xff000000);
 
         dump_kprocesses();
+        proc_list_procs(proc_mgr);
         ulime->ptr_proc_curr = init_proc;
         #if JUMPTOUSER == 1
             JumpToUserspace(init_proc);
