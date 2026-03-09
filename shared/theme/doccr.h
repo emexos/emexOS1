@@ -1,5 +1,7 @@
 #pragma once
 #include "stdclrs.h"
+#include "../ui/fonts.h"
+
 #include <kernel/file_systems/vfs/vfs.h> // fs_write & fs_open
 #include <kernel/communication/serial.h>
 #include <string/string.h>
@@ -33,8 +35,9 @@ extern int init_boot_log;
 #define CONSOLE_COLOR_THEME FLU
 
 //panic
-#define PANIC_FONT FONT_8X8_DOS
-#define PANICSCREEN_BG_COLOR GFX_ST_BLUE
+#define PANIC_FONT FONT_8X8_BOLD
+#define PANICSCREEN_BG_COLOR GFX_ST_RED
+#define PANICSCREEN_FG_COLOR GFX_ST_WHITE
 #define PANICSCREEN_COLOR GFX_ST_WHITE
 #define PANICSCREEN_COLOR_R GFX_ST_RED
 #define PANIC_COLOR_THEME STD

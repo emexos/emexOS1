@@ -105,6 +105,9 @@ int fb0_ioctl(int request, void *arg) {
             fix->line_length = pitch;
             return 0;
         }
+        case FBIO_RESET_POS:
+            fb_write_pos = 0;
+            return 0;
         default:
             return -1;
     }

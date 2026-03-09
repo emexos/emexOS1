@@ -1,26 +1,37 @@
 #include "panic.h"
+
 #include <kernel/graph/graphics.h>
-#include <theme/doccr.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+#include <kernel/kernel_processes/fm/fm.h>
+
+//#define BOOTUP_VISUALS 0
+
+#define PANIC_BG PANICSCREEN_BG_COLOR
+#define PANIC_FG PANICSCREEN_FG_COLOR
 
 __attribute__((noreturn)) void panic(const char *message)
 {
     setcontext(THEME_PANIC);
     clear(PANICSCREEN_BG_COLOR);
-    // Disable interrupts
+    f_setcontext(PANIC_FONT);
+    // disable interrupts
     __asm__ volatile("cli");
 
-    print("\n", white());
-    print("!!! --- KERNEL PANIC --- !!!", red());
-    print("\n", white());
+    print("\n", PANIC_FG);
+    print("--- KERNEL PANIC --- ", PANIC_FG);
+    print("\n", PANIC_FG);
+
+    f_setcontext(FONT_8X8);
+
+    print("\nIt seems that emexOS has encountered an error.\n\n", PANIC_FG);
 
     if (message) {
-        print(message, red());
-        print("\n", white());
+        print(message, PANIC_FG);
+        print("\n", PANIC_FG);
     }
 
-    print("\nSystem halted.", white());
+    print("System halted, \nYour computer will now restart...", PANIC_FG);
 
     // HALT
     while(1) {
@@ -32,19 +43,24 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
 {
     setcontext(THEME_PANIC);
     clear(PANICSCREEN_BG_COLOR);
+    f_setcontext(PANIC_FONT);
     // Disable interrupts
     __asm__ volatile("cli");
 
-    print("\n", white());
-    print("!!! PANIC !!!", red());
-    print("\n", white());
+    print("\n", PANIC_FG);
+    print("--- KERNEL PANIC --- ", PANIC_FG);
+    print("\n", PANIC_FG);
+
+    f_setcontext(FONT_8X8);
+
+    print("\nIt seems that emexOS has encountered an error.\n\n", PANIC_FG);
 
     if (message) {
         char buf[128];
         str_copy(buf, "Exception: ");
         str_append(buf, message);
-        print(buf, red());
-        print("\n", white());
+        print(buf, PANIC_FG);
+        print("\n", PANIC_FG);
     }
 
     // Print exception details
@@ -53,25 +69,25 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
     str_append_uint(buf, (u32)state->int_no);
     str_append(buf, " ERR: ");
     str_append_uint(buf, (u32)state->err_code);
-    print(buf, white());
-    print("\n", white());
+    print(buf, PANIC_FG);
+    print("\n", PANIC_FG);
 
     // Print RIP
     char hex[32];
     str_copy(buf, "RIP: 0x");
     str_from_hex(hex, state->rip);
     str_append(buf, hex);
-    print(buf, white());
-    print("\n", white());
+    print(buf, PANIC_FG);
+    print("\n", PANIC_FG);
 
     // Print RSP
     str_copy(buf, "RSP: 0x");
     str_from_hex(hex, state->rsp);
     str_append(buf, hex);
-    print(buf, white());
-    print("\n\n", white());
+    print(buf, PANIC_FG);
+    print("\n\n", PANIC_FG);
 
-    print("System halted.", white());
+    print("System halted, \nYour computer will now restart...", PANIC_FG);
 
     // HALT
     while(1) {

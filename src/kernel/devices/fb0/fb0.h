@@ -40,6 +40,7 @@ typedef struct {
 #define FBIOGET_VSCREENINFO 0x4600
 #define FBIOPUT_VSCREENINFO 0x4601
 #define FBIOGET_FSCREENINFO 0x4602
+#define FBIO_RESET_POS 0x4603
 
 // /dev/fb0 module
 extern driver_module fb0_module;
