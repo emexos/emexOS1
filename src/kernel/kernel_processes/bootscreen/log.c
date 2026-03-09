@@ -35,6 +35,7 @@ void log_message(const char *tag, const char *message, log_level_t level) {
 	    print(message, msg_color);
 		//printf("%s %s", tag, message);
 	#endif
+	//printf("%s", str);
 }
 void log_printf(log_level_t level, const char *tag, const char *format, ...) {
     if (!tag || !format) return;

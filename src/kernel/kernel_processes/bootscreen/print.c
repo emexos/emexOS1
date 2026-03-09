@@ -272,6 +272,7 @@ void printInt(int value, u32 color)
 	    IntToString(value, buffer);
 	    string(buffer, color);
 	#endif
+	//printf("%s", value);
 }
 
 void print(const char *str, u32 color)
@@ -280,6 +281,7 @@ void print(const char *str, u32 color)
     	string(str, color);
      //putchar('\n', color);
     #endif
+    //printf("%s", str);
 }
 
 void reset_cursor(void)

@@ -4,6 +4,8 @@
 #include <theme/stdclrs.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
+#include <kernel/arch/x86_64/exceptions/panic.h>
+
 static font_type_t current_font_type = FONT_8X8_BOLD; // default font
 static const font_t *current_font = NULL;
 
@@ -63,10 +65,12 @@ int f_setcontext(font_type_t font_type)
     current_font_type = font_type;
     current_font = &font_registry[font_type];
 
-    BOOTUP_PRINT("[FM] ", GFX_GRAY_70);
-    BOOTUP_PRINT("switched to: ", white());
-    BOOTUP_PRINT(current_font->name, GFX_ST_CYAN);
-    BOOTUP_PRINT("\n", white());
+    #if PANIC_SHOWSWITCH == 1
+	    BOOTUP_PRINT("[FM] ", GFX_GRAY_70);
+	    BOOTUP_PRINT("switched to: ", white());
+	    BOOTUP_PRINT(current_font->name, GFX_ST_CYAN);
+	    BOOTUP_PRINT("\n", white());
+    #endif
 
     return 0;
 }
