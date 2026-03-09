@@ -144,9 +144,9 @@ int cpio_extract_to_vfs(const u8 *data, u64 size, const char *base_path)
         make_path(s->path, base_path, entry.name);
 
         if (cpio_is_dir(&entry)) {
-            log("[CPIO]"," dir  ", d);}
+            log("[CPIO]",DIR_PREFIX, d);}
         else {
-            log("[CPIO]"," file ", d);}
+            log("[CPIO]",FILE_PREFIX, d);}
         print(s->path, white());
         if (cpio_is_file(&entry) && entry.filesize > 0) {
             char buf[20];

@@ -10,7 +10,8 @@ typedef struct limine_hhdm_response limine_hhdm_response_t;
 typedef struct limine_framebuffer_response limine_framebuffer_response_t;
 typedef struct limine_framebuffer limine_framebuffer_t;
 
-#define HEAP_START 0xFFFF800000000000 // Start of kernel heap
+// moved above the HHDM range
+#define HEAP_START 0xFFFFA00000000000ULL // Start of kernel heap
 #define HEAP_SIZE 1024 * 1024 * 32
 
 #define GRAPHICS_START (HEAP_START + HEAP_SIZE) // Start of graphics memory
@@ -32,7 +33,7 @@ typedef struct limine_framebuffer limine_framebuffer_t;
 #define KLIME_OFFSET_HEAP      KLIME_OFFSET_DMA       + KLIME_SIZE_DMA
 
 #define GLIME_SIZE_META (PAGE_SIZE * 256) //2mb
-#define GLIME_HEAP_SIZE (GRAPHICS_SIZE - GLIME_SIZE_META) 
+#define GLIME_HEAP_SIZE (GRAPHICS_SIZE - GLIME_SIZE_META)
 
 #define PAGE_SIZE 4096
 #define FRAME_FREE       0x00    // Frame is available

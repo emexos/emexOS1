@@ -60,27 +60,26 @@ void scroll_up(u32 lines)
 {
     u32 pixels_to_scroll = lines;
     u32 pitch_dwords = fb_pitch / 4;
-    u32 bytes_per_row = fb_width * sizeof(u32);
-    u32 bg_color = black();
+    //u32 bytes_per_row = fb_width * sizeof(u32);
+    //u32 bg_color = black();
 
     // move framebuffer content up
-    for (u32 y = pixels_to_scroll; y < fb_height; y++) {
-        memcpy(framebuffer + (y - pixels_to_scroll) * pitch_dwords,
-               framebuffer + y * pitch_dwords,
-               bytes_per_row);
-    }
+    //for (u32 y = pixels_to_scroll; y < fb_height; y++) {
+    //    memcpy(framebuffer + (y - pixels_to_scroll) * pitch_dwords,
+    //           framebuffer + y * pitch_dwords,
+    //           bytes_per_row);
+    //}
 
-    // clear bottom lines
-    for (u32 y = fb_height - pixels_to_scroll; y < fb_height; y++) {
-        u32 *row = framebuffer + y * pitch_dwords;
-        if (bg_color == 0) {
-            memset(row, 0, bytes_per_row);
-        } else {
-            for (u32 x = 0; x < fb_width; x++) {
-                row[x] = bg_color;
-            }
-        }
-    }
+    u32 *src = framebuffer + pixels_to_scroll * pitch_dwords;
+    u32 *dst = framebuffer;
+    size_t rows = fb_height - pixels_to_scroll;
+    memmove(dst, src, rows * pitch_dwords * sizeof(u32));
+
+    // clear bottom lines (bg is black = 0)
+    memset(
+    	framebuffer + (fb_height - pixels_to_scroll) * pitch_dwords, 0,
+        pixels_to_scroll * pitch_dwords * sizeof(u32)
+    );
 }
 
 void putpixel(u32 x, u32 y, u32 color)
