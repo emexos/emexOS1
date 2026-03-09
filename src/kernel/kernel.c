@@ -122,6 +122,7 @@ void _start(void)
         kproc_loader_init();
         init_bootscreen();
         fm_init();
+        log("::", "finished loading esr\n", _d);
         cursor_x = 0;
         cursor_y = 0;
         font_scale = 1;

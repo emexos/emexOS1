@@ -18,6 +18,14 @@ static u32 get_log_color(log_level_t level) {
             return LCOLOR_D;
     }
 }
+static u32 get_tag_color(log_level_t level) {
+    switch (level) {
+        case LDEBUG_TAG:
+            return GFX_GRAY_70;
+        default:
+            return LCOLOR_TAG;
+    }
+}
 
 
 void log_message(const char *tag, const char *message, log_level_t level) {
@@ -26,13 +34,14 @@ void log_message(const char *tag, const char *message, log_level_t level) {
     #if BOOTUP_VISUALS == 0
 
     	u32 msg_color = get_log_color(level);
+        u32 tag_color = get_tag_color(level);
 
      	// gray
       	//print("[", LCOLOR_BRACKET);
-	    print(tag, LCOLOR_TAG);
-	    print(" ", LCOLOR_BRACKET);
 
-	    print(message, msg_color);
+        print(tag, tag_color);
+        print(" ", LCOLOR_BRACKET);
+        print(message, msg_color);
 		//printf("%s %s", tag, message);
 	#endif
 	//printf("%s", str);
@@ -43,11 +52,12 @@ void log_printf(log_level_t level, const char *tag, const char *format, ...) {
     #if BOOTUP_VISUALS == 0
 
 	    u32 msg_color = get_log_color(level);
+	    u32 tag_color = get_tag_color(level);
 
 	    // gray
 	    //print("[", LCOLOR_BRACKET);
-		print(tag, LCOLOR_TAG);
-		print(" ", LCOLOR_BRACKET);
+	    print(tag, tag_color);
+	    print(" ", LCOLOR_BRACKET);
 
 	    va_list args;
 	    va_start(args, format);

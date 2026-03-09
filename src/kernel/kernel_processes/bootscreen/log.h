@@ -9,11 +9,13 @@ typedef enum {
     LDEF = 0,
     LSUCCESS,
     LWARNING,
-    LERROR
+    LERROR,
+    LDEBUG_TAG
 } log_level_t;
 
 // Keywords for log levels
 #define d       LDEF
+#define _d      LDEBUG_TAG
 #define success LSUCCESS
 #define warning LWARNING
 #define error   LERROR
