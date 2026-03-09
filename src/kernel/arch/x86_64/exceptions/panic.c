@@ -14,7 +14,7 @@ __attribute__((noreturn)) void panic(const char *message)
 {
 	print("\nPANIC WILL BE EXECUTED IN 100000000 TICKS\n\n", white());
  	for (volatile int i = 0; i < 100000000; i++) {
-        nop();
+  		__asm__ volatile("nop");
     }
     setcontext(THEME_PANIC);
     clear(PANICSCREEN_BG_COLOR);
@@ -47,7 +47,7 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
 {
 	print("\nPANIC WILL BE EXECUTED IN 100000000 TICKS\n\n", white());
 	for (volatile int i = 0; i < 100000000; i++) {
-        nop();
+		 __asm__ volatile("nop");
     }
     setcontext(THEME_PANIC);
     clear(PANICSCREEN_BG_COLOR);
