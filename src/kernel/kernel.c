@@ -168,6 +168,8 @@ void _start(void)
         physmem_init(memmap_request.response, hhdm_request.response);
         paging_init(hhdm_request.response);
 
+        map_region_alloc(hhdm_request.response, HEAP_START, HEAP_SIZE);
+
         // kernel lifetime
         klime_t *klime = klime_init((u64 *)HEAP_START, HEAP_SIZE);
 
@@ -188,6 +190,7 @@ void _start(void)
             glres.height = (u64)fb->height;
             glres.pitch  = (u64)fb->pitch;
 
+            map_region_alloc(hhdm_request.response, GRAPHICS_START, GRAPHICS_SIZE);
             glime_t *glime = glime_init(&glres, (u64 *)GRAPHICS_START, GRAPHICS_SIZE);
         #else
             log("[GLIME]", "skipped (hardware compatibility)\n", warning);
