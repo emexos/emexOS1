@@ -55,6 +55,9 @@
 
     #define SHM_DESTROY 245
 
+    // emex specific
+    #define EMXREBOOT   169
+
 #elif ARM64 == 1
     #define EXIT       93
 

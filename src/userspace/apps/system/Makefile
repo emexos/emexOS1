@@ -11,10 +11,10 @@ LDFLAGS := -nostdlib -static -no-pie -T ../../user.ld
 
 all: clean system.emx/app.elf
 
-system.emx/app.elf: init.o $(LIBC)/build/crt0.o $(LIBC)/build/libc.a
-	$(LD) $(LDFLAGS) $(LIBC)/build/crt0.o init.o $(LIBC)/build/libc.a -o $@
+system.emx/app.elf: init.o emxrc.o $(LIBC)/build/crt0.o $(LIBC)/build/libc.a
+	$(LD) $(LDFLAGS) $(LIBC)/build/crt0.o init.o emxrc.o $(LIBC)/build/libc.a -o $@
 
-init.o: init.c
+emxrc.o: emxrc.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(LIBC)/build/crt0.o $(LIBC)/build/libc.a:

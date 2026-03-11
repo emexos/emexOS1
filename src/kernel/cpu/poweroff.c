@@ -18,12 +18,16 @@ static inline void x86_restart(void)
         __asm__ volatile("nop");
 
     // PCI RCR
-    u8 temp = inb(0xCF9);
-    outb(0xCF9, temp | 0x02);
-    outb(0xCF9, temp | 0x06);
+    outb(0xCF9, 0x02);
+    for (volatile int i = 0; i < 100; i++) __asm__ volatile("nop");
+    outb(0xCF9, 0x0E);
+    for (volatile int i = 0; i < 1000000; i++) __asm__ volatile("nop");
 
-    for (volatile int i = 0; i < 1000000; i++)
-        __asm__ volatile("nop");
+    __asm__ volatile(
+        "lidt %0\n"
+        "int $3\n"
+        :: "m"((u64[]){0, 0}) : "memory"
+    );
 }
 
 static inline void x86_shutdown(void)

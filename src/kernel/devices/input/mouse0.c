@@ -4,52 +4,37 @@
 #include <theme/doccr.h>
 #include <drivers/drivers.h>
 #include <kernel/arch/x86_64/exceptions/irq.h>
-//#include <drivers/ps2/mouse/mouse.h>
+#include <drivers/ps2/mouse/mouse.h>
 
 static int mouse0_init(void) {
     log("[MOUSE]", "init /dev/input/mouse0\n", d);
-    //mouse_init();
+    mouse_init();
     return 0;
 }
-
-static void mouse0_fini(void) {
-    //irq_unregister_handler(12);
+static void mouse0_fini(void){
+	irq_unregister_handler(12);
 }
-
-static void *mouse0_open(const char *path) {
-    (void)path;
-    return (void *)1;
+static void *mouse0_open(const char *p){
+	(void)p; return (void *)1;
+}
+static int mouse0_write(void *h, const void *b, size_t c, u64 o){
+	(void)h;(void)b;(void)c;(void)o; return -1;
 }
 
 static int mouse0_read(void *handle, void *buf, size_t count, u64 offset) {
-    (void)handle;
-    (void)buf;
-    (void)count;
-    (void)offset;
-
-/*
-	size_t ev_size = sizeof(mouse_event_t);
+    (void)handle; (void)offset;
+    size_t esz = sizeof(mouse_event_t);
     size_t written = 0;
     u8 *out = (u8 *)buf;
-
-    while (written + ev_size <= count && mouse_has_event()) {
+    while (written + esz <= count && mouse_has_event()) {
         mouse_event_t ev;
         if (mouse_get_event(&ev)) {
             u8 *src = (u8 *)&ev;
-            for (size_t i = 0; i < ev_size; i++) {
-                out[written + i] = src[i];
-            }
-            written += ev_size;
+            for (size_t i = 0; i < esz; i++) out[written + i] = src[i];
+            written += esz;
         }
     }
-
-    return (int)written; */
-    return 0;
-}
-
-static int mouse0_write(void *handle, const void *buf, size_t count, u64 offset) {
-    (void)handle; (void)buf; (void)count; (void)offset;
-    return -1;
+    return (int)written;
 }
 
 driver_module mouse0_module = {

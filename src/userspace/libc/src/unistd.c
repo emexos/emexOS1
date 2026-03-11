@@ -16,7 +16,7 @@ pid_t getpid(void) {
 }
 
 pid_t fork(void) {
-    return (pid_t)_sc1(_SCAL_FORK, 0);
+    return (pid_t)_sc0(_SCAL_FORK);
 }
 
 void _exit(int status) {

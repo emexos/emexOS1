@@ -1,0 +1,11 @@
+var login_path = ("/emr/system/login.elf")
+var shell_path = (ep: "/user/apps/shell.emx")
+var gui_path   = (ep: "/user/apps/gui.emx")
+
+// ep == emex package
+
+//exec -f"ep" gui_path
+
+// last things which should happen
+exec login_path
+exec -f"ep" shell_path

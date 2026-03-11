@@ -4,7 +4,8 @@
 #define FBIOGET_VSCREENINFO 0x4600
 #define FBIOPUT_VSCREENINFO 0x4601
 #define FBIOGET_FSCREENINFO 0x4602
-#define FBIO_RESET_POS 0x4603
+#define FBIO_READ_RECT      0x4610
+#define FBIO_BLIT           0x4611
 
 typedef struct {
     unsigned int xres;
@@ -31,5 +32,11 @@ typedef struct {
     unsigned int smem_len;    // size in bytes
     unsigned int type;
     unsigned int visual;
-    unsigned int line_length; // pitch
+    unsigned int line_length; // pitch in bytes
 } fb_fix_screeninfo;
+
+// used for both FBIO_READ_RECT and FBIO_BLIT
+typedef struct {
+    unsigned int  x, y, w, h;
+    unsigned int *pixels;
+} fb_rect_t;

@@ -15,6 +15,8 @@
 #define SHELL_CONFIG "/.config/shelly/"
 #define BIN_PATH "/bin/"
 
+#define WELCOME_MESSAGE "\n\033[0m Welcome to shelly, emexOS's default shell.\n Type \"ls /bin\" for a list of commands.\n\n"
+
 
 static int parse_args(char *buf, char **argv, int max_args)
 {
@@ -56,6 +58,8 @@ static int exec_from_bin(const char *cmd, char **argv)
 
 int main(void)
 {
+	printf(WELCOME_MESSAGE);
+
     char buf[BUFFER];
     char *argv[32];
 
