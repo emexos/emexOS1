@@ -8,14 +8,14 @@
 #define CPIO_MAGIC_NEWC_CRC "070702"
 #define CPIO_MAGIC_LEN      6
 
-#define DIR_PREFIX  "<dir>  "
-#define FILE_PREFIX "<file> "
+#define DIR_PREFIX  "dir:  "
+#define FILE_PREFIX "file: "
 
 // signals end of the archive
-#define CPIO_TRAILER        "TRAILER!!!"
+#define CPIO_TRAILER "TRAILER!!!"
 
 // newc header is always 110 bytes before the filename
-#define CPIO_HEADER_SIZE    110
+#define CPIO_HEADER_SIZE 110
 
 #define CPIO_MODE_IFMT 0170000 // mask to get file type bits
 #define CPIO_MODE_IFSOCK 0140000

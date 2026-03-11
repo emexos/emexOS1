@@ -20,3 +20,16 @@ pid_t getpid (void);
 pid_t fork (void);
 void _exit (int status) __attribute__((noreturn));
 int execve (const char *path, char *const argv[], char *const envp[]);
+
+static inline pid_t spawn(const char *path) {
+    pid_t pid = fork();
+    if (pid == 0) {
+        // spawn child
+        char *const argv[] = { (char *)path, (char *)0 };
+        char *const envp[] = { (char *)0 };
+        execve(path, argv, envp);
+        _exit(1); // execve failed
+    }
+    return pid; // parent gets pid immediately
+    // no wait
+}

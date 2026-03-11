@@ -141,31 +141,23 @@ static void putchar_at(u32 codepoint, u32 x, u32 y, u32 color)
 }
 
 static void bs_scroll(u32 line_height) {
-    u32 fb_w = get_fb_width();
     u32 fb_h = get_fb_height();
     u32 pitch_dwords = get_fb_pitch() / 4;
     u32 *fb = get_framebuffer();
-    u32 bytes_per_row = fb_w * sizeof(u32);
 
-    // shift everything up by line_height rows
-    for (u32 y = line_height; y < fb_h; y++) {
-        memcpy(fb + (y - line_height) * pitch_dwords,
-               fb + y * pitch_dwords,
-               bytes_per_row);
-    }
+    // single memmove shifts the entire framebuffer at once (much faster than row-by-row on real hardware)
+    memmove(fb,
+            fb + line_height * pitch_dwords,
+            (fb_h - line_height) * pitch_dwords * sizeof(u32));
 
-    // clear bottom lines
-    u32 clear_start = fb_h - line_height;
-    u32 *first_clear_row = fb + clear_start * pitch_dwords;
-    for (u32 x = 0; x < fb_w; x++) first_clear_row[x] = 0xFF000000;
-    for (u32 y = clear_start + 1; y < fb_h; y++) {
-        memcpy(fb + y * pitch_dwords, first_clear_row, bytes_per_row);
-    }
+    // clear bottom lines with memset (bg is black = 0)
+    memset(fb + (fb_h - line_height) * pitch_dwords, 0,
+           line_height * pitch_dwords * sizeof(u32));
 }
 
 static void putcodepoint(u32 codepoint, u32 color)
 {
-    u32 char_width = fm_get_char_width() * font_scale;
+    u32 char_width  = fm_get_char_width() * font_scale;
     u32 char_height = fm_get_char_height() * font_scale;
     u32 char_spacing = char_width;
     u32 line_height = char_height + 2 * font_scale;
@@ -174,6 +166,7 @@ static void putcodepoint(u32 codepoint, u32 color)
     {
         cursor_x = 0;
         cursor_y += line_height;
+        // scroll only once, right here
         if (cursor_y + char_height > fb_height) {
             bs_scroll(line_height);
             cursor_y -= line_height;
@@ -185,12 +178,14 @@ static void putcodepoint(u32 codepoint, u32 color)
     {
         cursor_x = 0;
         cursor_y += line_height;
+        // scroll only once, right here
         if (cursor_y + char_height > fb_height) {
             bs_scroll(line_height);
             cursor_y -= line_height;
         }
     }
 
+    // removed the third redundant scroll check that was here before drawing
     putchar_at(codepoint, cursor_x, cursor_y, color);
     cursor_x += char_spacing;
 }

@@ -65,7 +65,8 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@mkdir -p $(DISK_DIR)/rd/bin
 	@mkdir -p $(DISK_DIR)/rd/emr/system
 	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/apps/
-	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system
+	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system/
+	@cp -r src/userspace/apps/gui/gui.emx $(DISK_DIR)/rd/user/apps/
 
 	@echo "[MK] copying files..."
 #@cp limine.conf $(DISK_DIR)/rd/boot/
@@ -77,6 +78,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp src/userspace/bin/cat/cat.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/cd/cd.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/lsblk/lsblk.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/reboot/reboot.elf $(DISK_DIR)/rd/bin/
 
 
 	@echo "[MK] creating initrd.cpio..."

@@ -105,6 +105,37 @@ int fb0_ioctl(int request, void *arg) {
             fix->line_length = pitch;
             return 0;
         }
+        case FBIO_READ_RECT: {
+            fb_rect_t *r = (fb_rect_t *)arg;
+            if (!r || !r->pixels) return -1;
+            u32 pitch_dw = pitch / 4;
+            for (u32 row = 0; row < r->h; row++) {
+                u32 py = r->y + row;
+                if (py >= h) break;
+                for (u32 col = 0; col < r->w; col++) {
+                    u32 px = r->x + col;
+                    r->pixels[row * r->w + col] = (px < w) ? fb[py * pitch_dw + px] : 0;
+                }
+            }
+            return 0;
+        }
+        case FBIO_BLIT: {
+            fb_rect_t *r = (fb_rect_t *)arg;
+            if (!r || !r->pixels) return -1;
+            u32 pitch_dw = pitch / 4;
+            for (u32 row = 0; row < r->h; row++) {
+                u32 py = r->y + row;
+                if (py >= h) break;
+                for (u32 col = 0; col < r->w; col++) {
+                    u32 px = r->x + col;
+                    if (px >= w) break;
+                    u32 c = r->pixels[row * r->w + col];
+                    if ((c >> 24) == 0) continue; // transparent
+                    fb[py * pitch_dw + px] = c;
+                }
+            }
+            return 0;
+        }
         case FBIO_RESET_POS:
             fb_write_pos = 0;
             return 0;

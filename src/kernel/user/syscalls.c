@@ -27,8 +27,9 @@
 #include <kernel/mem/paging/paging.h>
 #include <kernel/mem/phys/physmem.h>
 
-//ipc
+//multitasking
 #include <kernel/multitasking/ipc/ipc.h>
+#include <kernel/multitasking/multitasking.h>
 
 #include "scalls/scalls.h"
 
@@ -36,7 +37,7 @@
 //#include <kernel/devices/tty/tty0.h>
 
 
-static ulime_t *g_ulime = NULL;
+ulime_t *g_ulime = NULL;
 
 #if ENABLE_ULIME
 extern ulime_t *ulime;
@@ -47,6 +48,7 @@ extern ulime_t *ulime;
 #define MOUSE0 MS0PATH
 
 extern char cwd[];
+extern mt_t *mt;
 
 // fromsyscall_entry.asm
 extern u64 user_rsp;
@@ -639,6 +641,9 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     //ulime_ptr->syscalls[SHM_DESTROY]       = scall_shm_destroy;
     ulime_ptr->syscalls[MMAP]            = scall_mmap;
     ulime_ptr->syscalls[MUNMAP]          = scall_munmap;
+
+    // emex specific
+    ulime_ptr->syscalls[EMXREBOOT]       = scall_reboot;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }

@@ -53,6 +53,7 @@ __attribute__((noreturn)) void panic(const char *message)
 
     print("System halted, \nYour computer will now restart...", PANIC_FG);
 
+    delay(50);
     panic_reboot();
 
     // HALT
@@ -123,8 +124,6 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
     print(buf, white());
     print("\n", white());
 
-    print("System halted, \nYour computer will now restart...", PANIC_FG);
-
     if (state->int_no == 14) {
         str_copy(buf, "CR2: 0x");
         str_from_hex(hex, cr2);
@@ -157,6 +156,9 @@ __attribute__((noreturn)) void panic_exception(cpu_state_t *state, const char *m
     print(buf, white());
     print("\n\n", white());
 
+    print("System halted, \nYour computer will now restart...", PANIC_FG);
+
+    delay(50);
     panic_reboot();
 
     // HALT

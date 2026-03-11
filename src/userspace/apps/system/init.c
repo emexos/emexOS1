@@ -1,61 +1,25 @@
 #include "init.h"
+#include "emxrc.h"
 
 #include <unistd.h>
 #include <stdio.h>
-//#include <string.h>
-#include <sys/types.h>
+#include <unistd.h>
 
-#include <emx/sinfo.h>
-#include <emx/ansi.h>
+int main(void) {
+    static emxrc_t rc;
 
-const char* handlers[] = EMRHANDLERS;
-
-int main(void)
-{
-
-    //printf(__EMEXF_B1__);
-
-
-    //printf("[ESH] launching programms:\n");
-
-    // other initializations...
-    rc: {
-        //TODO:
-        // create file .emxrc
-        // content: exec emx_window_system
-        // dir: /emr/system/
-    };
-
-    //clear
-
-    login: {
-        //printf("     launching: %s\n", LOGINLOCATE);
+    if (emxrc_parse(EMXRC_PATH, &rc) != 0) {
+        fprintf(stderr, "[init] .emxrc not found, using defaults!\n");
         char *const argv[] = { (char *)LOGINLOCATE, (char *)0 };
         char *const envp[] = { (char *)0 };
-        execve( LOGINLOCATE, argv, envp);
-        //
-        // load .emxrc and look for login.elf location
-        //
-    };
-
-    emx_shell: {
-        //printf("     launching: %s\n", EMX_SHELL);
-        //printf(" \n");
-        printf(":[%s]\n", EMX_SHELL);
-        // launch the shell as a new process via execve
-        char *const argv[] = { (char *)EMX_SHELL, (char *)0 };
-        char *const envp[] = { (char *)0 };
-        execve(EMX_SHELL, argv, envp);
-
-        //
-        // load .emxrc and switch to ws
-        // and initialise de + wm
-        //
+        execve(LOGINLOCATE, argv, envp);
         goto error;
-    };
-    goto error;
+    }
+
+    emxrc_run(&rc);
+
 error:
-    printf("[ESH] ERROR: failed to launch %s\n", EMX_SHELL);
+    fprintf(stderr, "[init] all execs failed, halting\n");
     for (;;) __asm__ volatile("pause");
     return 0;
 }

@@ -40,11 +40,17 @@ typedef struct {
 #define FBIOGET_VSCREENINFO 0x4600
 #define FBIOPUT_VSCREENINFO 0x4601
 #define FBIOGET_FSCREENINFO 0x4602
-#define FBIO_RESET_POS 0x4603
+#define FBIO_RESET_POS      0x4603
+#define FBIO_READ_RECT      0x4610
+#define FBIO_BLIT           0x4611
+
+typedef struct {
+    u32  x, y, w, h;
+    u32 *pixels;
+} fb_rect_t;
 
 // /dev/fb0 module
 extern driver_module fb0_module;
-
 
 
 int fb0_ioctl(int request, void *arg);
