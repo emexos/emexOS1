@@ -1,25 +1,38 @@
-       --- emexOS Attribution Requirement ---
+# =========================================================
+#                emexOS Attribution Requirements
+# =========================================================
 
-This project is under GNU GPLv3 License, and it is called emexOS.
+This project is licensed under the GNU GPLv3, and is known as **emexOS**.
 
-You are allowed to:
-- use this project in ANY way
-- modify it in ANY way
-- redistribute it 
-- fork it
-- publish ANY modified versions
+## Permitted Actions
 
-AS LONG AS, any modified or redistributed version MUST clearly
-state that it is based on emexOS.
+You are **explicitly permitted** to:
 
-The attribution must be:
-- visible to users,
-- placed in at least one of the following locations:
-  - README file
-  - boot screen
-  - system information screen
-  - documentation
+- Use this project for any purpose
+- Modify it in any manner
+- Redistribute unmodified or modified versions
+- Fork and create derivative works
+- Publish your modifications and derived projects
 
-The attribution must contain the name "emexOS" in ANY way
+---
 
-This requirement applies to ALL forks and derivatives.
+## **Attribution Condition**
+
+All modified or redistributed versions **must** include a clear notice that the work is based on **emexOS**.
+
+### The attribution notice **must**:
+- Be visible and easily found by users
+- Be included in **at least one** of the following locations:
+    - The primary README document of your repository or distribution
+    - The system boot screen (if applicable)
+    - The system information/about screen
+    - Any user-facing documentation
+
+- Contain the name **"emexOS"** in any form
+
+---
+
+> **This requirement is mandatory for all forks, distributions, and derivative projects.**  
+> Failure to comply with this attribution policy may result in a violation of the license terms.
+
+# =========================================================
