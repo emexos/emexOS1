@@ -67,7 +67,7 @@ const font_t font_registry[FONT_COUNT] = {
         .char_height = 8,
         .row_bytes = 1,
         .lsb_left = 0,
-        .glyph_count = 256,
+        .glyph_count = 2590,
         .unicode_direct = 0
     },
     /*[FONT_16X32] = {

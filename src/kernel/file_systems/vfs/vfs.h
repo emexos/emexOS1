@@ -2,6 +2,8 @@
 #define _VFS_H
 
 #include <types.h>
+//#include <kernel/file_systems/vfs/pipefs/pipefs.h>
+#include <kernel/net/pipe/pipe.h>
 
 // file types
 #define FS_FILE 0x01
@@ -150,5 +152,6 @@ void devfs_register(void);
 int devfs_register_device(driver_module *mod);
 
 void procfs_register(void);
+//void netfs_register(void);
 
 #endif

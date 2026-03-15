@@ -44,11 +44,13 @@ typedef struct {
 } mt_user_ctx_t;
 
 #define MT_MAX_TASKS 32
+#define MT_KSTACK_SIZE 8192
 
 typedef struct {
     ulime_proc_t *proc;
     mt_context_t ctx;
     mt_user_ctx_t user_ctx;
+    u8 *kstack;
     int valid;
 } mt_task_t;
 
@@ -65,6 +67,7 @@ extern void scheduler_context_switch(mt_context_t *old_ctx, mt_context_t *new_ct
 
 void mt_init(mt_t *mt, scheduler_t *sched, ulime_t *ulime);
 int mt_add_task(mt_t *mt, ulime_proc_t *proc);
+void mt_start(mt_t *mt);
 void mt_preempt(mt_t *mt, cpu_state_t *state);
 void mt_yield(mt_t *mt);
 int mt_task_count(mt_t *mt);

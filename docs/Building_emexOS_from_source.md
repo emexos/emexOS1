@@ -98,4 +98,8 @@ This will automatically handle all build steps and produce the final ISO image i
 
 ---
 
+<<<<<<< HEAD
 **Happy hacking!**
+=======
+**Happy hacking!**
+>>>>>>> aefa8b3 (half working multitasking......)

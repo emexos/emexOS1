@@ -5,11 +5,22 @@
 #include <stdio.h>
 #include <unistd.h>
 
+//-////////////////////////////////////////-//
+//-//                                    //-//
+//-//               INITD                //-//
+//-//     the init demon for emexOS      //-//
+//-//                                    //-//
+//-////////////////////////////////////////-//
+
+#define __INIT_SYSTEM_VER 1
+#define __INIT_D "initd"
+
 int main(void) {
     static emxrc_t rc;
+    #define __INIT_D_BRACKETS "[" __INIT_D "]"
 
     if (emxrc_parse(EMXRC_PATH, &rc) != 0) {
-        fprintf(stderr, "[init] .emxrc not found, using defaults!\n");
+        fprintf(stderr, __INIT_D_BRACKETS " .emxrc not found, using defaults!\n");
         char *const argv[] = { (char *)LOGINLOCATE, (char *)0 };
         char *const envp[] = { (char *)0 };
         execve(LOGINLOCATE, argv, envp);
@@ -19,7 +30,7 @@ int main(void) {
     emxrc_run(&rc);
 
 error:
-    fprintf(stderr, "[init] all execs failed, halting\n");
+    fprintf(stderr, __INIT_D_BRACKETS " all execs failed, halting\n");
     for (;;) __asm__ volatile("pause");
     return 0;
 }

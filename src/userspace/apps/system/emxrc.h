@@ -20,6 +20,7 @@ typedef struct {
 typedef struct {
     char var_name[64];
     emxrc_fmt_t fmt;
+    int bg;
 } emxrc_exec_t;
 
 typedef struct {

@@ -69,7 +69,7 @@ klime_t *klime = NULL;
     #include <kernel/multitasking/multitasking.h>
     #include <kernel/multitasking/ipc/ipc.h>
     scheduler_t *scheduler = NULL;
-    #define SCHEDQUANT 20
+    #define SCHEDQUANT 1
     proc_manager_t *proc_mgr = NULL;
     ulime_t *ulime = NULL;
     mt_t *mt = NULL;
@@ -297,10 +297,10 @@ void _start(void)
             log("[ATA]", "skipped (hardware compatibility)\n", warning);
     #endif
 
-    fs_mount(NULL, SYS_MOUNT_DEFAULT, SYSFS);
-
-    //logo_init();
-    //draw_logo();
+    ofs:{
+	    fs_mount(NULL, SYS_MOUNT_DEFAULT, SYSFS);
+	    //fs_mount(NULL, PIPE_MOUNT_DEFAULT, PIPEFS);
+    };
 
     #if HARDWARE_SC == 1
         // let the cpu rest a small time
@@ -362,10 +362,10 @@ void _start(void)
 
     //extern void kproc(void);
     genprocs();
-    proc_list_procs(proc_mgr);
-    dump_kprocesses();
+    //proc_list_procs(proc_mgr);
+    //dump_kprocesses();
     //hcf();
-    DEinit();
+    //DEinit();
 
     //should not reach here
     //font_manager_set_context(FONT_CONTEXT_PANIC);

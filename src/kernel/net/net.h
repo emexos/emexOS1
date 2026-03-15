@@ -1,17 +1,12 @@
 #pragma once
 
-// commit: deleted unix_sockets
-
-//! (
-//!  this file is half empty now :(
-//! )
-
-
 // gen net
 
-#define _EAF_UNIX 1
+#define _EU_UNIX 0
+#define _EU_P 1
 #include <config/tasks.h>
-#include <kernel/net/unix/unix_sock.h>
+//#include <kernel/net/pipe/pipe.h>
+
 // initial tasks
 #ifndef SOCKET1
 #   include <head.h>

@@ -51,4 +51,8 @@ For advanced configuration, network setup, or troubleshooting, consult:
 - [Debian Wiki: Virtualization](https://wiki.debian.org/Virtualization)
 
 **Appearance Note:**  
+<<<<<<< HEAD
 Virt-Manager provides a modern graphical interface to manage and create virtual machines, suitable for both beginners and advanced users. QEMU itself can also be used via the command line for custom or automated setups.
+=======
+Virt-Manager provides a modern graphical interface to manage and create virtual machines, suitable for both beginners and advanced users. QEMU itself can also be used via the command line for custom or automated setups.
+>>>>>>> aefa8b3 (half working multitasking......)
