@@ -18,9 +18,14 @@ this is not a complete todo list
 [ ] implement window system/server
 [ ] implement desktop enviroment
 [ ] implement window manager
+[ ] implement gzip for rd
+[x] implement cpio for rd
+[ ] implement gzip for userspace
+[ ] implement zip for userspace
+[ ] implement cpio for userspace
 [ ] upgrade theme manager
 [ ] upgrade font manager
 [ ] upgrade bootscreen manager
-
+[ ] port DOOM
 
 ⁠

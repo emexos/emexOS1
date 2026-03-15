@@ -256,10 +256,13 @@ int ulime_load_program(ulime_proc_t *proc, u8 *code, u64 code_size) {
         return 1;
     }
 
-    memcpy((void*)proc->heap_base, code, code_size);
+    void *dest = (void *)(proc->phys_heap + proc->ulime->hpr->offset);
+    memcpy(dest, code, code_size);
     proc->entry_point = proc->heap_base;
 
-    BOOTUP_PRINTF("Loaded program (%lu bytes) into process %s at 0x%lX\n",
-           code_size, proc->name, proc->entry_point);
+    BOOTUP_PRINTF(
+    	"Loaded program (%lu bytes) into process %s at 0x%lX\n",
+        code_size, proc->name, proc->entry_point
+    );
     return 0;
 }

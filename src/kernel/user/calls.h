@@ -52,6 +52,8 @@
     #define MQ_SEND    242
     #define MQ_RECV    243
 
+    #define WAITPID     61
+
 
     #define SHM_DESTROY 245
 

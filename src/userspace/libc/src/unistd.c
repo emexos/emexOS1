@@ -15,6 +15,11 @@ pid_t getpid(void) {
     return (pid_t)_sc1(_SCAL_GETPID, 0);
 }
 
+pid_t waitpid(pid_t pid, int *status, int options) {
+    (void)status; (void)options;
+    return (pid_t)_sc1(_SCAL_WAITPID, (long)pid);
+}
+
 pid_t fork(void) {
     return (pid_t)_sc0(_SCAL_FORK);
 }

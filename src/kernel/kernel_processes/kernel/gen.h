@@ -15,6 +15,7 @@
 #include <kernel/include/reqs.h>
 #include <string/string.h>
 #include <kernel/graph/graphics.h>
+#include <kernel/multitasking/multitasking.h>
 
 #include <theme/doccr.h>
 #include <config/system.h>
@@ -25,6 +26,7 @@
 #if ENABLE_ULIME
 extern proc_manager_t *proc_mgr;
 extern ulime_t *ulime;
+extern mt_t *mt;
 #endif
 
 void kproc(void);

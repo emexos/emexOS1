@@ -7,6 +7,9 @@
 
 #include <emx/ansi.h>
 
+#define LOGO_BIG 1
+#define LOGO_SMALL 0
+
 //TODO:
 // implement password hashing
 
@@ -40,7 +43,12 @@ int main(void)
     printf("\n");
 
     print_logo: {
-    	#define LOGO_PATH "/emr/assets/logo.txt"
+    	#if LOGO_SMALL == 1
+    	#	define LOGO_PATH "/emr/assets/logo_small.txt"
+     	#elif LOGO_BIG == 1
+      	#	define LOGO_PATH "/emr/assets/logo.txt"
+      	#endif
+
      	#define LOGO_BUF 2048
 
         int fd = open(LOGO_PATH, O_RDONLY);

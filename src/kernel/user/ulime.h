@@ -33,6 +33,8 @@ typedef struct ulime_proc {
     u64 entry_rsp;
     u64 mmap_base;    // next virtual address for mmap allocations
 
+    u64 vma_base; // or. ELF VMA base
+
     struct ulime *ulime;
     struct ulime_proc *next;
     struct ulime_proc *prev;

@@ -79,4 +79,8 @@ If you prefer using a Visual Virtual Machine Manager (like `virt-manager`):
 
 ---
 
+<<<<<<< HEAD
 **For additional configuration details, consult the official [QEMU documentation](https://wiki.qemu.org/Documentation/Networking) or visit the [emexOS wiki](https://github.com/emexos/emexOS1/wiki).**
+=======
+**For additional configuration details, consult the official [QEMU documentation](https://wiki.qemu.org/Documentation/Networking) or visit the [emexOS wiki](https://github.com/emexos/emexOS1/wiki).**
+>>>>>>> aefa8b3 (half working multitasking......)

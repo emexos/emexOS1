@@ -63,6 +63,7 @@ int elf_load(ulime_proc_t *proc, u8 *elf_data, u64 size) {
     }
 
     u64 load_offset = proc->heap_base - min_vaddr;
+    proc->vma_base  = min_vaddr; // save for fork
     u64 hhdm_offset = proc->ulime->hpr->offset;
 
     printf("[ELF] Loading '%s'\n", proc->name);

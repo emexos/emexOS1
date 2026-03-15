@@ -10,13 +10,16 @@ static char *tp;
 static char tb[256]; // token result buffer
 
 #define PREFIX ":: emxrc: "
-#define CMD_PREFIX "-"
+#define CMD_PREFIX '-'
 
 #define VAR_NAME "var"
 #define EMX_NAME "ep"
 #define ELF_NAME "elf"
 #define EXE_NAME "exec"
 #define FMT_NAME "f"
+
+//#define BG " &"
+#define BG ""
 
 static char *tok(void) {
  	int i = 0;
@@ -99,10 +102,17 @@ int emxrc_parse(const char *path, emxrc_t *out) {
 
             char *next = tok();
             if (!next) { skipline(); continue; }
-            if (next[0] == CMD_PREFIX && next[1] == FMT_NAME) {
-                char *fs = tok(); // "ep" or "elf" or whatever
-                e->fmt = (fs && strcmp(fs, EMX_NAME) == 0) ? EMXRC_FMT_EP : EMXRC_FMT_ELF;
-                next = tok();
+            while (next && next[0] == CMD_PREFIX) {
+                if (strcmp(next + 1, "bg") == 0) {
+                    e->bg = 1;
+                    next = tok();
+                } else if (next[1] == FMT_NAME[0]) {
+                    char *fs = tok();
+                    e->fmt = (fs && strcmp(fs, EMX_NAME) == 0) ? EMXRC_FMT_EP : EMXRC_FMT_ELF;
+                    next = tok();
+                } else {
+                    next = tok();
+                }
             }
             if (next) strncpy(e->var_name, next, sizeof(e->var_name) - 1);
 
@@ -114,6 +124,7 @@ int emxrc_parse(const char *path, emxrc_t *out) {
 }
 
 void emxrc_run(emxrc_t *rc) {
+	//printf("strt emexrc_run");
     for (int i = 0; i < rc->exec_count; i++) {
         emxrc_exec_t *e = &rc->execs[i];
 
@@ -129,13 +140,22 @@ void emxrc_run(emxrc_t *rc) {
         }
 
         if (!path) { fprintf(stderr, PREFIX "unknown var '%s'\n", e->var_name); continue; }
+        printf(PREFIX EXE_NAME " %s (%s)%s\n", path,
+               fmt == EMXRC_FMT_EP ? EMX_NAME : ELF_NAME,
+               e->bg ? BG : "");
 
-        printf(PREFIX "" EXE_NAME" %s (%s)\n", path, fmt == EMXRC_FMT_EP ? EMX_NAME : ELF_NAME);
+        char *const argv[] = { (char *)path, (char *)0 };
+        char *const envp[] = { (char *)0 };
 
-        char *const argv[] = {(char *)path, (char*) 0};
-        char *const envp[] = {(char *) 0 };
-        int r = execve(path, argv, envp);
+        pid_t p = fork();
+        if (p == 0) {
+            execve(path, argv, envp);
+            _exit(1); // execve failed
+        }
 
-        if (r < 0) fprintf(stderr, PREFIX "" EXE_NAME " failed: '%s'\n", path);
+        if (!e->bg) {
+            waitpid(p, NULL, 0);
+        }
     }
+    //printf("end emexrc_run");
 }

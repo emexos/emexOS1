@@ -50,5 +50,5 @@
 [ ] umount
 [ ] unalias
 [ ] clear
-[ ] reboot
+[x] reboot
 [ ] shutdown

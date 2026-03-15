@@ -28,6 +28,11 @@ void initvfs(void);
 #define _DEV  "/dev/"
 #define MOUNT_DEV "/dev/hda"
 
+//#define PIPEFS "pipefs"
+
+//#define NETFS "netfs"
+//#define NET_MOUNT_DEFAULT "/net"
+
 #define EMX_DIRECTORY "/emr" // == emex system resources
 #define _EMX "/emr/" // mount point (/disk)
 #define EMCFG_DIRECTORY /*" /emr "*/EMX_DIRECTORY "/config" // == system configs

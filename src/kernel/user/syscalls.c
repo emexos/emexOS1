@@ -64,17 +64,16 @@ extern u64 user_r15;
 extern void resume_parent_sysret(u64 rip,u64 rsp,u64 r11,u64 cr3,u64 rbx,u64 rbp,u64 r12,u64 r13,u64 r14,u64 r15);
 
 // full saved context of the blocked parent
-static ulime_proc_t *blocked_parent = NULL;
-static u64 blocked_parent_rip = 0;
-static u64 blocked_parent_rsp = 0;
-static u64 blocked_parent_cr3 = 0;
-static u64 blocked_parent_rbx = 0;
-static u64 blocked_parent_r11 = 0;
-static u64 blocked_parent_rbp = 0;
-static u64 blocked_parent_r12 = 0;
-static u64 blocked_parent_r13 = 0;
-static u64 blocked_parent_r14 = 0;
-static u64 blocked_parent_r15 = 0;
+#define MAX_BLOCKED 16
+
+typedef struct {
+    ulime_proc_t *proc;
+    u64 rip, rsp, r11, cr3, rbx, rbp, r12, r13, r14, r15;
+    u64 waiting_for_pid;
+} blocked_entry_t;
+
+static blocked_entry_t blocked_list[MAX_BLOCKED];
+static int blocked_count = 0;
 static ulime_proc_t *find_proc_by_cr3(ulime_t *u, u64 cr3) {
     ulime_proc_t *p = u->ptr_proc_list;
     while (p) {
@@ -177,45 +176,86 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3)
     printf("\n[SYSCALL] process '%s' exited with code %lu\n", proc->name, exit_code);
     proc->state = PROC_ZOMBIE;
 
-    if (blocked_parent) {
-        ulime_proc_t *parent = blocked_parent;
-        u64 rip = blocked_parent_rip;
-        u64 rsp = blocked_parent_rsp;
-        u64 r11 = blocked_parent_r11;
-        u64 cr3 = blocked_parent_cr3;
-        u64 rbx = blocked_parent_rbx;
-        u64 rbp = blocked_parent_rbp;
-        u64 r12 = blocked_parent_r12;
-        u64 r13 = blocked_parent_r13;
-        u64 r14 = blocked_parent_r14;
-        u64 r15 = blocked_parent_r15;
+    // remove from mt so timer skips it
+    extern mt_t *mt;
+    if (mt) {
+        for (int i = 0; i < mt->task_count; i++) {
+            if (mt->tasks[i].proc == proc) {
+                mt->tasks[i].valid = 0;
+                break;
+            }
+        }
+    }
 
-        blocked_parent = NULL;
-        blocked_parent_rip = 0;
-        blocked_parent_rsp = 0;
-        blocked_parent_r11 = 0;
-        blocked_parent_cr3 = 0;
-        blocked_parent_rbx = 0;
-        blocked_parent_rbp = 0;
-        blocked_parent_r12 = 0;
-        blocked_parent_r13 = 0;
-        blocked_parent_r14 = 0;
-        blocked_parent_r15 = 0;
+    // find who is waiting for this pid
+    blocked_entry_t *found = NULL;
+    int found_idx = -1;
+    for (int i = 0; i < blocked_count; i++) {
+        if (blocked_list[i].waiting_for_pid == proc->pid) {
+            found = &blocked_list[i];
+            found_idx = i;
+            break;
+        }
+    }
+
+    if (found) {
+        ulime_proc_t *parent = found->proc;
+        u64 rip = found->rip, rsp = found->rsp, r11 = found->r11;
+        u64 cr3 = found->cr3, rbx = found->rbx, rbp = found->rbp;
+        u64 r12 = found->r12, r13 = found->r13;
+        u64 r14 = found->r14, r15 = found->r15;
+
+        // remove from blocked list
+        blocked_list[found_idx] = blocked_list[--blocked_count];
 
         parent->state = PROC_RUNNING;
         g_ulime->ptr_proc_curr = parent;
 
-        printf("[SYSCALL] resuming '%s' via sysret: RIP=0x%lX\n", parent->name, rip);
+        if (mt) {
+            for (int i = 0; i < mt->task_count; i++) {
+                if (mt->tasks[i].proc == parent) {
+                    mt->current_idx = i;
+                    if (mt->tasks[i].kstack)
+                        gdt_set_kernel_stack(((u64)mt->tasks[i].kstack + MT_KSTACK_SIZE) & ~0xFULL);
+                    break;
+                }
+            }
+        }
 
         // restore full parent state
+        printf("[SYSCALL] resuming '%s' via sysret: RIP=0x%lX\n", parent->name, rip);
         resume_parent_sysret(rip, rsp, r11, cr3, rbx, rbp, r12, r13, r14, r15);
         __builtin_unreachable();
     }
 
-    g_ulime->ptr_proc_curr = NULL;
-    while(1) {
-        __asm__ volatile("cli; hlt");
+    // one waitin
+    if (mt) {
+        for (int i = 0; i < mt->task_count; i++) {
+            mt_task_t *t = &mt->tasks[i];
+            if (!t->valid || !t->proc) continue;
+            if (t->proc->state == PROC_ZOMBIE || t->proc->state == PROC_BLOCKED) continue;
+            mt->current_idx = i;
+            t->proc->state = PROC_RUNNING;
+            g_ulime->ptr_proc_curr = t->proc;
+            if (t->kstack) gdt_set_kernel_stack(((u64)t->kstack + MT_KSTACK_SIZE) & ~0xFULL);
+            printf("[SYSCALL] no waiter, resuming '%s'\n", t->proc->name);
+            if (t->user_ctx.saved) {
+                resume_parent_sysret(
+                    t->user_ctx.rip, t->user_ctx.rsp, t->user_ctx.rflags,
+                    t->proc->pml4_phys,
+                    t->user_ctx.rbx, t->user_ctx.rbp,
+                    t->user_ctx.r12, t->user_ctx.r13,
+                    t->user_ctx.r14, t->user_ctx.r15
+                );
+            } else {
+                JumpToUserspace(t->proc);
+            }
+            __builtin_unreachable();
+        }
     }
+
+    printf("[SYSCALL] no more processes\n");
+    for (;;) __asm__ volatile("hlt");
     return 0;
 }
 
@@ -250,11 +290,11 @@ static void setup_argv_on_stack(ulime_proc_t *new_proc, char **user_argv, int ar
     str_p_virt = str_p_virt & ~7ULL;
     str_p_phys = pstack + (str_p_virt - sbase);
 
-    u64 ptrsec   = (u64)(1 + argc + 1) * 8;
+    u64 ptrsec =   (u64)(1 + argc + 1) * 8;
     u64 rsp_phys = (str_p_phys - ptrsec) & ~0xFULL;
     u64 rsp_virt = sbase + (rsp_phys - pstack);
 
-    u64 *p = (u64 *)(hhdm + rsp_phys);
+    u64 *p = (u64*)(hhdm + rsp_phys);
     *p++ = (u64)argc;
     for (int i = 0; i < argc; i++) *p++ = str_vaddrs[i];
     *p = 0;
@@ -338,23 +378,43 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
         setup_argv_on_stack(new_proc, user_argv, argc);
     }
 
-    blocked_parent     = caller;
-    blocked_parent_rip = user_rcx;
-    blocked_parent_rsp = user_rsp;
-    blocked_parent_r11 = user_r11;
-    blocked_parent_cr3 = user_cr3;
-    blocked_parent_rbx = user_rbx;
-    blocked_parent_rbp = user_rbp;
-    blocked_parent_r12 = user_r12;
-    blocked_parent_r13 = user_r13;
-    blocked_parent_r14 = user_r14;
-    blocked_parent_r15 = user_r15;
+    //blocked_parent     = caller;
+    if (blocked_count < MAX_BLOCKED) {
+        blocked_entry_t *e = &blocked_list[blocked_count++];
+        e->proc = caller;
+        e->rip = user_rcx;
+        e->rsp = user_rsp;
+        e->r11 = user_r11;
+        e->cr3 = user_cr3;
+        e->rbx = user_rbx;
+        e->rbp = user_rbp;
+        e->r12 = user_r12;
+        e->r13 = user_r13;
+        e->r14 = user_r14;
+        e->r15 = user_r15;
+        e->waiting_for_pid = new_proc->pid;
+    }
 
     caller->state = PROC_BLOCKED;
     g_ulime->ptr_proc_curr = new_proc;
 
-    printf("[SYSCALL] process '%s' blocked, waiting for '%s'\n",
-           caller->name, new_proc->name);
+    if (mt) mt_add_task(mt, new_proc);
+
+    printf(
+    	"[SYSCALL] process '%s' blocked, waiting for '%s'\n",
+            caller->name, new_proc->name
+    );
+    extern mt_t *mt;
+    if (mt) {
+        for (int i = 0; i < mt->task_count; i++) {
+            if (mt->tasks[i].proc == new_proc) {
+                mt->current_idx = i;
+                if (mt->tasks[i].kstack)
+                    gdt_set_kernel_stack(((u64)mt->tasks[i].kstack + MT_KSTACK_SIZE) & ~0xFULL);
+                break;
+            }
+        }
+    }
 
     JumpToUserspace(new_proc);
 
@@ -381,7 +441,22 @@ u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count)
             return (u64)-1;
         }
     }
-    return (u64)fs_read(tty_fd, (void *)buf, (size_t)count);
+    ulime_proc_t *cur = find_proc_by_cr3(g_ulime, user_cr3);
+    if (cur) cur->state = PROC_BLOCKED;
+    u64 result = (u64)fs_read(tty_fd, (void *)buf, (size_t)count);
+    if (cur) {
+        cur->state = PROC_RUNNING;
+        extern mt_t *mt;
+        if (mt) {
+            for (int i = 0; i < mt->task_count; i++) {
+                if (mt->tasks[i].proc == cur) {
+                    mt->current_idx = i;
+                    break;
+                }
+            }
+        }
+    }
+    return result;
 }
 
 u64 scall_getpid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3) {
@@ -517,6 +592,80 @@ u64 scall_ioctl(ulime_proc_t *proc, u64 fd, u64 request, u64 arg_ptr)
     return (u64)-1;
 }
 
+u64 scall_fork(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
+{
+    (void)arg1; (void)arg2; (void)arg3;
+
+    if (!proc_mgr) return (u64)-1;
+
+    ulime_proc_t *child = proc_create_proc(proc_mgr, proc->name, proc->entry_point, proc->priority);
+    if (!child) return (u64)-1;
+
+    u64 hhdm = g_ulime->hpr->offset;
+
+    // copy heap and stack content via hhdm
+    memcpy((void*)(child->phys_heap + hhdm),(void*)(proc->phys_heap + hhdm), proc->heap_size);
+    memcpy((void*)(child->phys_stack + hhdm),(void*)(proc->phys_stack + hhdm), proc->stack_size);
+
+    child->brk = child->heap_base + (proc->brk - proc->heap_base);
+    child->entry_point = user_rcx;
+    child->entry_rsp =   user_rsp;
+
+    u64 heap_flags =  PTE_PRESENT | PTE_WRITABLE | PTE_USER;
+    u64 stack_flags = PTE_PRESENT | PTE_WRITABLE | PTE_USER | PTE_NO_EXEC;
+    u64 heap_pages =  proc->heap_size / 0x1000;
+    u64 stack_pages = proc->stack_size / 0x1000;
+
+    // map parents virtual address into childs PML4 so the copied stack return addresses work
+    for (u64 p = 0; p < heap_pages; p++) {
+        u64 parent_virt = proc->heap_base + (p * 0x1000);
+        u64 child_phys = child->phys_heap + (p * 0x1000);
+        paging_map_page_proc(g_ulime->hpr, child->pml4_phys, parent_virt, child_phys, heap_flags);
+    }
+    for (u64 p = 0; p < stack_pages; p++) {
+        u64 parent_virt = proc->stack_base + (p * 0x1000);
+        u64 child_phys = child->phys_stack + (p * 0x1000);
+        paging_map_page_proc(g_ulime->hpr, child->pml4_phys, parent_virt, child_phys, stack_flags);
+    }
+
+    if (proc->vma_base != 0) {
+        for (u64 p = 0; p < heap_pages; p++) {
+            u64 orig_virt = proc->vma_base + (p * 0x1000);
+            u64 child_phys = child->phys_heap + (p * 0x1000);
+            paging_map_page_proc(g_ulime->hpr, child->pml4_phys, orig_virt, child_phys, heap_flags);
+        }
+    }
+    child->vma_base = proc->vma_base;
+
+    extern mt_t *mt;
+    int idx = mt_add_task(mt, child);
+    if (!mt) return (u64)-1;
+    if (idx < 0) return (u64)-1;
+
+    // save full child context so timer can switch to it correctly
+    mt_task_t *ct = &mt->tasks[idx];
+    ct->user_ctx.saved = 1;
+    ct->user_ctx.rip = user_rcx; // resume after fork() syscall
+    ct->user_ctx.rsp = user_rsp;
+    ct->user_ctx.cs = (USER_CODE_SELECTOR | 3);
+    ct->user_ctx.rflags = 0x202; // IF=1
+    ct->user_ctx.ss = (USER_DATA_SELECTOR | 3);
+    ct->user_ctx.cr3 = child->pml4_phys;
+    ct->user_ctx.rax = 0; // child sees fork() == 0
+    ct->user_ctx.rbx = user_rbx;
+    ct->user_ctx.rbp = user_rbp;
+    ct->user_ctx.r12 = user_r12;
+    ct->user_ctx.r13 = user_r13;
+    ct->user_ctx.r14 = user_r14;
+    ct->user_ctx.r15 = user_r15;
+    printf(
+    	"[SYSCALL] fork: parent pid=%llu child pid=%llu\n",
+        proc->pid, child->pid
+    );
+
+    return child->pid;  // parent sees child pid
+}
+
 u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
     (void)proc;
     (void)arg3;
@@ -529,7 +678,7 @@ u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
     if ((u64)(cwlen + 1) > size) return 0; // buffer too small
 
     str_copy(buf, cwd);
-    return (u64)(cwlen + 1); // return written byte count (> 0 = success)
+    return (u64)(cwlen + 1); // return the written byte count
 }
 
 /*u64 scall_mmap(ulime_proc_t *proc, u64 args_ptr, u64 arg2, u64 arg3) {
@@ -615,6 +764,80 @@ u64 scall_munmap(ulime_proc_t *proc, u64 addr, u64 length, u64 arg3) {
     return 0;
 }*/
 
+u64 scall_waitpid(ulime_proc_t *proc, u64 pid, u64 arg2, u64 arg3)
+{
+    (void)arg2;
+    (void)arg3;
+
+    // find child
+    ulime_proc_t *child = NULL;
+    ulime_proc_t *p = g_ulime->ptr_proc_list;
+    while (p) {
+        if (p->pid == pid) { child = p; break; }
+        p = p->next;
+    }
+
+    if (!child) return (u64)-1;
+
+    // child already done
+    if (child->state == PROC_ZOMBIE) return pid;
+
+    // block parent until child exits
+    if (blocked_count < MAX_BLOCKED) {
+        blocked_entry_t *e = &blocked_list[blocked_count++];
+        e->proc = proc;
+        e->rip  = user_rcx;
+        e->rsp  = user_rsp;
+        e->r11  = user_r11;
+        e->cr3  = user_cr3;
+        e->rbx  = user_rbx;
+        e->rbp  = user_rbp;
+        e->r12  = user_r12;
+        e->r13  = user_r13;
+        e->r14  = user_r14;
+        e->r15  = user_r15;
+        e->waiting_for_pid = pid;
+    }
+
+    proc->state = PROC_BLOCKED;
+    g_ulime->ptr_proc_curr = NULL;
+
+    // find next ready task
+    extern mt_t *mt;
+    if (mt) {
+        for (int i = 0; i < mt->task_count; i++) {
+            mt_task_t *t = &mt->tasks[i];
+            if (!t->valid || !t->proc) continue;
+            if (t->proc->state == PROC_ZOMBIE || t->proc->state == PROC_BLOCKED) continue;
+            mt->current_idx = i;
+            t->proc->state = PROC_RUNNING;
+            g_ulime->ptr_proc_curr = t->proc;
+            if (t->kstack)
+                gdt_set_kernel_stack(((u64)t->kstack + MT_KSTACK_SIZE) & ~0xFULL);
+            printf(
+            	"[SYSCALL] waitpid: '%s' waiting for pid=%llu, running '%s'\n",
+                proc->name, pid, t->proc->name
+            );
+            if (t->user_ctx.saved) {
+                resume_parent_sysret(
+                    t->user_ctx.rip, t->user_ctx.rsp,
+                    t->user_ctx.rflags, t->proc->pml4_phys,
+                    t->user_ctx.rbx, t->user_ctx.rbp,
+                    t->user_ctx.r12, t->user_ctx.r13,
+                    t->user_ctx.r14, t->user_ctx.r15
+                );
+            } else {
+                JumpToUserspace(t->proc);
+            }
+            __builtin_unreachable();
+        }
+    }
+
+    printf("[SYSCALL] waitpid: no ready task, spinning\n");
+    for (;;) __asm__ volatile("hlt");
+    return 0;
+}
+
 void _init_syscalls_table(ulime_t *ulime_ptr) {
     if (!ulime_ptr) return;
 
@@ -641,6 +864,8 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     //ulime_ptr->syscalls[SHM_DESTROY]       = scall_shm_destroy;
     ulime_ptr->syscalls[MMAP]            = scall_mmap;
     ulime_ptr->syscalls[MUNMAP]          = scall_munmap;
+    ulime_ptr->syscalls[FORK]            = scall_fork;
+    ulime_ptr->syscalls[WAITPID]         = scall_waitpid;
 
     // emex specific
     ulime_ptr->syscalls[EMXREBOOT]       = scall_reboot;

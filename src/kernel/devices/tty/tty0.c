@@ -167,9 +167,9 @@ static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
         int got = 0;
 
         while (!got) {
-            __asm__ volatile("hlt");
             int n = fs_read(kbd_fd, &event, sizeof(key_event_t));
-            if (n == (int)sizeof(key_event_t)) got = 1;
+            if (n == (int)sizeof(key_event_t)) { got = 1; break; }
+            __asm__ volatile("hlt");
         }
 
         if (!event.pressed) continue;

@@ -15,6 +15,7 @@
 #define _SCAL_MKDIR       		83
 #define _SCAL_UNLINK      		87  // (delete file)
 #define _SCAL_IOCTL     	    16
+#define _SCAL_WAITPID           61
 #define _SCAL_IPC_SEND   	   200
 #define _SCAL_IPC_RECV   	   201
 #define _SCAL_REBOOT    	   169

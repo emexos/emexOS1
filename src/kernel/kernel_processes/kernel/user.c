@@ -1,4 +1,5 @@
 #include "gen.h"
+#include "../shells/shells.h"
 #include <kernel/packages/emex/emex.h>
 
 // path to the init app in the VFS (loaded from initrd.cpio)
@@ -23,6 +24,7 @@ void uproc(void) {
             log("[INIT]", "system cannot continue without init\n", error);
             //while (1) __asm__ volatile("cli; hlt");
             // hcf();
+            return;
         }
 
         log("[INIT]", "jumping to userspace\n", success);
@@ -33,11 +35,25 @@ void uproc(void) {
         dump_kprocesses();
         proc_list_procs(proc_mgr);
         ulime->ptr_proc_curr = init_proc;
+
+        log("[INIT]", "jumping to init_proc\n", d);
+
         #if JUMPTOUSER == 1
-            JumpToUserspace(init_proc);
+	        if (mt) {
+	            mt_add_task(mt, init_proc); // register init with mt
+	            mt_start(mt); // and launch
+				//never returns
+	        }
+            JumpToUserspace(init_proc); // fallback if mt is not up
         #endif
 
+        // if JumpToUserspace fails
+        emergency_shell();
 
+        // if emergency_shell fails
+        void recovery_shell(void);
+
+        // if recovery_shell fails
         __builtin_unreachable();
 
         //proc_list_procs(proc_mgr);

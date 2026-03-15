@@ -65,4 +65,8 @@ You should now be able to create and run virtual machines using QEMU on your Arc
 
 - [Arch Wiki: QEMU](https://wiki.archlinux.org/title/QEMU)
 - [Arch Wiki: Libvirt](https://wiki.archlinux.org/title/Libvirt)
+<<<<<<< HEAD
 - [Arch Wiki: Virt-manager](https://wiki.archlinux.org/title/Virt-manager)
+=======
+- [Arch Wiki: Virt-manager](https://wiki.archlinux.org/title/Virt-manager)
+>>>>>>> aefa8b3 (half working multitasking......)

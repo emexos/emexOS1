@@ -145,7 +145,7 @@ void fs_system_init(void *klime)
     initvfs();
 
     init_boot_log = fs_open(logpath, O_CREAT | O_WRONLY);
-    log("[FS]", "[FS] wrote", d);
+    log("[FS]", "wrote", d);
     BOOTUP_PRINT(logpath, white());
     if (init_boot_log < 0) {
         panic("Cannot open [logs]");
