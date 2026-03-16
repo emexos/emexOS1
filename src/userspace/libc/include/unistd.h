@@ -17,7 +17,6 @@ int unlink(const char *path);
 
 // process
 pid_t getpid (void);
-pid_t waitpid(pid_t pid, int *status, int options);
 pid_t fork (void);
 void _exit (int status) __attribute__((noreturn));
 int execve (const char *path, char *const argv[], char *const envp[]);
