@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
 
 static char buf[2048];
 static char *tp;

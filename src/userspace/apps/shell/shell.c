@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/wait.h>
 
 
 //-////////////////////////////////////////-//
@@ -56,6 +57,38 @@ static int exec_from_bin(const char *cmd, char **argv)
     return execve(path, argv, envp);
 }
 
+static void builtin_exec(char **argv)
+{
+    if (!argv[1]) {
+        printf("exec: missing path\n");
+        return;
+    }
+
+    const char *path = argv[1];
+    char *const envp[] = { (char *)0 };
+
+    // check if it ends with .emx
+    size_t len = strlen(path);
+    int is_emx = (len > 4 && strcmp(path + len - 4, ".emx") == 0);
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        if (is_emx) {
+            execve(path, argv + 1, envp);
+        } else {
+            execve(path, argv + 1, envp);
+        }
+        printf("exec: failed to run: ");
+        printf(path);
+        printf("\n");
+        _exit(1);
+    } else if (pid > 0) {
+        waitpid(pid, NULL, 0);
+    } else {
+        printf("exec: fork failed\n");
+    }
+}
+
 int main(void)
 {
 	printf(WELCOME_MESSAGE);
@@ -79,6 +112,13 @@ int main(void)
 
         int argc = parse_args(buf, argv, 32);
         if (argc == 0) continue;
+
+        builtins: {
+	        if (strcmp(argv[0], "exec") == 0) {
+	            builtin_exec(argv);
+	            continue;
+	        }
+        }
 
         int ret = exec_from_bin(argv[0], argv);
         if (ret < 0) {

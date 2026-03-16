@@ -1,13 +1,16 @@
 var lsblk      = ("/bin/lsblk.elf")
+var bg_test    = ("/bin/bg_test.elf")
+var bg_test2   = ("/bin/cursor.elf")
 var login_path = ("/emr/system/login.elf")
 var shell_path = (ep: "/user/apps/shell.emx")
-var gui_path   = (ep: "/user/apps/gui.emx")
 
-// ep == emex package
 
-exec -bg gui_path
 exec lsblk
+exec -bg bg_test
+exec -bg bg_test2
+
+
 
 // last things which should happen
-exec login_path
-exec -f"ep" shell_path
+//exec login_path
+//exec -f"ep" shell_path

@@ -596,7 +596,10 @@ u64 scall_fork(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
 {
     (void)arg1; (void)arg2; (void)arg3;
 
-    if (!proc_mgr) return (u64)-1;
+    // null check
+    if (!proc_mgr || !g_ulime) return (u64)-1;
+    extern mt_t *mt;
+    if (!mt) return (u64)-1;
 
     ulime_proc_t *child = proc_create_proc(proc_mgr, proc->name, proc->entry_point, proc->priority);
     if (!child) return (u64)-1;
@@ -604,8 +607,8 @@ u64 scall_fork(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
     u64 hhdm = g_ulime->hpr->offset;
 
     // copy heap and stack content via hhdm
-    memcpy((void*)(child->phys_heap + hhdm),(void*)(proc->phys_heap + hhdm), proc->heap_size);
-    memcpy((void*)(child->phys_stack + hhdm),(void*)(proc->phys_stack + hhdm), proc->stack_size);
+    memcpy((void*)(child->phys_heap + hhdm), (void*)(proc->phys_heap  + hhdm), proc->heap_size);
+    memcpy((void*)(child->phys_stack + hhdm), (void*)(proc->phys_stack + hhdm), proc->stack_size);
 
     child->brk = child->heap_base + (proc->brk - proc->heap_base);
     child->entry_point = user_rcx;
@@ -637,14 +640,13 @@ u64 scall_fork(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
     }
     child->vma_base = proc->vma_base;
 
-    extern mt_t *mt;
+    //extern mt_t *mt;
     int idx = mt_add_task(mt, child);
-    if (!mt) return (u64)-1;
+    //if (!mt) return (u64)-1;
     if (idx < 0) return (u64)-1;
 
     // save full child context so timer can switch to it correctly
     mt_task_t *ct = &mt->tasks[idx];
-    ct->user_ctx.saved = 1;
     ct->user_ctx.rip = user_rcx; // resume after fork() syscall
     ct->user_ctx.rsp = user_rsp;
     ct->user_ctx.cs = (USER_CODE_SELECTOR | 3);
@@ -658,10 +660,9 @@ u64 scall_fork(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
     ct->user_ctx.r13 = user_r13;
     ct->user_ctx.r14 = user_r14;
     ct->user_ctx.r15 = user_r15;
-    printf(
-    	"[SYSCALL] fork: parent pid=%llu child pid=%llu\n",
-        proc->pid, child->pid
-    );
+    ct->user_ctx.saved = 1;
+
+    printf("[SYSCALL] fork: parent pid=%llu child pid=%llu\n", proc->pid, child->pid);
 
     return child->pid;  // parent sees child pid
 }
