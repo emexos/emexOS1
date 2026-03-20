@@ -21,6 +21,8 @@ typedef struct {
     char var_name[64];
     emxrc_fmt_t fmt;
     int bg;
+    int is_wait;
+    int wait_time;
 } emxrc_exec_t;
 
 typedef struct {

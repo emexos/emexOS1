@@ -1,14 +1,18 @@
 var lsblk      = ("/bin/lsblk.elf")
-var bg_test    = ("/bin/bg_test.elf")
-var bg_test2   = ("/bin/cursor.elf")
+var bg_test    = ("/emr/system/sinfo.elf")
+var bg_test2   = ("/emr/system/libraries/cursor.elf")
 var login_path = ("/emr/system/login.elf")
 var shell_path = (ep: "/user/apps/shell.emx")
 
 
 exec lsblk
-exec -bg bg_test
 exec -bg bg_test2
+exec login_path
 
+wait 1
+
+exec -bg bg_test
+//exec -bg bg_test
 
 
 // last things which should happen

@@ -1,11 +1,13 @@
 all:
 	@$(MAKE) -C libc
+	@$(MAKE) -C libs/emxfb0
+	@$(MAKE) -C libs/font8x12
+	@$(MAKE) -C libs/wm
+	@$(MAKE) -C libs/cursor
 
-	#@$(MAKE) -C apps/hello
 	@$(MAKE) -C apps/system
 	@$(MAKE) -C apps/shell
 	@$(MAKE) -C apps/login
-	#@$(MAKE) -C apps/gui
 
 	@$(MAKE) -C bin/echo
 	@$(MAKE) -C bin/hello
@@ -15,16 +17,20 @@ all:
 	@$(MAKE) -C bin/cat
 	@$(MAKE) -C bin/lsblk
 	@$(MAKE) -C bin/reboot
-	@$(MAKE) -C bin/bg_test
+	@$(MAKE) -C bin/sinfo
+	@$(MAKE) -C bin/rm
+	@$(MAKE) -C bin/touch
 
 clean:
 	@$(MAKE) -C libc clean
+	@$(MAKE) -C libs/emxfb0 clean
+	@$(MAKE) -C libs/font8x12 clean
+	@$(MAKE) -C libs/wm clean
+	@$(MAKE) -C libs/cursor clean
 
-	#@$(MAKE) -C apps/hello clean
 	@$(MAKE) -C apps/system clean
 	@$(MAKE) -C apps/shell clean
 	@$(MAKE) -C apps/login clean
-	#@$(MAKE) -C apps/gui clean
 
 	@$(MAKE) -C bin/echo clean
 	@$(MAKE) -C bin/hello clean
@@ -34,6 +40,8 @@ clean:
 	@$(MAKE) -C bin/cat clean
 	@$(MAKE) -C bin/lsblk clean
 	@$(MAKE) -C bin/reboot clean
-	@$(MAKE) -C bin/bg_test clean
+	@$(MAKE) -C bin/sinfo clean
+	@$(MAKE) -C bin/rm clean
+	@$(MAKE) -C bin/touch clean
 
 .PHONY: all clean

@@ -39,19 +39,21 @@ void uproc(void) {
         log("[INIT]", "jumping to init_proc\n", d);
 
         #if JUMPTOUSER == 1
-	        if (mt) {
+
+        	if (mt) {
 	            mt_add_task(mt, init_proc); // register init with mt
 	            mt_start(mt); // and launch
 				//never returns
 	        }
             JumpToUserspace(init_proc); // fallback if mt is not up
+
         #endif
 
         // if JumpToUserspace fails
         emergency_shell();
 
         // if emergency_shell fails
-        void recovery_shell(void);
+        recovery_shell();
 
         // if recovery_shell fails
         __builtin_unreachable();
