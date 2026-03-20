@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdlib.h>
 
 static char buf[2048];
 static char *tp;
@@ -53,6 +54,12 @@ static void skipline(void) {
     while (*tp && *tp != '\n') tp++;
     if (*tp) tp++;
 }
+static void emx_sleep(int ticks) {
+    volatile int i, j;
+    for (i = 0; i < ticks; i++) {
+        for (j = 0; j < 1000000; j++);
+    }
+}
 
 int emxrc_parse(const char *path, emxrc_t *out) {
     if (!out) return -1;
@@ -96,6 +103,21 @@ int emxrc_parse(const char *path, emxrc_t *out) {
             out->var_count++;
         }
 
+        // wait <time>
+        else if (strcmp(kw, "wait") == 0 && out->exec_count < EMXRC_MAX_EXECS) {
+            emxrc_exec_t *e = &out->execs[out->exec_count];
+            memset(e, 0, sizeof(*e));
+
+            e->is_wait = 1;
+
+            char *t = tok();
+            if (t) {
+                e->wait_time = atoi(t);
+            }
+
+            out->exec_count++;
+        }
+
         // exec -f"format" var_name
         else if (strcmp(kw, EXE_NAME) == 0 && out->exec_count < EMXRC_MAX_EXECS) {
             emxrc_exec_t *e = &out->execs[out->exec_count];
@@ -128,6 +150,13 @@ void emxrc_run(emxrc_t *rc) {
 	//printf("strt emexrc_run");
     for (int i = 0; i < rc->exec_count; i++) {
         emxrc_exec_t *e = &rc->execs[i];
+
+   	    if (e->is_wait) {
+	        printf(PREFIX "wait %d\n", e->wait_time);
+	        emx_sleep(e->wait_time);
+	        continue;
+	    }
+
 
         const char *path = NULL;
         emxrc_fmt_t fmt = e->fmt;

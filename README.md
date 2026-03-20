@@ -9,7 +9,9 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/emexos/emexos1?style=for-the-badge&labelColor=black&color=white)
 
 
-![Discord Badge](https://img.shields.io/badge/Join%20the%20Discord-Black?style=for-the-badge&logo=discord&logoColor=white&color=black)
+<a href="https://discord.gg/JFGK4yqSyA">
+	<img src="https://img.shields.io/badge/Join%20the%20Discord-Black?style=for-the-badge&logo=discord&logoColor=white&color=black" alt="Discord Badge" />
+</a>
 
 </div>
 

@@ -33,6 +33,7 @@ $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 
 # Build userspace first
 userspace:
+	@$(MAKE) -C src/userspace clean
 	@$(MAKE) -C src/userspace
 
 # Compile Limine
@@ -59,7 +60,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp $(addprefix $(INCLUDE_DIR)/limine/limine-, bios.sys bios-cd.bin uefi-cd.bin) $(ISODIR)/boot/limine/
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
 
-	@echo "[MK] copying executables..."
+	@echo "[MK] copying applications..."
 	@mkdir -p $(DISK_DIR)/rd/user/apps
 	@mkdir -p $(DISK_DIR)/rd/user/bin
 	@mkdir -p $(DISK_DIR)/rd/bin
@@ -67,18 +68,25 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/apps/
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system/
 
-	@echo "[MK] copying files..."
+	@echo "[MK] copying other binarys..."
 	@cp src/userspace/apps/login/login.elf $(DISK_DIR)/rd/emr/system
 	@cp src/userspace/bin/hello/hello.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/sinfo/sinfo.elf $(DISK_DIR)/rd/emr/system
+	@cp src/userspace/bin/touch/touch.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/echo/echo.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/ls/ls.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/cd/cd.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/rm/rm.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/cat/cat.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/tree/tree.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/lsblk/lsblk.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/reboot/reboot.elf $(DISK_DIR)/rd/bin/
-	@cp src/userspace/bin/bg_test/cursor.elf $(DISK_DIR)/rd/bin/
-	@cp src/userspace/bin/bg_test/bg_test.elf $(DISK_DIR)/rd/bin/
+
+	@echo "[MK] copying libs..."
+	@cp src/userspace/libs/wm/libwm.a $(DISK_DIR)/rd/emr/system/libraries/
+	@cp src/userspace/libs/cursor/cursor.elf $(DISK_DIR)/rd/emr/system/libraries
+	@cp src/userspace/libs/emxfb0/libemxfb0.a $(DISK_DIR)/rd/emr/system/libraries/
+	@cp src/userspace/libs/font8x12/libfont8x12.a $(DISK_DIR)/rd/emr/system/libraries/
 
 
 	@echo "[MK] creating initrd.cpio..."
@@ -102,7 +110,7 @@ run: $(ISO)
 	@qemu-system-x86_64 \
 		-M pc \
 		-cpu qemu64 \
-		-m 512 \
+		-m 1024 \
 		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
 		-drive file=$(DISK_IMG),format=raw,if=ide,index=0 \

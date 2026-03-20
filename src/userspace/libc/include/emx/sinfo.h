@@ -1,16 +1,18 @@
 #pragma once
 
-#define __EMEX__       "emex"
-#define __EMEXF_C__    "EMEX"
-#define __EMEXF_B1__   "[emex]"
-#define __EMEXF_B1C__  "[EMEX]"
-#define __EMEXF_S__    "emx"
-#define __EMXSOPN__    EMEX4
-#define __EMXSOPN_B1__ "[" EMEX4 "]"
+#include "../../../../../shared/emex.h"
 
-#define __EMX_VER_     "v0.4"
-#define __EMX_BUILD_   "26M15"
-#define __EMX_BUILD_B_ "b26M15"
+#define __EMEX__          __EMEX_KERNEL
+#define __EMEXF_C__       "EMEX"
+#define __EMEXF_B1__      "[emex]"
+#define __EMEXF_B1C__     "[EMEX]"
+#define __EMEXF_S__       "emx"
+#define __EMXSOPN__       __EMEX__
+#define __EMXSOP_N_F_B1__ "[" __EMEX__ "]"
+
+#define __EMX_VER_         __EMEX_VERSION
+#define __EMX_BUILD_       __EMEX_BUILD
+#define __EMX_BUILD_B_     "b26M15"
 
 /*
  * F_C   == fromat caps

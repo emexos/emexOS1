@@ -4,9 +4,9 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include "gen.h"
+#include "cursor.h"
 
-// cursor config
+//config
 #define T 0x00000000u
 #define B 0xFF101010u
 #define W 0xFFFFFFFFu
@@ -20,18 +20,22 @@
 #define CURSOR_POS "/tmp/wm/cursor_pos"
 
 static const unsigned int cursor_px[CW * CH] = {
-    B,T,T,T,T,T,T,T,T,
-    B,B,T,T,T,T,T,T,T,
-    B,W,B,T,T,T,T,T,T,
-    B,W,W,B,T,T,T,T,T,
-    B,W,W,W,B,T,T,T,T,
-    B,W,W,W,W,B,T,T,T,
-    B,W,W,W,W,W,B,T,T,
-    B,W,W,W,W,W,W,B,T,
-    B,W,W,B,B,B,B,B,T,
-    B,W,B,T,T,T,T,T,T,
-    B,B,T,T,T,T,T,T,T,
-    T,T,T,T,T,T,T,T,T,
+    B,T,T,T,T,T,T,T,T,T,T,T,
+    B,B,T,T,T,T,T,T,T,T,T,T,
+    B,W,B,T,T,T,T,T,T,T,T,T,
+    B,W,W,B,T,T,T,T,T,T,T,T,
+    B,W,W,W,B,T,T,T,T,T,T,T,
+    B,W,W,W,W,B,T,T,T,T,T,T,
+    B,W,W,W,W,W,B,T,T,T,T,T,
+    B,W,W,W,W,W,W,B,T,T,T,T,
+    B,W,W,W,W,W,W,W,B,T,T,T,
+    B,W,W,W,W,W,W,W,W,B,T,T,
+    B,W,W,W,W,W,W,W,W,W,B,T,
+    B,W,W,W,W,B,B,B,B,B,B,T,
+    B,W,W,W,B,T,T,T,T,T,T,T,
+    B,W,W,B,T,T,T,T,T,T,T,T,
+    B,W,B,T,T,T,T,T,T,T,T,T,
+    B,B,T,T,T,T,T,T,T,T,T,T,
 };
 
 static unsigned int scaled_cursor[SCW * SCH];
@@ -64,7 +68,6 @@ static int check_dirty(void) {
     char c = 0;
     read(fd, &c, 1);
     if (c == '1') {
-        // reset flag
         int dummy = 0;
         (void)dummy;
         close(fd);
@@ -76,8 +79,9 @@ static int check_dirty(void) {
     return 0;
 }
 
-int main(void) {
-    int fb = open( "/dev/fb0", O_RDWR);
+int main(void)
+{
+    int fb = open("/dev/fb0", O_RDWR);
     int mfd = open("/dev/input/mouse0", O_RDONLY);
     if (fb < 0 || mfd < 0) _exit(1);
 
@@ -86,6 +90,7 @@ int main(void) {
     for (;;) {
         mouse_event_t ev;
         if ((int)read(mfd, &ev, sizeof(ev)) < (int)sizeof(ev)) continue;
+
         if (check_dirty())
             bg_valid = 0;
 
@@ -111,7 +116,7 @@ int main(void) {
 
         fb_rect_t drw = {
             .x=(unsigned)nx, .y=(unsigned)ny,
-            .w=SCW, .h=SCH,.pixels=scaled_cursor
+            .w=SCW, .h=SCH, .pixels=scaled_cursor
         };
         ioctl(fb, FBIO_BLIT, &drw);
 
@@ -124,7 +129,7 @@ int main(void) {
             if (!vx) { tx[li++] = '0'; } else {
                 char tmp[12]; int ti = 0;
                 while (vx) { tmp[ti++] = '0' + vx % 10; vx /= 10; }
-                while (ti > 0)tx[li++] = tmp[--ti];
+                while (ti > 0) tx[li++] = tmp[--ti];
             }
             tx[li] = '\0';
             li = 0;
