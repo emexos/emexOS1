@@ -38,3 +38,10 @@ volatile struct limine_module_request module_request = {
     .revision = 0,
     .response = NULL
 };
+
+// Added for ACPI
+__attribute__((used, section(".requests")))
+volatile struct limine_rsdp_request rsdp_request = {
+    .id = LIMINE_RSDP_REQUEST_ID,
+    .revision = 0
+};
