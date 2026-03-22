@@ -52,9 +52,9 @@ After booting, you will be asked for a password + user both are "emex" by defaul
 Currently, no SMP support is available just yet so emexOS runs using only a single core.
 
 <div align="center">
-	<h2>$${Contributors}$$</h2>
-	<a href="https://github.com/emexos/emexOS1/graphs/contributors">
-	  <img src="https://contrib.rocks/image?repo=emexos/emexOS1" />
+	<h2> Contributors </h2>
+	<a href="https://github.com/emexos/emexOS/graphs/contributors">
+	  <img src="https://contrib.rocks/image?repo=emexos/emexOS" />
 	</a>
 </div>
 
