@@ -96,6 +96,8 @@ klime_t *klime = NULL;
 #include <kernel/modules/limine.h>
 #include <kernel/inits/init.h>
 
+// ACPI
+#include <kernel/acpi/acpi.h>
 
 void _start(void)
 {
@@ -246,6 +248,7 @@ void _start(void)
             }
         #endif
 
+        init_acpi(); // Init ACPI
 
         u32 freq = 1000;
         timer_init(freq);
