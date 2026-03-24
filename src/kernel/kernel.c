@@ -18,8 +18,8 @@
 
 // CPU
 #include <kernel/cpu/cpu.h>
+#include <kernel/cpu/acpi/acpi.h>
 #include <kernel/pci/pci.h>
-#include <kernel/acpi/acpi.h>
 #if X64 == 1
     #include <kernel/arch/x86_64/gdt/gdt.h>
     #include <kernel/arch/x86_64/idt/idt.h>

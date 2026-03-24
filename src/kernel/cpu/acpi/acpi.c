@@ -1,14 +1,16 @@
 #include <types.h>
 #include <kernel/include/reqs.h>
 #include <kernel/include/ports.h>
-#include <kernel/acpi/acpi.h>
+#include "acpi.h"
 #include <kernel/include/assembly.h>
 #include <string/string.h>
 #include <kernel/cpu/cpu.h>
 #include <kernel/user/ulime.h>
 
 /*
-Written by @msaid5860. Modified to match emexOS.
+ * Written by @msaid5860 for NullOS.
+ * Modified to match emexOS.
+ *
 */
 
 /*
@@ -921,7 +923,7 @@ void shutdown(void) {
     if (!fadt) hcf();
     cli();
 
-    uint8_t sleep_val = (uint8_t)slp_typa; 
+    uint8_t sleep_val = (uint8_t)slp_typa;
     if (sleep_val == 0xFF) sleep_val = 7;
     uint8_t sleep_val_b = (slp_typb == 0 || slp_typb == 0xFFFF) ? sleep_val : (uint8_t)slp_typb;
 
@@ -938,7 +940,7 @@ void shutdown(void) {
 
     // 2. Platform-specific prep (Apple/NVIDIA SPTS/SLPN/SLPT/OEMS)
     if (ns_find("\\", "SPTS") || ns_find("\\", "SLPN") || ns_find("\\", "RAMB")) {
-        aml_exec_pts(sleep_val); 
+        aml_exec_pts(sleep_val);
     }
 
     // 3. Clear wake status

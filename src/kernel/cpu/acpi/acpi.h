@@ -115,7 +115,7 @@ typedef struct {
         u64 ival;
         struct { u8 *body; u32 blen; u8 argc; } method;
         struct {
-            u8  space;                  // 0=Mem 1=IO
+            u8  space;                       // 0=Mem 1=IO
             int      dyn;                    // base is a runtime field ref
             u64 base;
             char     base_fld[AML_NAME_MAX]; // if dyn: absolute path of base field
@@ -135,6 +135,7 @@ typedef struct {
 #define RET_RET  2  // return statement hit
 
 typedef struct { u64 v; int t; } aml_val_t;
+
 #define V(x)  ((aml_val_t){.v=(x),.t=RET_VAL})
 #define VOID  ((aml_val_t){.t=RET_VOID})
 #define RET(x)((aml_val_t){.v=(x),.t=RET_RET})
