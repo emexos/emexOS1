@@ -25,6 +25,8 @@ src/kernel/console/functions/edit.c
 
 tmp/
 
+dsk/disk.img
+
 
 #shared/libc/math/math.c
 #shared/libc/math/pi.h
