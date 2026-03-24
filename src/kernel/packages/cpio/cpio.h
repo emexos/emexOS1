@@ -8,8 +8,8 @@
 #define CPIO_MAGIC_NEWC_CRC "070702"
 #define CPIO_MAGIC_LEN      6
 
-#define DIR_PREFIX  "dir:  "
-#define FILE_PREFIX "file: "
+#define DIR_PREFIX  "dir  "
+#define FILE_PREFIX "file "
 
 // signals end of the archive
 #define CPIO_TRAILER "TRAILER!!!"

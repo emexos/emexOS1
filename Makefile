@@ -25,7 +25,10 @@ fetchDeps:
 
 disk:
 	@mkdir -p $(DISK_DIR)
-	@touch $(DISK_DIR)/disk.img
+	@rm $(DISK_IMG)
+	@qemu-img create -f raw $(DISK_IMG) 256M
+	@echo "[DISK] created $(DISK_IMG)"
+
 # Kernel binary
 $(BUILD_DIR)/kernel.elf: src/kernel/linker.ld $(OBJS)
 	@mkdir -p $(dir $@)
@@ -54,6 +57,8 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@mkdir -p $(ISODIR)/boot/keymaps
 	@mkdir -p $(ISODIR)/boot/images
 	@mkdir -p $(ISODIR)/boot/programs
+	@mkdir -p $(ISODIR)/boot/flags
+	@touch $(ISODIR)/boot/flags/install
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_a.elf
 	@cp $(BUILD_DIR)/kernel.elf $(ISODIR)/boot/kernel_b.elf
 	@cp $< $(ISODIR)/boot/limine/
@@ -119,6 +124,28 @@ run: $(ISO)
 		#-no-reboot \
 		#-no-shutdown
 
+install_disk: $(ISO) disk
+	@echo "[QEMU] running installer..."
+	@qemu-system-x86_64 \
+		-M pc -cpu qemu64 -m 1024 \
+		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
+		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
+		-drive file=$(DISK_IMG),format=raw,if=ide,index=0 \
+		-cdrom $(ISO) -boot d \
+		-serial stdio 2>&1 || true
+	@echo "[LIMINE] installing bootloader to disk..."
+	@$(LIMINE_TOOL) bios-install $(DISK_IMG)
+	@echo "[DONE] now run: make run_disk"
+
+run_disk:
+	@echo "[QEMU] booting from disk (UEFI)..."
+	@qemu-system-x86_64 \
+		-M pc -cpu qemu64 -m 1024 \
+		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
+		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
+		-drive file=$(DISK_IMG),format=raw,if=ide,index=0 \
+		-serial stdio 2>&1
+
 run_usb: $(ISO)
 	@chmod +x run_xhci.sh
 	./run_xhci.sh
@@ -136,4 +163,5 @@ $(BUILD_DIR)/%.asm.o: %.asm
 clean:
 	@echo "[CLR] Cleaning..."
 	@rm -rf $(BUILD_DIR)
+#@rm $(DISK_DIR)/disk.img
 	@echo "[OK]"

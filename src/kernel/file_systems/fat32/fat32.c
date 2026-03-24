@@ -75,9 +75,10 @@ typedef struct {
 fat_BS_t bootSector;
 uint32_t* FAT;
 void* working_buffer;
-static ATAdevice_t *disk_device;
-static int fat32_initialized = 0;
-static u32 partition_start_lba = 0;
+
+ATAdevice_t *disk_device;
+int fat32_initialized = 0;
+u32 partition_start_lba = 0;
 
 void fat32_init(void)
 {

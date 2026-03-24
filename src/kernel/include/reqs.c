@@ -38,3 +38,16 @@ volatile struct limine_module_request module_request = {
     .revision = 0,
     .response = NULL
 };
+
+__attribute__((used, section(".requests")))
+volatile struct limine_executable_cmdline_request cmdline_request = {
+	// searches for:
+	// /x
+	//     cmdline: x
+	// for service_install it would search for
+	//     cmdline: install
+	// while in update it would be
+	//     cmdline: update
+    .id = LIMINE_EXECUTABLE_CMDLINE_REQUEST_ID,
+    .response = NULL
+};

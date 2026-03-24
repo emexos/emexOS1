@@ -1,6 +1,4 @@
-# =========================================================
 #                emexOS Attribution Requirements
-# =========================================================
 
 This project is licensed under the GNU GPLv3, and is known as **emexOS**.
 
@@ -35,4 +33,3 @@ All modified or redistributed versions **must** include a clear notice that the 
 > **This requirement is mandatory for all forks, distributions, and derivative projects.**  
 > Failure to comply with this attribution policy may result in a violation of the license terms.
 
-# =========================================================

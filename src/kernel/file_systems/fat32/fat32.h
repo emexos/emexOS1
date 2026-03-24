@@ -33,6 +33,9 @@ void fat32_init(void);
 int fat32_format_partition(u32 start_lba, u32 sector_count);
 file_t* fat32_open(const char* path);
 int fat32_read(file_t* this_file, void* buffer, size_t size);
+int fat32_write(file_t *file, const void *buffer, size_t size);
 void fat32_close(file_t* file);
+int fat32_create_dir(const char *path);
+int fat32_write_file(const char *path, const void *data, u32 size);
 
 #endif

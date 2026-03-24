@@ -10,8 +10,10 @@
 
 #include <drivers/drivers.h>
 
-// Dual Slot Kernel System
+// System services
 #include <kernel/kernelslot/slot.h>
+#include <kernel/inits/limine/cmd.h>
+#include <kernel/services/installer/install.h>
 
 
 // CPU
@@ -122,6 +124,7 @@ void _start(void)
         kproc_loader_init();
         init_bootscreen();
         fm_init();
+        cmd_init(); //cmdline limine
         log("::", "finished loading esr\n", _d);
         cursor_x = 0;
         cursor_y = 0;
@@ -283,6 +286,8 @@ void _start(void)
                 log("[DISK]", "no valid partition found\n", warning);
                 log("[DISK]", "run 'install' to set up the disk\n", warning);
             }
+
+            installer_run();
 
             #if ENABLE_FAT32 == 1
                 log("[FAT32]", "mounting FAT32 file system\n", d);
