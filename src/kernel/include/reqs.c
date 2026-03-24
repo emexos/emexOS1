@@ -51,3 +51,10 @@ volatile struct limine_executable_cmdline_request cmdline_request = {
     .id = LIMINE_EXECUTABLE_CMDLINE_REQUEST_ID,
     .response = NULL
 };
+
+// Added for ACPI
+__attribute__((used, section(".requests")))
+volatile struct limine_rsdp_request rsdp_request = {
+    .id = LIMINE_RSDP_REQUEST_ID,
+    .revision = 0
+};

@@ -19,6 +19,7 @@
 // CPU
 #include <kernel/cpu/cpu.h>
 #include <kernel/pci/pci.h>
+#include <kernel/acpi/acpi.h>
 #if X64 == 1
     #include <kernel/arch/x86_64/gdt/gdt.h>
     #include <kernel/arch/x86_64/idt/idt.h>
@@ -249,6 +250,7 @@ void _start(void)
             }
         #endif
 
+        init_acpi(); // Init ACPI
 
         u32 freq = 1000;
         timer_init(freq);
