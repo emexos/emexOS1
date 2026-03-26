@@ -25,7 +25,9 @@ fetchDeps:
 
 disk:
 	@mkdir -p $(DISK_DIR)
-	@rm $(DISK_IMG)
+	@if $(DISK_IMG); then\
+		@rm $(DISK_IMG);\
+	fi
 	@qemu-img create -f raw $(DISK_IMG) 256M
 	@echo "[DISK] created $(DISK_IMG)"
 
