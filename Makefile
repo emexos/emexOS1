@@ -88,6 +88,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp src/userspace/bin/tree/tree.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/lsblk/lsblk.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/reboot/reboot.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/uptime/uptime.elf $(DISK_DIR)/rd/bin/
 
 	@echo "[MK] copying libs..."
 	@cp src/userspace/libs/wm/libwm.a $(DISK_DIR)/rd/emr/system/libraries/

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../../../shared/emex.h"
+#include "../../../../../shared/syscalls/sysinfo.h"
 
 #define __EMEX__          __EMEX_KERNEL
 #define __EMEXF_C__       "EMEX"
@@ -13,6 +14,8 @@
 #define __EMX_VER_         __EMEX_VERSION
 #define __EMX_BUILD_       __EMEX_BUILD
 #define __EMX_BUILD_B_     "b26M15"
+
+int sysinfo(struct sysinfo_t *info);
 
 /*
  * F_C   == fromat caps
