@@ -59,7 +59,7 @@
 
     // emex specific
     #define EMXREBOOT   169
-
+    #define EMXSYSINFO  170
 #elif ARM64 == 1
     #define EXIT       93
 
