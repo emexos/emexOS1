@@ -13,6 +13,7 @@
 #include <kernel/proc/proc_manager.h>
 #include <theme/doccr.h>
 #include <kernel/arch/x86_64/gdt/gdt.h>
+#include <kernel/arch/x86_64/exceptions/timer.h>
 #include <kernel/cpu/cpu.h>
 
 // read syscall
@@ -30,6 +31,9 @@
 //multitasking
 #include <kernel/multitasking/ipc/ipc.h>
 #include <kernel/multitasking/multitasking.h>
+
+// sinfo
+#include <syscalls/sysinfo.h>
 
 #include "scalls/scalls.h"
 
@@ -839,6 +843,18 @@ u64 scall_waitpid(ulime_proc_t *proc, u64 pid, u64 arg2, u64 arg3)
     return 0;
 }
 
+u64 scall_sysinfo(ulime_proc_t *proc, u64 info_addr, u64 a1, u64 a2) {
+	(void)a1;
+	(void)a2;
+
+	if (!info_addr || info_addr > 0x0000800000000000ULL) return (u64) -1;
+
+	struct sysinfo_t *info = (struct sysinfo_t *)info_addr;
+	info->uptime = timer_get_uptime_seconds();
+
+	return 0;
+}
+
 void _init_syscalls_table(ulime_t *ulime_ptr) {
     if (!ulime_ptr) return;
 
@@ -870,6 +886,7 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
 
     // emex specific
     ulime_ptr->syscalls[EMXREBOOT]       = scall_reboot;
+	ulime_ptr->syscalls[EMXSYSINFO]      = scall_sysinfo;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
 }

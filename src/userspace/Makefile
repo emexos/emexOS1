@@ -20,6 +20,7 @@ all:
 	@$(MAKE) -C bin/sinfo
 	@$(MAKE) -C bin/rm
 	@$(MAKE) -C bin/touch
+	@$(MAKE) -C bin/uptime
 
 clean:
 	@$(MAKE) -C libc clean
@@ -43,5 +44,6 @@ clean:
 	@$(MAKE) -C bin/sinfo clean
 	@$(MAKE) -C bin/rm clean
 	@$(MAKE) -C bin/touch clean
+	@$(MAKE) -C bin/uptime clean
 
 .PHONY: all clean

@@ -20,6 +20,7 @@
 #define _SCAL_IPC_RECV   	   201
 #define _SCAL_REBOOT    	   169
 #define _SCAL_MOUSE_INIT       250
+#define _SCAL_SYSINFO          170
 
 static inline long _sc0(long n) {
     long r;

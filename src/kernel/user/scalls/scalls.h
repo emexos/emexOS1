@@ -15,3 +15,4 @@ u64 scall_munmap(ulime_proc_t *proc, u64 addr, u64 length, u64 arg3);
 
 // emex specific
 u64 scall_reboot(ulime_proc_t *proc, u64 magic1, u64 magic2, u64 cmd);
+u64 scall_sysinfo(ulime_proc_t *proc, u64 info_addr, u64 a1, u64 a2);
