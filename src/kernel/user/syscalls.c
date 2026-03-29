@@ -24,7 +24,7 @@
 #include <config/user.h>
 
 // memory
-#include <syscalls/mmap.h>
+#include <kernel/user/mmap.h>
 #include <kernel/mem/paging/paging.h>
 #include <kernel/mem/phys/physmem.h>
 
@@ -33,7 +33,7 @@
 #include <kernel/multitasking/multitasking.h>
 
 // sinfo
-#include <syscalls/sysinfo.h>
+#include <kernel/user/sysinfo.h>
 
 #include "scalls/scalls.h"
 
