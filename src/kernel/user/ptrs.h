@@ -4,8 +4,7 @@
 
 static inline int is_valid_user_ptr(u64 pointer) {
 	/* This should be used to chec k if a user-provided pointer
-	 * is within the "safe" range (id est, not inside the kernel's memory space)
-	 * and is not NULL.
+	 * is within the "safe" range and is not NULL.
 	*/
 	return pointer && pointer <= KSTART;
 }
@@ -21,5 +20,5 @@ static inline int is_valid_user_ptr_range(u64 pointer, u64 size) {
 	if (__builtin_add_overflow(pointer, size, &max))
 		return 0;
 
-	return max <= KSTART;
+	return (pointer && pointer <= KSTART) && (max && max <= KSTART);
 }
