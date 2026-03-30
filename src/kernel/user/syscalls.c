@@ -430,7 +430,7 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
 u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count)
 {
     (void)proc;
-    if (buf == 0 || count == 0) return 0;
+    if (!is_valid_user_ptr_range(buf, count)) return 0;
 
     // (urandom, zero, files, ...)
     if (fd >= 3)

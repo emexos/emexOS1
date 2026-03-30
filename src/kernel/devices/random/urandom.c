@@ -6,19 +6,8 @@
 #include <drivers/drivers.h>
 #include <types.h>
 
-//
-// Xorshift64 PRNG
-//
-
-static u64 xr_state = 0; // 0 means "not seeded yet"
-
-static inline u64 rdtsc(void) {
-    u32 lo, hi;
-    __asm__ volatile("rdtsc" : "=a"(lo), "=d"(hi));
-    return ((u64)hi << 32) | lo;
-}
-
-static u64 xorshift64(void) {
+#include <kernel/arch/x86_64/rand.h>
+/* static u64 xorshift64(void) {
 	//https://en.wikipedia.org/wiki/Xorshift
 	// https://github.com/jj1bdx/xorshiftplus-c/blob/master/xorshift64star.c
     if (xr_state == 0) {
@@ -31,13 +20,10 @@ static u64 xorshift64(void) {
     x ^= x << 17;
     xr_state = x;
     return x;
-}
+} */
 
 static int urandom_init(void) {
     log("[URND]", "init /dev/urandom\n", d);
-    // pre-seed from RDTSC so state is ready
-    xr_state = rdtsc();
-    if (xr_state == 0) xr_state = 0xDEADBEEFCAFEBABEULL;
     return 0;
 }
 
@@ -57,7 +43,7 @@ int urandom_read_fn(void *handle, void *buf, size_t count, u64 offset) {
 
     // fill 8 bytes at a time then handle tail
     while (i + 8 <= count) {
-        u64 r = xorshift64();
+        u64 r = get_hw_rand();
         out[i+0] = (u8)(r);
         out[i+1] = (u8)(r >> 8);
         out[i+2] = (u8)(r >> 16);
@@ -69,7 +55,7 @@ int urandom_read_fn(void *handle, void *buf, size_t count, u64 offset) {
         i += 8;
     }
     if (i < count) {
-        u64 r = xorshift64();
+        u64 r = get_hw_rand();
         while (i < count) {
             out[i++] = (u8)(r & 0xFF);
             r >>= 8;
