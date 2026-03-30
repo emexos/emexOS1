@@ -37,6 +37,8 @@
 
 #include "scalls/scalls.h"
 
+#include <kernel/user/ptrs.h>
+
 //#include <kernel/devices/fb0/fb0.h>
 //#include <kernel/devices/tty/tty0.h>
 
@@ -152,7 +154,7 @@ static void ansi_write_char(char c) {
 // syscall handlers
 u64 scall_write(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
     (void)proc;
-    if (buf == 0 || buf > 0x0000800000000000ULL) return (u64)-1;
+    if (!is_valid_user_ptr_range(buf, count)) return (u64)-1;
 
     if (fd >= 3)
         return (u64)fs_write((int)fd, (const void *)buf, (size_t)count);
@@ -310,7 +312,7 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
 {
     (void)arg3;
 
-    if (path_ptr == 0 || path_ptr > 0x0000800000000000ULL) return (u64)-1;
+    if (!is_valid_user_ptr(path_ptr)) return (u64)-1;
 
     const char *path = (const char *)path_ptr;
 
@@ -375,7 +377,7 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
         }
     }
 
-    if (argv_ptr && argv_ptr < 0x0000800000000000ULL) {
+    if (is_valid_user_ptr(argv_ptr)) {
         char **user_argv = (char **)argv_ptr;
         int argc = 0;
         while (argc < 31 && user_argv[argc]) argc++;
@@ -489,7 +491,7 @@ u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3)
 
 u64 scall_open(ulime_proc_t *proc, u64 path_ptr, u64 flags, u64 arg3) {
     (void)proc; (void)arg3;
-    if (!path_ptr || path_ptr > 0x0000800000000000ULL) return (u64)-1;
+    if (!is_valid_user_ptr(path_ptr)) return (u64)-1;
     int fd = fs_open((const char *)path_ptr, (int)flags);
     return (fd < 0) ? (u64)-1 : (u64)fd;
 }
@@ -501,7 +503,7 @@ u64 scall_close(ulime_proc_t *proc, u64 fd, u64 arg2, u64 arg3) {
 
 u64 scall_getdents(ulime_proc_t *proc, u64 path_ptr, u64 buf_ptr, u64 max_entries) {
     (void)proc;
-    if (!path_ptr || !buf_ptr || path_ptr > 0x0000800000000000ULL) return (u64)-1;
+    if (!is_valid_user_ptr(path_ptr) || !is_valid_user_ptr(buf_ptr)) return (u64)-1;
     int n = fs_listdir((const char *)path_ptr, (_emx_kdirent_t *)buf_ptr, (int)max_entries);
     return (n < 0) ? (u64)-1 : (u64)n;
 }
@@ -510,7 +512,7 @@ u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3)
 {
     (void)proc; (void)arg2; (void)arg3;
 
-    if (!path_ptr || path_ptr > 0x0000800000000000ULL) return (u64)-1;
+    if (!is_valid_user_ptr(path_ptr)) return (u64)-1;
 
     const char *s = (const char *)path_ptr;
 
@@ -567,7 +569,7 @@ u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3)
 u64 scall_ioctl(ulime_proc_t *proc, u64 fd, u64 request, u64 arg_ptr)
 {
     (void)proc;
-    if (arg_ptr > 0x0000800000000000ULL) return (u64)-1;
+    if (!is_valid_user_ptr(arg_ptr)) return (u64)-1;
 
     void *arg = (void *)arg_ptr;
 
@@ -675,7 +677,7 @@ u64 scall_getcwd(ulime_proc_t *proc, u64 buf_ptr, u64 size, u64 arg3) {
     (void)proc;
     (void)arg3;
 
-    if (!buf_ptr || size == 0 || buf_ptr > 0x0000800000000000ULL) return 0;
+    if (!is_valid_user_ptr_range(buf_ptr, size)) return 0;
 
     char *buf = (char *)buf_ptr;
     int cwlen = str_len(cwd);
@@ -847,7 +849,7 @@ u64 scall_sysinfo(ulime_proc_t *proc, u64 info_addr, u64 a1, u64 a2) {
 	(void)a1;
 	(void)a2;
 
-	if (!info_addr || info_addr > 0x0000800000000000ULL) return (u64) -1;
+	if (!is_valid_user_ptr_range(info_addr, sizeof(struct sysinfo_t))) return (u64) -1;
 
 	struct sysinfo_t *info = (struct sysinfo_t *)info_addr;
 	info->uptime = timer_get_uptime_seconds();
