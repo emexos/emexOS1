@@ -2,6 +2,7 @@
 
 #include "../../../../../shared/emex.h"
 #include "../../../../kernel/user/sysinfo.h"
+#include <string.h>
 
 #define __EMEX__          __EMEX_KERNEL
 #define __EMEXF_C__       "EMEX"
@@ -13,7 +14,7 @@
 
 #define __EMX_VER_         __EMEX_VERSION
 #define __EMX_BUILD_       __EMEX_BUILD
-#define __EMX_BUILD_B_     "b26M15"
+#define __EMX_BUILD_B_     "b" __EMEX_BUILD
 
 int sysinfo(struct sysinfo_t *info);
 
@@ -27,6 +28,26 @@ int sysinfo(struct sysinfo_t *info);
  *
  * N == name
  */
+
+typedef struct {
+    char sysname[32];
+    char nodename[32];
+    char release[32];
+    char version[32];
+    char machine[32];
+} emx_sinfo_t;
+static inline int emx_sinfo(emx_sinfo_t *info)
+{
+    if (!info) return -1;
+
+    strncpy(info->sysname, __EMEX__, sizeof(info->sysname));
+    strncpy(info->nodename, "emx-host", sizeof(info->nodename));
+    strncpy(info->release, __EMX_VER_, sizeof(info->release));
+    strncpy(info->version, __EMX_BUILD_B_, sizeof(info->version));
+    strncpy(info->machine, "x86_64", sizeof(info->machine));
+
+    return 0;
+}
 
 /*
  * b1 == []

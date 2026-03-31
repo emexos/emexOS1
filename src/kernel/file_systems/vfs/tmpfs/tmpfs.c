@@ -116,15 +116,33 @@ static int tmpfs_mkdir(fs_node *dir, const char *name) {
     return 0;
 }
 
+static int tmpfs_unlink(fs_node *dir, const char *name) {
+    if (dir->type != FS_DIR) return -1;
+
+    fs_node *prev = NULL;
+    fs_node *child = dir->children;
+    while (child) {
+        if (str_equals(child->name, name)) {
+            if (prev) prev->next = child->next;
+            else dir->children = child->next;
+            return 0;
+        }
+        prev = child;
+        child = child->next;
+    }
+
+    return -1;
+}
+
 static fs_ops tmpfs_ops = {
-    .open = tmpfs_open,
-    .close = tmpfs_close,
-    .read = tmpfs_read,
-    .write = tmpfs_write,
+    .open   = tmpfs_open,
+    .close  = tmpfs_close,
+    .read   = tmpfs_read,
+    .write  = tmpfs_write,
     .lookup = tmpfs_lookup,
     .create = tmpfs_create,
-    .mkdir = tmpfs_mkdir,
-
+    .mkdir  = tmpfs_mkdir,
+    .unlink = tmpfs_unlink,
 };
 
 static int tmpfs_mount(const char *src, const char *tgt, fs_mnt *mnt) {

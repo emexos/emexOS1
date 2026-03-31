@@ -180,6 +180,18 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3)
     (void)arg3;
 
     printf("\n[SYSCALL] process '%s' exited with code %lu\n", proc->name, exit_code);
+
+    if (proc->phys_heap && proc->heap_size) {
+        u64 heap_pages = proc->heap_size / PAGE_SIZE;
+        physmem_free_to(proc->phys_heap, heap_pages);
+        proc->phys_heap = 0;
+    }
+    if (proc->phys_stack && proc->stack_size) {
+        u64 stack_pages = proc->stack_size / PAGE_SIZE;
+        physmem_free_to(proc->phys_stack, stack_pages);
+        proc->phys_stack = 0;
+    }
+
     proc->state = PROC_ZOMBIE;
 
     // remove from mt so timer skips it
@@ -247,8 +259,8 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3)
             printf("[SYSCALL] no waiter, resuming '%s'\n", t->proc->name);
             if (t->user_ctx.saved) {
                 resume_parent_sysret(
-                    t->user_ctx.rip, t->user_ctx.rsp, t->user_ctx.rflags,
-                    t->proc->pml4_phys,
+                    t->user_ctx.rip, t->user_ctx.rsp,
+                    t->user_ctx.rflags, t->proc->pml4_phys,
                     t->user_ctx.rbx, t->user_ctx.rbp,
                     t->user_ctx.r12, t->user_ctx.r13,
                     t->user_ctx.r14, t->user_ctx.r15
@@ -880,6 +892,8 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     ulime_ptr->syscalls[MQ_UNLINK]       = scall_mq_unlink;
     ulime_ptr->syscalls[MQ_SEND]         = scall_mq_send;
     ulime_ptr->syscalls[MQ_RECV]         = scall_mq_recv;
+    ulime_ptr->syscalls[MKDIR]           = scall_mkdir;
+    ulime_ptr->syscalls[UNLINK]          = scall_unlink;
     //ulime_ptr->syscalls[SHM_DESTROY]       = scall_shm_destroy;
     ulime_ptr->syscalls[MMAP]            = scall_mmap;
     ulime_ptr->syscalls[MUNMAP]          = scall_munmap;

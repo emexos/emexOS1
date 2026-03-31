@@ -19,6 +19,7 @@ typedef struct {
 
 typedef struct {
     char var_name[64];
+    char direct_path[256];
     emxrc_fmt_t fmt;
     int bg;
     int is_wait;

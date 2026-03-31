@@ -2,12 +2,13 @@ all:
 	@$(MAKE) -C libc
 	@$(MAKE) -C libs/emxfb0
 	@$(MAKE) -C libs/font8x12
-	@$(MAKE) -C libs/wm
-	@$(MAKE) -C libs/cursor
+	@$(MAKE) -C libs/libdesktop
+#@$(MAKE) -C libs/cursor
 
 	@$(MAKE) -C apps/system
 	@$(MAKE) -C apps/shell
 	@$(MAKE) -C apps/login
+	@$(MAKE) -C apps/desktop
 
 	@$(MAKE) -C bin/echo
 	@$(MAKE) -C bin/hello
@@ -21,17 +22,23 @@ all:
 	@$(MAKE) -C bin/rm
 	@$(MAKE) -C bin/touch
 	@$(MAKE) -C bin/uptime
+	@$(MAKE) -C bin/uname
+	@$(MAKE) -C bin/initd
+#@$(MAKE) -C bin/chaosd
+	@$(MAKE) -C bin/ps
+	@$(MAKE) -C bin/pwd
 
 clean:
 	@$(MAKE) -C libc clean
 	@$(MAKE) -C libs/emxfb0 clean
 	@$(MAKE) -C libs/font8x12 clean
-	@$(MAKE) -C libs/wm clean
-	@$(MAKE) -C libs/cursor clean
+	@$(MAKE) -C libs/libdesktop clean
+#@$(MAKE) -C libs/cursor clean
 
 	@$(MAKE) -C apps/system clean
 	@$(MAKE) -C apps/shell clean
 	@$(MAKE) -C apps/login clean
+	@$(MAKE) -C apps/desktop clean
 
 	@$(MAKE) -C bin/echo clean
 	@$(MAKE) -C bin/hello clean
@@ -45,5 +52,10 @@ clean:
 	@$(MAKE) -C bin/rm clean
 	@$(MAKE) -C bin/touch clean
 	@$(MAKE) -C bin/uptime clean
+	@$(MAKE) -C bin/uname clean
+	@$(MAKE) -C bin/initd clean
+#@$(MAKE) -C bin/chaosd clean
+	@$(MAKE) -C bin/ps clean
+	@$(MAKE) -C bin/pwd clean
 
 .PHONY: all clean

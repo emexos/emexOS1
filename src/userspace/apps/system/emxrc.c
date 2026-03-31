@@ -23,7 +23,8 @@ static char tb[256]; // token result buffer
 //#define BG " &"
 #define BG ""
 
-static char *tok(void) {
+static char *tok(void)
+{
  	int i = 0;
 
     while (*tp == ' ' || *tp == '\t') tp++;
@@ -54,14 +55,19 @@ static void skipline(void) {
     while (*tp && *tp != '\n') tp++;
     if (*tp) tp++;
 }
-static void emx_sleep(int ticks) {
+static void emx_sleep(int ticks)
+{
     volatile int i, j;
     for (i = 0; i < ticks; i++) {
         for (j = 0; j < 1000000; j++);
     }
 }
+static int is_direct_path(const char *s) {
+    return s && (s[0] == '/' || s[0] == '.');
+}
 
-int emxrc_parse(const char *path, emxrc_t *out) {
+int emxrc_parse(const char *path, emxrc_t *out)
+{
     if (!out) return -1;
     out->var_count = out->exec_count = 0;
 
@@ -74,7 +80,8 @@ int emxrc_parse(const char *path, emxrc_t *out) {
     buf[n] = '\0';
     tp = buf;
 
-    while (*tp) {
+    while (*tp)
+    {
         while (*tp == ' ' || *tp == '\t') tp++; // space or tab
         if (*tp == '\n') { tp++; continue; } // new line
         if (tp[0]=='/' && tp[1]=='/') { skipline(); continue; } // comments
@@ -83,7 +90,8 @@ int emxrc_parse(const char *path, emxrc_t *out) {
         if (!kw) { skipline(); continue; }
 
         // var name=("path") or var name=(ep: "path")
-        if (strcmp(kw, VAR_NAME) == 0 && out->var_count < EMXRC_MAX_VARS) {
+        if (strcmp(kw, VAR_NAME) == 0 && out->var_count < EMXRC_MAX_VARS)
+        {
             emxrc_var_t *v = &out->vars[out->var_count];
             v->fmt = EMXRC_FMT_ELF;
 
@@ -104,7 +112,8 @@ int emxrc_parse(const char *path, emxrc_t *out) {
         }
 
         // wait <time>
-        else if (strcmp(kw, "wait") == 0 && out->exec_count < EMXRC_MAX_EXECS) {
+        else if (strcmp(kw, "wait") == 0 && out->exec_count < EMXRC_MAX_EXECS)
+        {
             emxrc_exec_t *e = &out->execs[out->exec_count];
             memset(e, 0, sizeof(*e));
 
@@ -119,8 +128,10 @@ int emxrc_parse(const char *path, emxrc_t *out) {
         }
 
         // exec -f"format" var_name
-        else if (strcmp(kw, EXE_NAME) == 0 && out->exec_count < EMXRC_MAX_EXECS) {
+        else if (strcmp(kw, EXE_NAME) == 0 && out->exec_count < EMXRC_MAX_EXECS)
+        {
             emxrc_exec_t *e = &out->execs[out->exec_count];
+            memset(e, 0, sizeof(*e));
             e->fmt = EMXRC_FMT_INHERIT; // fmt == format btw
 
             char *next = tok();
@@ -137,7 +148,23 @@ int emxrc_parse(const char *path, emxrc_t *out) {
                     next = tok();
                 }
             }
-            if (next) strncpy(e->var_name, next, sizeof(e->var_name) - 1);
+
+            if (!next) { skipline(); continue; }
+
+            if (is_direct_path(next))
+            {
+                strncpy(e->direct_path, next, sizeof(e->direct_path) - 1);
+
+                if (e->fmt == EMXRC_FMT_INHERIT) {
+                    size_t l = strlen(next);
+                    if (l > 4 && strcmp(next + l - 4, ".emx") == 0)
+                        e->fmt = EMXRC_FMT_EP;
+                    else
+                        e->fmt = EMXRC_FMT_ELF;
+                }
+            } else {
+                strncpy(e->var_name, next, sizeof(e->var_name) - 1);
+            }
 
             out->exec_count++;
         }
@@ -146,7 +173,8 @@ int emxrc_parse(const char *path, emxrc_t *out) {
     return 0;
 }
 
-void emxrc_run(emxrc_t *rc) {
+void emxrc_run(emxrc_t *rc)
+{
 	//printf("strt emexrc_run");
     for (int i = 0; i < rc->exec_count; i++) {
         emxrc_exec_t *e = &rc->execs[i];
@@ -161,18 +189,29 @@ void emxrc_run(emxrc_t *rc) {
         const char *path = NULL;
         emxrc_fmt_t fmt = e->fmt;
 
-        for (int j = 0; j < rc->var_count; j++) {
-            if (strcmp(rc->vars[j].name, e->var_name) == 0) {
-                path = rc->vars[j].path;
-                if (fmt == EMXRC_FMT_INHERIT) fmt = rc->vars[j].fmt;
-                break;
+        if (e->direct_path[0] != '\0') {
+            path = e->direct_path;
+        } else {
+            for (int j = 0; j < rc->var_count; j++) {
+                if (strcmp(rc->vars[j].name, e->var_name) == 0) {
+                    path = rc->vars[j].path;
+                    if (fmt == EMXRC_FMT_INHERIT) fmt = rc->vars[j].fmt;
+                    break;
+                }
             }
         }
 
-        if (!path) { fprintf(stderr, PREFIX "unknown var '%s'\n", e->var_name); continue; }
-        printf(PREFIX EXE_NAME " %s (%s)%s\n", path,
-               fmt == EMXRC_FMT_EP ? EMX_NAME : ELF_NAME,
-               e->bg ? BG : "");
+        if (!path) {
+            fprintf(stderr, PREFIX "unknown var '%s'\n", e->var_name);
+            continue;
+        }
+
+        printf(
+        	PREFIX EXE_NAME " %s (%s)%s\n",
+         	path,
+            fmt == EMXRC_FMT_EP ? EMX_NAME : ELF_NAME,
+            e->bg ? BG : ""
+        );
 
         char *const argv[] = { (char *)path, (char *)0 };
         char *const envp[] = { (char *)0 };

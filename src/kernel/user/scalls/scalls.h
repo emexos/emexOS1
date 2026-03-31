@@ -8,6 +8,9 @@ u64 scall_mq_unlink(ulime_proc_t *proc, u64 name_ptr, u64 arg2, u64 arg3);
 u64 scall_mq_send(ulime_proc_t *proc, u64 mqid, u64 buf, u64 size);
 u64 scall_mq_recv(ulime_proc_t *proc, u64 mqid, u64 buf, u64 size);
 
+u64 scall_mkdir(ulime_proc_t *proc, u64 path_ptr, u64 a2, u64 a3);
+u64 scall_unlink(ulime_proc_t *proc, u64 path_ptr, u64 a2, u64 a3);
+
 u64 scall_mmap(ulime_proc_t *proc, u64 addr, u64 length, u64 shm_id);
 u64 scall_munmap(ulime_proc_t *proc, u64 addr, u64 length, u64 arg3);
 

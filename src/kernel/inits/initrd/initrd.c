@@ -1,15 +1,64 @@
 #include "initrd.h"
 #include <kernel/packages/cpio/cpio.h>
 #include <kernel/file_systems/vfs/vfs.h>
+#include <kernel/inits/fs/init.h>
 #include <kernel/include/reqs.h>       // module_request
 #include <string/string.h>
 #include <kernel/communication/serial.h>
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
+static int is_cpio_newc(const u8 *raw, u64 size) {
+	if (size < 6) return 0;
+
+	return (
+		raw[0]=='0' &&
+		raw[1]=='7' &&
+		raw[2]=='0' &&
+		raw[3]=='7' &&
+		raw[4]=='0' &&
+		(
+			raw[5]=='1' || raw[5]=='2'
+		)
+	);
+}
+
+static struct limine_file *find_module(const char *name)
+{
+    struct limine_module_response *resp = module_request.response;
+
+    for (u64 i = 0; i < resp->module_count; i++) {
+        const char *path = resp->modules[i]->path;
+
+        const char *fname = path;
+        for (const char *p = path; *p; p++) {
+            if (*p == '/') fname = p + 1;
+        }
+
+        if (str_equals(fname, name)) {
+            return resp->modules[i];
+        }
+    }
+
+    return NULL;
+}
+
+static void log_module(const char *tag, struct limine_file *file)
+{
+    char buf[64];
+
+    str_copy(buf, "found at 0x");
+    str_from_hex(buf + str_len(buf), (u64)file->address);
+    str_append(buf, " (");
+    str_append_uint(buf, (u32)file->size);
+    str_append(buf, " bytes)\n");
+
+    log(tag, buf, d);
+}
+
 int initrd_load(void)
 {
-    log("[INITRD]", "looking for " INITRD_MODULE_NAME "...\n", d);
+    log("[INITRD]", "loading initrds...\n", d);
 
     if (!module_request.response ||
         module_request.response->module_count == 0)
@@ -18,66 +67,65 @@ int initrd_load(void)
         return -1;
     }
 
-    struct limine_module_response *resp = module_request.response;
-    struct limine_file *initrd_file = NULL;
+    struct limine_file *initrd  = find_module("initrd.cpio");
+    struct limine_file *initrdh = find_module("initrdh.cpio");
 
-    for (u64 i = 0; i < resp->module_count; i++) {
-        const char *path = resp->modules[i]->path;
-
-        // extract just the filename from the Limine path
-        const char *fname = path;
-        for (const char *p = path; *p; p++) {
-            if (*p == '/') fname = p + 1;
-        }
-
-        if (str_equals(fname, INITRD_MODULE_NAME)) {
-            initrd_file = resp->modules[i];
-            break;
-        }
-    }
-
-    if (!initrd_file) {
-        log("[INITRD]", INITRD_MODULE_NAME " not found in Limine modules\n", warning);
-        //hcf();
+    if (!initrd) {
+        log("[INITRD]", "initrd.cpio not found\n", error);
         return -1;
     }
 
+    log_module("[INITRD] initrd", initrd);
 
+    // put initrd.cpio to /
+    const u8 *raw = (const u8 *)initrd->address;
 
-    search_initrd: {
-        char buf[48];
-        str_copy(buf, "found at 0x");
-        str_from_hex(buf + str_len(buf), (u64)initrd_file->address);
-        str_append(buf, " (");
-        str_append_uint(buf, (u32)initrd_file->size);
-        str_append(buf, " bytes)\n");
-        log("[INITRD]", buf, d);
-    };
-
-
-    // CPIO newc magic
-    const u8 *raw = (const u8 *)initrd_file->address;
-    if (initrd_file->size < 6 ||
-        raw[0]!='0' || raw[1]!='7' || raw[2]!='0' ||
-        raw[3]!='7' || raw[4]!='0' || (raw[5]!='1' && raw[5]!='2'))
-    {
-        log("[INITRD]", "the initrd file uses the wrong format, need to be newc\n", error);
+    if (!is_cpio_newc(raw, initrd->size)) {
+        log("[INITRD]", "initrd has wrong format (need newc)\n", error);
         return -1;
     }
 
-
-    int extracted = cpio_extract_to_vfs(
+    int res = cpio_extract_to_vfs(
         raw,
-        (u64)initrd_file->size,
+        (u64)initrd->size,
         "/"
     );
 
-    if (extracted < 0) {
-        log("[INITRD]", "extraction failed\n", error);
-        //hcf();
+    if (res < 0) {
+        log("[INITRD]", "initrd extraction failed\n", error);
         return -1;
     }
 
-    //log("[INITRD]", "mounted at the root\n", success);
-    return extracted;
+    log("[INITRD]", "root filesystem loaded\n", success);
+
+    // put initrdh.cpio to /home
+    if (initrdh) {
+        log_module("[INITRD] initrdh", initrdh);
+
+        const u8 *rawh = (const u8 *)initrdh->address;
+
+        if (!is_cpio_newc(rawh, initrdh->size)) {
+            log("[INITRD]", "initrdh has wrong format (need newc)\n", error);
+            return -1;
+        }
+
+        //fs_mkdir(HOME);
+
+        int resh = cpio_extract_to_vfs(
+            rawh,
+            (u64)initrdh->size,
+            "/"
+        );
+
+        if (resh < 0) {
+            log("[INITRD]", "initrdh extraction failed\n", error);
+            return -1;
+        }
+
+        log("[INITRD]", "home filesystem loaded\n", success);
+    } else {
+        log("[INITRD]", "initrdh.cpio not found (no /home)\n", warning);
+    }
+
+    return 0;
 }

@@ -130,3 +130,50 @@ int fs_mkdir(const char *path) {
 
     return ret;
 }
+
+int fs_unlink(const char *path) {
+    if (!path) return -1;
+
+    char ppath[FS_MAX_PATH];
+    char fname[64];
+
+    // split path into parent and filename
+    const char *last = path;
+    for (const char *p = path; *p; p++) {
+        if (*p == '/') last = p;
+    }
+
+    int plen = last - path;
+    if (plen == 0) plen = 1;
+
+    for (int i = 0; i < plen && i < FS_MAX_PATH - 1; i++) {
+        ppath[i] = path[i];
+    }
+    ppath[plen] = '\0';
+    str_copy(fname, last + 1);
+
+    if (!fname[0]) return -1;
+
+    fs_node *parent = fs_resolve(ppath);
+    if (!parent || parent->type != FS_DIR) return -1;
+
+    // use fs unlink op if available
+    if (parent->ops && parent->ops->unlink) {
+        return parent->ops->unlink(parent, fname);
+    }
+
+    // fallback: remove from children linked list directly
+    fs_node *prev = NULL;
+    fs_node *child = parent->children;
+    while (child) {
+        if (str_equals(child->name, fname)) {
+            if (prev) prev->next = child->next;
+            else parent->children = child->next;
+            return 0;
+        }
+        prev = child;
+        child = child->next;
+    }
+
+    return -1;
+}

@@ -37,6 +37,10 @@ int mkdir(const char *path) {
     return (int)_sc1(_SCAL_MKDIR, (long)path);
 }
 
+int rmdir(const char *path) {
+    return (int)_sc1(_SCAL_UNLINK, (long)path);
+}
+
 int unlink(const char *path) {
     return (int)_sc1(_SCAL_UNLINK, (long)path);
 }

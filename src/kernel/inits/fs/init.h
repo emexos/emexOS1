@@ -9,6 +9,8 @@ void initvfs(void);
 #define ROOTFS TMPFS // for now, soon its fat32/ext2
 #define ROOT_MOUNT_DEFAULT "/"
 
+#define HOME "/home"
+
 #define FAT32 "fat32"
 #define FAT32_DIRECTORY "/"
 

@@ -7,6 +7,9 @@ void initvfs(void){
     // create standard dirs
     fs_mkdir(DEV_DIRECTORY);
     fs_mkdir(TMP_DIRECTORY);
+    fs_mkdir("/tmp/dt");
+    fs_mkdir("/tmp/ids");
+    fs_mkdir("/tmp/chaos");
 
     fs_mkdir(BOOT_DIRECTORY);
     //emx system requirement paths

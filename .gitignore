@@ -3,7 +3,7 @@
 
 # Build output
 build/
-!build/src/kernel/console/functions/edit.c.o
+.build
 
 # Libraries/Dependencies
 include/limine/*

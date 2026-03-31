@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <emx/sinfo.h>
 
 //-////////////////////////////////////////-//
 //-//                                    //-//
@@ -15,7 +16,11 @@
 #define __INIT_SYSTEM_VER 1
 #define __INIT_D "initd"
 
-int main(void) {
+int main(void)
+{
+	printf("emexOS version:" __EMX_VER_ "\n");
+	printf("emexOS build:" __EMX_BUILD_ "\n");
+
     static emxrc_t rc;
     #define __INIT_D_BRACKETS "[" __INIT_D "]"
 

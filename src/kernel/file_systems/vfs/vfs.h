@@ -75,11 +75,7 @@ struct fs_ops {
     fs_node* (*lookup)(fs_node *dir, const char *name);
     int (*create)(fs_node *dir, const char *name);
     int (*mkdir)(fs_node *dir, const char *name);
-
-    //tmpfs using ram
-    // devfs using modules/modules...
-    // ... maybe writing on disk
-
+    int (*unlink)(fs_node *dir, const char *name); // remove file or dir
 
     fs_node* (*readdir)(fs_node *dir);
 };
@@ -124,6 +120,7 @@ int fs_close(int fd);
 ssize_t fs_read(int fd, void *buf, size_t cnt);
 ssize_t fs_write(int fd, const void *buf, size_t cnt);
 int fs_mkdir(const char *path);
+int fs_unlink(const char *path);
 int fs_listdir(const char *path, _emx_kdirent_t *buf, int max_entries);
 
 // global klime pointer (shared by all fs types)

@@ -41,3 +41,4 @@ int printf(const char *fmt, ...);
 int vprintf(const char *fmt, va_list ap);
 int snprintf(char *buf, size_t size, const char *fmt, ...);
 int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
+int remove(const char *path); // file or directory

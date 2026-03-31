@@ -8,4 +8,3 @@
 #define O_CREAT 0x04
 
 int open(const char *path, int flags, ...);
-int close(int fd);

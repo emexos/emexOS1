@@ -15,7 +15,7 @@
 #define JUMPTOUSER 1
 
 #define USE_HCF 1
-#define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
+#define BOOTUP_VISUALS 1 // verbose boot == 0, silent boot == 1
 
 // 1 == run tests like processes, scheduler which are in early developement and not finished
 // 0 == disable running those tests

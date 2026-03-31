@@ -1,12 +1,11 @@
-#include <freestanding/stdint.h>
-#include <freestanding/stddef.h>
-#include <main/string.h>
-#include <main/gzip.h>
+#include <types.h>
+#include <memory/main.h>
+#include "gzip.h"
 
 //
-// MADE BY @msaid5860
+// MADE BY @msaid5860 for NullOS
 // gzip parser
-// (currently not used)
+// ported to emexOS by @emex
 //
 
 static uint32_t tgz_get_bits(tgz_stream *s, int bits) {
@@ -19,8 +18,6 @@ static uint32_t tgz_get_bits(tgz_stream *s, int bits) {
     s->bit_cnt -= bits;
     return val;
 }
-
-// --- Huffman Logic ---
 typedef struct {
     uint16_t counts[TGZ_MAX_BITS + 1];
     uint16_t symbols[TGZ_MAX_BITS + 1][288];
@@ -61,7 +58,6 @@ static int tgz_decode_symbol(tgz_stream *s, tgz_huffman *tree) {
 
 static const uint8_t CLCL_ORDER[19] = { 16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15 };
 
-// --- Inflate ---
 static int tgz_inflate(tgz_stream *s) {
     int final = 0;
     while (!final) {
@@ -82,7 +78,7 @@ static int tgz_inflate(tgz_stream *s) {
 
         } else if (type == 1 || type == 2) {
             tgz_huffman lit_tree, dist_tree;
-            if (type == 1) { // Fixed
+            if (type == 1) {
                 uint8_t lens[288], dist_lens[32];
                 int i;
                 for (i=0; i<144; i++) lens[i] = 8;
@@ -150,14 +146,7 @@ static int tgz_inflate(tgz_stream *s) {
     return TGZ_OK;
 }
 
-// --- Public Wrapper ---
 
-/*
- * ungzip
- * * src: pointer to GZIP data
- * * dst: pointer to destination buffer (MUST BE LARGE ENOUGH)
- * * Returns: Number of bytes written to dst
- */
 int ungzip(const void *src, void *dst) {
     const uint8_t *in = (const uint8_t *)src;
 
@@ -167,7 +156,7 @@ int ungzip(const void *src, void *dst) {
     uint8_t flags = in[3];
     const uint8_t *data_start = in + 10;
 
-    // Skip Header Fields
+    // skip Header Fields
     if (flags & 0x04) { // FEXTRA
         uint16_t extra_len = data_start[0] | (data_start[1] << 8);
         data_start += 2 + extra_len;
@@ -182,7 +171,7 @@ int ungzip(const void *src, void *dst) {
     }
     if (flags & 0x02) data_start += 2; // FHCRC
 
-    // Initialize Stream
+    // init Stream
     tgz_stream stream;
     stream.in = data_start;
     stream.out = (uint8_t *)dst;
@@ -190,7 +179,8 @@ int ungzip(const void *src, void *dst) {
     stream.bit_buf = 0;
     stream.bit_cnt = 0;
 
-    // Decompress until End-of-Block symbol found
+
+    // Decompress until End of Block symbol found
     if (tgz_inflate(&stream) != TGZ_OK) return TGZ_ERR_FORMAT;
 
     return (int)(stream.out - stream.out_start);

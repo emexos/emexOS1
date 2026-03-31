@@ -57,11 +57,12 @@ void tty0_write_char(char c) {
                 u32 char_height = fm_get_char_height() * font_scale;
                 if (cursor_x >= char_width) {
                     cursor_x -= char_width;
-                    draw_rect(cursor_x, cursor_y, char_width, char_height, ansi_bg);
+                    //draw_rect(cursor_x, cursor_y, char_width, char_height, ansi_bg);
                     // later the window-system/desktop-environment should handle that
                 }
             } else {
-                cprintf(tmp, ansi_fg);
+                //cprintf(tmp, ansi_fg);
+                printf("%s", tmp);
             }
             break;
 
@@ -70,8 +71,10 @@ void tty0_write_char(char c) {
                 ansi_state = ANSI_CSI;
                 ansi_param = 0;
             } else {
-                cprintf("\033", ansi_fg);
-                cprintf(tmp, ansi_fg);
+	            printf("\033");
+	            printf("%s", tmp);
+                //cprintf("\033", ansi_fg);
+                //cprintf(tmp, ansi_fg);
                 ansi_state = ANSI_NORMAL;
             }
             break;

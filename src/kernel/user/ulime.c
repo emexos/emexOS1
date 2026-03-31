@@ -80,7 +80,7 @@ ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point) {
     proc->state = PROC_CREATED;
     proc->entry_point = entry_point;
 
-    proc->heap_size = 256 * 1024;
+    proc->heap_size = 4 * 1024 * 1024; // 4 MB
     //proc->heap_size = 8 * 1024 * 1024;
     proc->heap_base = (ulime->user_space_used + 0xFFF) & ~0xFFF;
     ulime->user_space_used = proc->heap_base + proc->heap_size;

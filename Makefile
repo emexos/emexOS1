@@ -41,12 +41,15 @@ userspace:
 	@$(MAKE) -C src/userspace clean
 	@$(MAKE) -C src/userspace
 
+buildgen:
+	@chmod +x tools/genbuild.sh
+	@./tools/genbuild.sh
 # Compile Limine
 $(LIMINE_TOOL):
 	@$(MAKE) -C $(LIMINE_DIR)
 
 # Create bootable ISO
-$(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
+$(ISO): limine.conf $(LIMINE_TOOL) buildgen $(BUILD_DIR)/kernel.elf disk userspace
 	@echo "[ISO] Creating bootable image..."
 	@rm -rf $(ISODIR)
 	@rm -f $(DISK_DIR)/initrd.cpio
@@ -68,18 +71,28 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp $(addprefix $(INCLUDE_DIR)/limine/BOOT, IA32.EFI X64.EFI) $(ISODIR)/EFI/BOOT/
 
 	@echo "[MK] copying applications..."
-	@mkdir -p $(DISK_DIR)/rd/user/apps
-	@mkdir -p $(DISK_DIR)/rd/user/bin
+	@mkdir -p $(DISK_DIR)/rdh/user_id
+	@mkdir -p $(DISK_DIR)/rdh/user_id/apps
+	@mkdir -p $(DISK_DIR)/rdh/user_id/bin
+	@mkdir -p $(DISK_DIR)/rdh/user_id/images
+	@mkdir -p $(DISK_DIR)/rdh/user_id/downloads
+	@mkdir -p $(DISK_DIR)/rdh/user_id/documents
 	@mkdir -p $(DISK_DIR)/rd/bin
 	@mkdir -p $(DISK_DIR)/rd/emr/system
-	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/user/apps/
+	@mkdir -p $(DISK_DIR)/rd/emr/system/bin
+	@mkdir -p $(DISK_DIR)/rd/emr/system/libraries
+	@mkdir -p $(DISK_DIR)/rd/emr/system/libraries/emex
+	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rdh/user_id/apps
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system/
+	@cp -r src/userspace/apps/desktop/desktop.elf $(DISK_DIR)/rd/emr/system/
 
 	@echo "[MK] copying other binarys..."
-	@cp src/userspace/apps/login/login.elf $(DISK_DIR)/rd/emr/system
+	@cp src/userspace/apps/login/login.elf $(DISK_DIR)/rd/emr/system/
 	@cp src/userspace/bin/hello/hello.elf $(DISK_DIR)/rd/bin/
-	@cp src/userspace/bin/sinfo/sinfo.elf $(DISK_DIR)/rd/emr/system
+	@cp src/userspace/bin/sinfo/sinfo.elf $(DISK_DIR)/rd/emr/system/
 	@cp src/userspace/bin/touch/touch.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/uname/uname.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/initd/initd.elf $(DISK_DIR)/rd/emr/system/system.emx/
 	@cp src/userspace/bin/echo/echo.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/ls/ls.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/cd/cd.elf $(DISK_DIR)/rd/bin/
@@ -88,19 +101,25 @@ $(ISO): limine.conf $(LIMINE_TOOL) $(BUILD_DIR)/kernel.elf disk userspace
 	@cp src/userspace/bin/tree/tree.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/lsblk/lsblk.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/reboot/reboot.elf $(DISK_DIR)/rd/bin/
+<<<<<<< HEAD
 	@cp src/userspace/bin/uptime/uptime.elf $(DISK_DIR)/rd/bin/
+=======
+	@cp src/userspace/bin/pwd/pwd.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/ps/ps.elf $(DISK_DIR)/rd/bin/
+>>>>>>> 8dffb2a ([REF] minimal code style refactor; [DE] new desktop environment)
 
 	@echo "[MK] copying libs..."
-	@cp src/userspace/libs/wm/libwm.a $(DISK_DIR)/rd/emr/system/libraries/
 	@cp src/userspace/libs/cursor/cursor.elf $(DISK_DIR)/rd/emr/system/libraries
 	@cp src/userspace/libs/emxfb0/libemxfb0.a $(DISK_DIR)/rd/emr/system/libraries/
 	@cp src/userspace/libs/font8x12/libfont8x12.a $(DISK_DIR)/rd/emr/system/libraries/
+	@cp src/userspace/libs/libdesktop/libdesktop.a $(DISK_DIR)/rd/emr/system/libraries/
 
 
 	@echo "[MK] creating initrd.cpio..."
 	@chmod +x tools/initrd.sh
 	./tools/initrd.sh
 	@cp $(DISK_DIR)/initrd.cpio $(ISODIR)/boot/
+	@cp $(DISK_DIR)/initrdh.cpio $(ISODIR)/boot/
 
 	@xorriso -as mkisofs -b boot/limine/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table \
