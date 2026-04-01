@@ -21,6 +21,7 @@ typedef struct {
     int z;
 
     int home_cx, home_cy, home_cw, home_ch;
+    int orig_cx, orig_cy, orig_cw, orig_ch;
 } dt_win_t;
 
 int win_add(

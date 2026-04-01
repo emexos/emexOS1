@@ -87,12 +87,8 @@ static int handle_one(mouse_event_t *ev, input_state_t *is)
     if (!btn) g_drag_idx = -1;
 
     if (g_drag_idx >= 0) {
-        dt_win_t *wn = win_get(g_drag_idx);
         int nx = mx - g_drag_ox;
         int ny = my - g_drag_oy;
-        // record old frame rect (only the first time this frame)
-        //
-        if (wn) record_first(is, wn);
         if (nx < 0) nx = 0;
         if (ny < 0) ny = 0;
 

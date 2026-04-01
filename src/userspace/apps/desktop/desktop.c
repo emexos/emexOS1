@@ -91,6 +91,29 @@ static void current_content(
     }
 }
 
+static void _old_full_rect(
+	dt_win_t *w, int hcx, int hcy, int hcw, int hch,
+    int *ox, int *oy, int *ow, int *oh
+){
+    unsigned int s = w->style;
+    if (s & DT_POPUP) {
+        *ox = hcx - 1;
+        *oy = hcy - 1;
+        *ow = hcw + 2;
+        *oh = hch + 2;
+    } else if (s & DT_NOTITLE) {
+        *ox = hcx - DT_BORDER;
+        *oy = hcy - DT_BORDER;
+        *ow = hcw + DT_BORDER * 2;
+        *oh = hch + DT_BORDER * 2;
+    } else {
+        *ox = hcx - DT_BORDER;
+        *oy = hcy - DT_TITLE_H - 1;
+        *ow = hcw + DT_BORDER * 2;
+        *oh = hch + DT_TITLE_H + 1 + DT_BORDER;
+    }
+}
+
 static void sync_home_to_current(void)
 {
     for (int i = 0; i < DT_WIN_MAX; i++)
@@ -109,22 +132,22 @@ static void sync_home_to_current(void)
             cx, cy,
         	w->home_cw, w->home_ch
         );
-    }
 
-    for (int i = 0; i < DT_WIN_MAX; i++)
-    {
-        dt_win_t *w = win_get(i);
-        if (!w) continue;
-
-        int cx, cy, cw, ch;
-        current_content(w, &cx, &cy, &cw, &ch);
-
-        if (cx == w->home_cx && cy == w->home_cy) continue;
-
-        comp_fill(
-        	w->home_cx, w->home_cy,
-            w->home_cw, w->home_ch, DT_BG
+        int ox, oy, ow, oh;
+        _old_full_rect(
+        	w, w->home_cx, w->home_cy, w->home_cw, w->home_ch,
+            &ox, &oy, &ow, &oh
         );
+        comp_fill(ox, oy, ow, oh, DT_BG);
+
+        if (
+        	w->orig_cx != w->home_cx || w->orig_cy != w->home_cy
+        ) comp_fill(w->orig_cx, w->orig_cy, w->orig_cw, w->orig_ch, DT_BG);
+
+        w->home_cx = cx;
+        w->home_cy = cy;
+        w->home_cw = cw;
+        w->home_ch = ch;
     }
 }
 

@@ -87,6 +87,9 @@ void comp_copy_rect(
     int step = (dst_y <= src_y) ? 1 : -1;
     int row_start = (step == 1) ? 0 : h - 1;
     int row_end = (step == 1) ? h : -1;
+    int xstep = (dst_x <= src_x) ? 1 : -1;
+    int col_start = (xstep == 1) ? 0 : w - 1;
+    int col_end = (xstep == 1) ? w : -1;
 
     for (int r = row_start; r != row_end; r += step)
     {
@@ -98,7 +101,10 @@ void comp_copy_rect(
         unsigned int *dst_row = g_buf + dy * g_w;
 
         // clamp x range
-        for (int c = 0; c < w; c++)
+        int col_start = (dst_x <= src_x) ? 0 : w - 1;
+        int col_end = (dst_x <= src_x) ? w : -1;
+        int xstep = (dst_x <= src_x) ? 1 : -1;
+        for (int c = col_start; c != col_end; c += xstep)
         {
             int spx = src_x + c;
             int dpx = dst_x + c;

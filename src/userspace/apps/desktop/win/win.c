@@ -35,6 +35,10 @@ static void compute_home(dt_win_t *w)
         w->home_cw = w->w - DT_BORDER * 2;
         w->home_ch = w->h - DT_TITLE_H - 1 - DT_BORDER;
     }
+    w->orig_cx = w->home_cx;
+    w->orig_cy = w->home_cy;
+    w->orig_cw = w->home_cw;
+    w->orig_ch = w->home_ch;
 }
 
 int win_add(
