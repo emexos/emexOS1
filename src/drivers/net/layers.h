@@ -12,10 +12,10 @@ typedef struct
     void 	(*get_mac)(u8 mac[6]);
 } net_driver_t;
 
-int net_init(void);
-int net_send(const void *data, u16 len);
-int net_recv(void *buf, u16 max_len);
+int netdrivers_init(void);
+int netdrivers_send(const void *data, u16 len);
+int netdrivers_recv(void *buf, u16 max_len);
 
-void net_get_mac(u8 mac[6]);
+void netdrivers_get_mac(u8 mac[6]);
 
 #endif
