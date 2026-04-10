@@ -6,7 +6,9 @@ all:
 #@$(MAKE) -C libs/cursor
 
 	@$(MAKE) -C apps/system
+		@$(MAKE) -C apps/system/stinf
 	@$(MAKE) -C apps/shell
+	@$(MAKE) -C apps/guishell
 	@$(MAKE) -C apps/login
 	@$(MAKE) -C apps/desktop
 
@@ -27,6 +29,7 @@ all:
 #@$(MAKE) -C bin/chaosd
 	@$(MAKE) -C bin/ps
 	@$(MAKE) -C bin/pwd
+	@$(MAKE) -C bin/meminfo
 
 clean:
 	@$(MAKE) -C libc clean
@@ -36,7 +39,9 @@ clean:
 #@$(MAKE) -C libs/cursor clean
 
 	@$(MAKE) -C apps/system clean
+		@$(MAKE) -C apps/system/stinf clean
 	@$(MAKE) -C apps/shell clean
+	@$(MAKE) -C apps/guishell clean
 	@$(MAKE) -C apps/login clean
 	@$(MAKE) -C apps/desktop clean
 
@@ -57,5 +62,6 @@ clean:
 #@$(MAKE) -C bin/chaosd clean
 	@$(MAKE) -C bin/ps clean
 	@$(MAKE) -C bin/pwd clean
+	@$(MAKE) -C bin/meminfo clean
 
 .PHONY: all clean

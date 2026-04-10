@@ -82,8 +82,10 @@ $(ISO): limine.conf $(LIMINE_TOOL) buildgen $(BUILD_DIR)/kernel.elf disk userspa
 	@mkdir -p $(DISK_DIR)/rd/emr/system/bin
 	@mkdir -p $(DISK_DIR)/rd/emr/system/libraries
 	@mkdir -p $(DISK_DIR)/rd/emr/system/libraries/emex
-	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rdh/user_id/apps
+	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/emr/system
+	@cp -r src/userspace/apps/guishell/shelly.emx $(DISK_DIR)/rdh/user_id/apps
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system/
+	@cp -r src/userspace/apps/system/stinf/stinf.elf $(DISK_DIR)/rd/emr/system/system.emx
 	@cp -r src/userspace/apps/desktop/desktop.elf $(DISK_DIR)/rd/emr/system/
 
 	@echo "[MK] copying other binarys..."
@@ -104,6 +106,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) buildgen $(BUILD_DIR)/kernel.elf disk userspa
 	@cp src/userspace/bin/uptime/uptime.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/pwd/pwd.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/ps/ps.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/meminfo/meminfo.elf $(DISK_DIR)/rd/bin/
 
 	@echo "[MK] copying libs..."
 	@cp src/userspace/libs/cursor/cursor.elf $(DISK_DIR)/rd/emr/system/libraries
@@ -134,7 +137,9 @@ run: $(ISO)
 	@qemu-system-x86_64 \
 		-M pc \
 		-cpu qemu64 \
-		-m 1024 \
+		-m 2048 \
+		-netdev user,id=net0 \
+		-device e1000,netdev=net0 \
 		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
 		-drive file=$(DISK_IMG),format=raw,if=ide,index=0 \
@@ -146,7 +151,7 @@ run: $(ISO)
 install_disk: $(ISO) disk
 	@echo "[QEMU] running installer..."
 	@qemu-system-x86_64 \
-		-M pc -cpu qemu64 -m 1024 \
+		-M pc -cpu qemu64 -m 2048 \
 		-drive if=pflash,format=raw,readonly=on,file=uefi/OVMF_CODE.fd \
 		-drive if=pflash,format=raw,file=uefi/OVMF_VARS.fd \
 		-drive file=$(DISK_IMG),format=raw,if=ide,index=0 \

@@ -4,7 +4,7 @@
 int main(void)
 {
 	//printf(__EMX_BUILD_"\n");
-    printf(":: exec /emr/system/system.emx... success\n");
+    printf(":: system: /emr/system/system.emx... was successful.\n");
 
     //for (;;);
 

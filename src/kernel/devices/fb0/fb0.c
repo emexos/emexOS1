@@ -19,14 +19,16 @@ static int fb0_mod_init(void) {
 
 static void fb0_mod_fini(void) {}
 
-static void *fb0_open(const char *path) {
+static void *fb0_open(const char *path)
+{
     (void)path;
     fb_write_pos = 0;
     fb_read_pos = 0;
     return (void *)1;
 }
 
-static int fb0_read(void *handle, void *buf, size_t count, u64 offset) {
+static int fb0_read(void *handle, void *buf, size_t count, u64 offset)
+{
     (void)handle;
     (void)offset;
     u32 *fb = get_framebuffer();
@@ -48,7 +50,8 @@ static int fb0_read(void *handle, void *buf, size_t count, u64 offset) {
     return (int)count;
 }
 
-static int fb0_write(void *handle, const void *buf, size_t count, u64 offset) {
+static int fb0_write(void *handle, const void *buf, size_t count, u64 offset)
+{
     (void)handle;
     (void)offset;
     u32 *fb = get_framebuffer();
@@ -70,7 +73,8 @@ static int fb0_write(void *handle, const void *buf, size_t count, u64 offset) {
     return (int)count;
 }
 
-int fb0_ioctl(int request, void *arg) {
+int fb0_ioctl(int request, void *arg)
+{
     if (!arg) return -1;
 
     u32 w = get_fb_width();
@@ -79,7 +83,8 @@ int fb0_ioctl(int request, void *arg) {
     u32 *fb = get_framebuffer();
 
     switch (request) {
-        case FBIOGET_VSCREENINFO: {
+        case FBIOGET_VSCREENINFO:
+    	{
             fb_var_screeninfo_t *info = (fb_var_screeninfo_t *)arg;
             info->xres = w;
             info->yres = h;
@@ -95,38 +100,46 @@ int fb0_ioctl(int request, void *arg) {
             info->transp_offset = 24; info->transp_length = 8;
             return 0;
         }
-        case FBIOGET_FSCREENINFO: {
+        case FBIOGET_FSCREENINFO:
+    	{
             fb_fix_screeninfo_t *fix = (fb_fix_screeninfo_t *)arg;
             str_copy(fix->id, FBN);
             fix->smem_start = (u64)fb;
-            fix->smem_len = pitch * h;
-            fix->type   = 0; // FB_TYPE_PACKED_PIXELS
-            fix->visual = 2; // FB_VISUAL_TRUECOLOR
+            fix->smem_len 	= pitch * h;
+            fix->type   	= 0; // FB_TYPE_PACKED_PIXELS
+            fix->visual 	= 2; // FB_VISUAL_TRUECOLOR
             fix->line_length = pitch;
             return 0;
         }
-        case FBIO_READ_RECT: {
+        case FBIO_READ_RECT:
+    	{
             fb_rect_t *r = (fb_rect_t *)arg;
             if (!r || !r->pixels) return -1;
             u32 pitch_dw = pitch / 4;
-            for (u32 row = 0; row < r->h; row++) {
+            for (u32 row = 0; row < r->h; row++)
+            {
                 u32 py = r->y + row;
                 if (py >= h) break;
-                for (u32 col = 0; col < r->w; col++) {
+                for (u32 col = 0; col < r->w; col++)
+                {
                     u32 px = r->x + col;
                     r->pixels[row * r->w + col] = (px < w) ? fb[py * pitch_dw + px] : 0;
                 }
             }
             return 0;
         }
-        case FBIO_BLIT: {
+        case FBIO_BLIT:
+    	{
             fb_rect_t *r = (fb_rect_t *)arg;
             if (!r || !r->pixels) return -1;
             u32 pitch_dw = pitch / 4;
-            for (u32 row = 0; row < r->h; row++) {
+            for (u32 row = 0; row < r->h; row++)
+            {
                 u32 py = r->y + row;
                 if (py >= h) break;
-                for (u32 col = 0; col < r->w; col++) {
+
+                for (u32 col = 0; col < r->w; col++)
+                {
                     u32 px = r->x + col;
                     if (px >= w) break;
                     u32 c = r->pixels[row * r->w + col];
@@ -134,6 +147,7 @@ int fb0_ioctl(int request, void *arg) {
                     fb[py * pitch_dw + px] = c;
                 }
             }
+
             return 0;
         }
         case FBIO_RESET_POS:
@@ -144,7 +158,8 @@ int fb0_ioctl(int request, void *arg) {
     }
 }
 
-driver_module fb0_module = {
+driver_module fb0_module =
+{
     .name    = FB0NAME,
     .mount   = FB0PATH,
     .version = FB0UNIVERSAL,

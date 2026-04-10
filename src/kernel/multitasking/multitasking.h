@@ -43,7 +43,7 @@ typedef struct {
     int saved; // 0 == first run; use entry_point
 } mt_user_ctx_t;
 
-#define MT_MAX_TASKS 32
+#define MT_MAX_TASKS 64
 #define MT_KSTACK_SIZE 8192
 
 typedef struct {

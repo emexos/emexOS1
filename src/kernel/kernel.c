@@ -3,12 +3,16 @@
 #include <kernel/include/logo.h>
 #include <kernel/graph/theme.h>
 #include <kernel/communication/serial.h>
-#include <math/math.h>
 #include <theme/doccr.h>
 #include <kernel/data/images/bmp.h>
 //int init_boot_log = -1; // boot logs
 
 #include <drivers/drivers.h>
+
+// configuration files
+#include <config/user.h>
+#include <config/system.h>
+#include <config/user_config.h>
 
 // System services
 #include <kernel/kernelslot/slot.h>
@@ -40,6 +44,7 @@
 #include <kernel/devices/fb0/fb0.h>
 #include <kernel/devices/input/kbd.h>
 #include <kernel/devices/input/mouse0.h>
+#include <kernel/devices/net/eth0.h>
 #include <kernel/devices/tty/tty0.h>
 #include <kernel/devices/random/urandom.h>
 #include <kernel/devices/random/random.h>
@@ -47,17 +52,17 @@
 
 // usermode stuff
 #include <kernel/user/user.h>
-//Desktop Enviroment
-#include <kernel/user/gen.h>
 // executables
 #include <kernel/packages/elf/loader.h>
 #include <kernel/packages/cpio/cpio.h>
 #include <kernel/packages/emex/emex.h>
+#include <kernel/packages/gz/gzip.h>
 
 
 // Memory
 #include <memory/main.h>
 #include <kernel/mem/meminclude.h>
+#include <kernel/mem/memlog.h>
 klime_t *klime = NULL;
 #if ENABLE_GLIME
     glime_t *glime = NULL;
@@ -241,7 +246,9 @@ void _start(void)
                 init_ipc:
             	{
 	                ipc_messages_init();
+					log("[IPC_MESSAGES]", "initialized\n", d);
 	                ipc_shm_init();
+					log("[IPC_SHM]", "initialized\n", d);
 	                //ipc_test();
                 };
 
@@ -316,9 +323,23 @@ void _start(void)
         }
     #endif
 
+    #if DEBUG_LOGGING == 1
+    	//log("[KERNEL]", "listing proceses\n", d);
+    	//proc_list_procs(proc_mgr);
+     	/*
+      		currently there arent any processes
+       	*/
+     	//log("[KERNEL]", "listing kernel proceses\n", d);
+     	/*
+    		only bootscreen [0]
+       	*/
+    	//dump_kprocesses();
+     	memlog_print_map();
+    #endif
+
     module_ss: module_init(); {
-        // Register driver modules
-        log("[MOD]", "Init regs:\n", d);
+        // Register device modules
+        log("[MOD]", "Init modules:\n", d);
 
         //module_register(&console_module);
         module_register(&ata_module);
@@ -327,6 +348,7 @@ void _start(void)
         module_register(&fb0_module);
         module_register(&kbd_dev_module);
         module_register(&mouse0_module);
+        module_register(&eth0_module);
         module_register(&tty0_module);
         module_register(&urandom_module);
         module_register(&random_module);

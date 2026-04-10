@@ -1,6 +1,8 @@
 #ifndef MEMINCLUDE_H
 #define MEMINCLUDE_H
 
+#include <kernel/mem/memlog.h> /* logging system */
+
 #include <kernel/mem/phys/physmem.h>
 #include <kernel/mem/paging/paging.h>
 #include <kernel/mem/heap/heap.h>

@@ -7,31 +7,40 @@
 static driver_module *modules[MAX_MODULES];
 static int module_count = 0;
 
-void module_init(void) {
+void module_init(void)
+{
     log("[MOD]", "init module system\n", d);
-    for (int i = 0; i < MAX_MODULES; i++) {
+    for (int i = 0; i < MAX_MODULES; i++)
+    {
         modules[i] = NULL;
     }
     module_count = 0;
 }
 
-int module_register(driver_module *module) {
-    if (!module || module_count >= MAX_MODULES) {
+int module_register(driver_module *module)
+{
+	if (!module || module_count >= MAX_MODULES)
+	{
+        log("[MOD]", "Module register failed: invalid module or max reached\n", warning);
         return -1;
     }
 
     // check if already registered
-    for (int i = 0; i < module_count; i++) {
+    for (int i = 0; i < module_count; i++)
+    {
         if (modules[i] == module) {
+            log("[MOD]", "Module already registered\n", warning);
             return -1;
         }
     }
 
     // call init if exists
-    if (module->init) {
+    if (module->init)
+    {
         int ret = module->init();
         if (ret != 0) {
-            return ret;
+            log("[MOD]", "Module init failed, skipping registration\n", warning);
+            return -1; /* don't add module if init fails */
         }
     }
 
@@ -39,65 +48,41 @@ int module_register(driver_module *module) {
     return 0;
 }
 
-void module_unregister(const char *name) {
+void module_unregister(const char *name)
+{
     if (!name) return;
 
-    for (int i = 0; i < module_count; i++) {
-        if (modules[i] && modules[i]->name) {
-            // simple string compare
-            const char *a = name;
-            const char *b = modules[i]->name;
-            int match = 1;
+    for (int i = 0; i < module_count; i++)
+    {
+	    if (modules[i] && modules[i]->name && str_equals(modules[i]->name, name))
+		{
+	        // call cleanup if exists
+	        if (modules[i]->fini) {
+	            modules[i]->fini();
+	        }
 
-            while (*a && *b) {
-                if (*a != *b) {
-                    match = 0;
-                    break;
-                }
-                a++;
-                b++;
-            }
+	        // shift array down
+	        for (int j = i; j < module_count - 1; j++) {
+	            modules[j] = modules[j + 1];
+	        }
+	        modules[module_count - 1] = NULL;
+	        module_count--;
 
-            if (match && *a == '\0' && *b == '\0') {
-                // call cleanup if exists
-                if (modules[i]->fini) {
-                    modules[i]->fini();
-                }
-
-                // shift array
-                for (int j = i; j < module_count - 1; j++) {
-                    modules[j] = modules[j + 1];
-                }
-                modules[module_count - 1] = NULL;
-                module_count--;
-                return;
-            }
-        }
+	        log("[MOD]", "Module unregistered\n", d);
+	        return;
+	    }
     }
+    log("[MOD]", "Module to unregister not found\n", warning);
 }
 
-driver_module* module_find(const char *name) {
+driver_module* module_find(const char *name)
+{
     if (!name) return NULL;
 
-    for (int i = 0; i < module_count; i++) {
-        if (modules[i] && modules[i]->name) {
-            // simple string compare
-            const char *a = name;
-            const char *b = modules[i]->name;
-            int match = 1;
-
-            while (*a && *b) {
-                if (*a != *b) {
-                    match = 0;
-                    break;
-                }
-                a++;
-                b++;
-            }
-
-            if (match && *a == '\0' && *b == '\0') {
-                return modules[i];
-            }
+    for (int i = 0; i < module_count; i++)
+    {
+        if (modules[i] && modules[i]->name && str_equals(modules[i]->name, name)) {
+            return modules[i];
         }
     }
     return NULL;

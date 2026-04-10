@@ -3,7 +3,7 @@
 
 # Build output
 build/
-.build
+#.build
 
 # Libraries/Dependencies
 include/limine/*

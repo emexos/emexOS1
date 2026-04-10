@@ -22,9 +22,12 @@ static tty0_ansi_state_t ansi_state = ANSI_NORMAL;
 static int ansi_param = 0;
 static u32 ansi_fg    = 0xFFFFFFFF; // default white
 static u32 ansi_bg    = 0xFF000000;
+static int ansi_private = 0;  /* set when we see ESC [ ? */
 
-static u32 tty0_ansi_color(int code) {
-    switch (code) {
+static u32 tty0_ansi_color(int code)
+{
+    switch (code)
+    {
         case  0: return 0xFFFFFFFF; // reset
         case 30: return 0xFF111111; // black
         case 31: return 0xFFFF5555; // red
@@ -46,23 +49,26 @@ static u32 tty0_ansi_color(int code) {
     }
 }
 
-void tty0_write_char(char c) {
+void tty0_write_char(char c)
+{
     char tmp[2] = { c, '\0' };
-    switch (ansi_state) {
+    switch (ansi_state)
+    {
         case ANSI_NORMAL:
             if (c == '\033') {
                 ansi_state = ANSI_ESC;
-            } else if (c == '\b') {
+            } else if (c == '\b')
+            {
                 u32 char_width  = fm_get_char_width()  * font_scale;
                 u32 char_height = fm_get_char_height() * font_scale;
                 if (cursor_x >= char_width) {
                     cursor_x -= char_width;
-                    //draw_rect(cursor_x, cursor_y, char_width, char_height, ansi_bg);
+                    draw_rect(cursor_x, cursor_y, char_width, char_height, ansi_bg);
                     // later the window-system/desktop-environment should handle that
                 }
             } else {
-                //cprintf(tmp, ansi_fg);
-                printf("%s", tmp);
+                cprintf(tmp, ansi_fg);
+                //printf("%s", tmp);
             }
             break;
 
@@ -70,11 +76,13 @@ void tty0_write_char(char c) {
             if (c == '[') {
                 ansi_state = ANSI_CSI;
                 ansi_param = 0;
-            } else {
-	            printf("\033");
-	            printf("%s", tmp);
-                //cprintf("\033", ansi_fg);
-                //cprintf(tmp, ansi_fg);
+                ansi_private = 0;
+            } else
+            {
+	            //printf("\033");
+	            //printf("%s", tmp);
+                cprintf("\033", ansi_fg);
+                cprintf(tmp, ansi_fg);
                 ansi_state = ANSI_NORMAL;
             }
             break;
@@ -82,16 +90,48 @@ void tty0_write_char(char c) {
         case ANSI_CSI:
             if (c >= '0' && c <= '9') {
                 ansi_param = ansi_param * 10 + (c - '0');
+
+            } else if (c == '?') {
+                ansi_private = 1;
+
+            } else if (c == ';') {
+                /*color reset before next param */
+                ansi_fg = tty0_ansi_color(ansi_param);
+                ansi_param = 0;
+
             } else if (c == 'm') {
                 ansi_fg = tty0_ansi_color(ansi_param);
                 ansi_param = 0;
                 ansi_state = ANSI_NORMAL;
-            } else if (c == ';') {
-                ansi_fg = tty0_ansi_color(ansi_param);
+
+            } else if (c == 'J') {
+                if (ansi_param == 2) clear(bg());   /* ESC[2J — clear whole screen */
                 ansi_param = 0;
-                // stay in CSI
+                ansi_private = 0;
+                ansi_state = ANSI_NORMAL;
+
+            } else if (c == 'H') {
+                /* ESC[H or ESC[1;1H both are home */
+                cursor_x = 0;
+                cursor_y = 0;
+                ansi_param = 0;
+                ansi_state = ANSI_NORMAL;
+
+            } else if (c == 'l') {
+                /* ESC[?25l hides a non existing cursor (compatibility*/
+                ansi_param = 0;
+                ansi_private = 0;
+                ansi_state = ANSI_NORMAL;
+
+            } else if (c == 'h') {
+                /* ESC[?25h shows cursor */
+                ansi_param = 0;
+                ansi_private = 0;
+                ansi_state = ANSI_NORMAL;
+
             } else {
                 ansi_param = 0;
+                ansi_private = 0;
                 ansi_state = ANSI_NORMAL;
             }
             break;
@@ -104,30 +144,31 @@ static int tty0_echo_mode = TTY_ECHO; // default == 0
 void tty0_set_echo_mode(int mode) { tty0_echo_mode = mode; }
 int  tty0_get_echo_mode(void) { return tty0_echo_mode; }
 
-static int tty0_init(void) {
+static int tty0_init(void)
+{
     log("[TTY0]", "init /dev/tty0\n", d);
     return 0;
 }
 
 static void tty0_fini(void) {}
 
-static void *tty0_open(const char *path) {
+static void *tty0_open(const char *path)
+{
     (void)path;
-    return (void *)1; // dummy handle
+    return (void *)1;
 }
 
-static int tty0_dev_write(void *handle, const void *buf, size_t count, u64 offset) {
-    (void)handle;
-    (void)offset;
+static int tty0_dev_write(void *handle, const void *buf, size_t count, u64 offset)
+{
+    (void)handle; (void)offset;
     const char *p = (const char *)buf;
-    for (size_t i = 0; i < count; i++) {
-        tty0_write_char(p[i]);
-    }
+    for (size_t i = 0; i < count; i++) tty0_write_char(p[i]);
     return (int)count;
 }
-static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
-    (void)handle;
-    (void)offset;
+
+static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset)
+{
+    (void)handle; (void)offset;
     if (!buf || count == 0) return 0;
 
     char *out = (char *)buf;
@@ -145,8 +186,10 @@ static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
 
     __asm__ volatile("sti");
 
-    if (tty0_echo_mode == TTY_RAW) {
-        while (1) {
+    if (tty0_echo_mode == TTY_RAW)
+    {
+        while (1)
+        {
             key_event_t event;
             char c = (char)(event.keycode & 0xFF);
             int n = fs_read(kbd_fd, &event, sizeof(key_event_t));
@@ -165,7 +208,8 @@ static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
         }
     }
 
-    while (i < count - 1) {
+    while (i < count - 1)
+    {
         key_event_t event;
         int got = 0;
 
@@ -179,13 +223,13 @@ static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
 
         char c = (char)(event.keycode & 0xFF);
 
-        if (c == '\n' || c == '\r') {
+        if (c == '\n' || c == '\r')
+        {
             // always echo the newline so cursor moves to next line
             tty0_write_char('\n');
             out[i++] = '\n';
             break;
         }
-
         if (c == '\b') {
             if (i > 0) {
                 i--;
@@ -194,7 +238,6 @@ static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
             }
             continue;
         }
-
         if (c < 0x20 || c > 0x7E) continue;
 
         // echo based on current mode
@@ -213,7 +256,8 @@ static int tty0_dev_read(void *handle, void *buf, size_t count, u64 offset) {
     return (int)i;
 }
 
-driver_module tty0_module = {
+driver_module tty0_module =
+{
     .name    = TTY0NAME,
     .mount   = TTY0PATH,
     .version = TTY0UNIVERSAL,

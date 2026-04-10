@@ -1,6 +1,9 @@
 #include "gen.h"
 #include "../shells/shells.h"
+#include <kernel/include/assembly.h>
 #include <kernel/packages/emex/emex.h>
+
+#include <kernel/mem/memlog.h>
 
 // path to the init app in the VFS (loaded from initrd.cpio)
 #define SYSTEMLOCATE "/emr/system/system.emx"
@@ -29,6 +32,8 @@ void uproc(void) {
 
         log("[INIT]", "jumping to userspace\n", success);
 
+        //memlog_print_map();
+
         //first clear screen
         clear(0xff000000);
 
@@ -36,7 +41,11 @@ void uproc(void) {
         proc_list_procs(proc_mgr);
         ulime->ptr_proc_curr = init_proc;
 
+        //hcf();
+
         log("[INIT]", "jumping to init_proc\n", d);
+
+        //clear(0xff000000);
 
         #if JUMPTOUSER == 1
 

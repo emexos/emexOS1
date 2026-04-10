@@ -127,11 +127,11 @@ static void ansi_write_char(char c) {
     switch (ansi_state) {
         case ANSI_STATE_NORMAL:
             if (c == '\033') { ansi_state = ANSI_STATE_ESC; }
-            else { /*cprintf(tmp, ansi_fg_color);*/ }
+            else { cprintf(tmp, ansi_fg_color); }
             break;
         case ANSI_STATE_ESC:
             if (c == '[') { ansi_state = ANSI_STATE_CSI; ansi_param = 0; }
-            else {/*cprintf("\033", ansi_fg_color); cprintf(tmp, ansi_fg_color);*/ ansi_state = ANSI_STATE_NORMAL;}
+            else {cprintf("\033", ansi_fg_color); cprintf(tmp, ansi_fg_color); ansi_state = ANSI_STATE_NORMAL;}
             break;
         case ANSI_STATE_CSI:
             if (c >= '0' && c <= '9') {

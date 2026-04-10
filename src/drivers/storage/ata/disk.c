@@ -129,17 +129,18 @@ int ATAidentify(ATAdevice_t *dev, ATAidentify_t *identify)
     u8 lba_mid = inb(base + 4);
     u8 lba_high = inb(base + 5);
 
-    if (lba_mid != 0 || lba_high != 0) {
+    if (lba_mid != 0 || lba_high != 0)
+    {
         // ATAPI device
-        dev->type = (lba_mid == 0x14 && lba_high == 0xEB) ?
-                    ATA_DEVICE_PATAPI : ATA_DEVICE_SATAPI;
-        BOOTUP_PRINT("    ATAPI devices are not supported", red());
+        dev->type = (lba_mid == 0x14 && lba_high == 0xEB) ? ATA_DEVICE_PATAPI : ATA_DEVICE_SATAPI;
+        BOOTUP_PRINT("    e: ATAPI devices are not supported", red());
         return -2; // not supported yet
     }
 
     // waits until DRQ with timeout
     int drq_result = ATAwait_drq(base);
-    if (drq_result != 0) {
+    if (drq_result != 0)
+    {
         if (drq_result == -2) {
             BOOTUP_PRINT("    Error flag set\n", red());
         } else {
@@ -160,7 +161,8 @@ int ATAidentify(ATAdevice_t *dev, ATAidentify_t *identify)
 // detects ata device on specific bus
 static int ATAdetect_device(u16 base_port, u16 control_port, u8 is_slave)
 {
-    if (ATAdevice_count >= MAX_ATA_DEVICES) {
+    if (ATAdevice_count >= MAX_ATA_DEVICES)
+    {
         return -1;
     }
 
@@ -174,7 +176,8 @@ static int ATAdetect_device(u16 base_port, u16 control_port, u8 is_slave)
 
     // this checks if the ports are responding
     u8 initial_status = inb(base_port + 7);
-    if (initial_status == 0xFF) {
+    if (initial_status == 0xFF)
+    {
         return -1; // floating bus
     }
 
@@ -193,10 +196,12 @@ static int ATAdetect_device(u16 base_port, u16 control_port, u8 is_slave)
     dev->model[40] = '\0';
 
     // trimt railing spaces
-    for (int i = 39; i >= 0; i--) {
+    for (int i = 39; i >= 0; i--)
+    {
         if (dev->model[i] == ' ') {
             dev->model[i] = '\0';
-        } else {
+        } else
+        {
             break;
         }
     }
@@ -207,10 +212,12 @@ static int ATAdetect_device(u16 base_port, u16 control_port, u8 is_slave)
     dev->serial[20] = '\0';
 
     // trim trailing spaces from serial
-    for (int i = 19; i >= 0; i--) {
+    for (int i = 19; i >= 0; i--)
+    {
         if (dev->serial[i] == ' ') {
             dev->serial[i] = '\0';
-        } else {
+        } else
+        {
             break;
         }
     }
@@ -223,12 +230,12 @@ static int ATAdetect_device(u16 base_port, u16 control_port, u8 is_slave)
     if (dev->lba48_supported)
     {
         dev->sectors = ((u64)identify.lba48_sectors[3] << 48) |
-                      ((u64)identify.lba48_sectors[2] << 32) |
-                      ((u64)identify.lba48_sectors[1] << 16) |
-                      ((u64)identify.lba48_sectors[0]);
+                       ((u64)identify.lba48_sectors[2] << 32) |
+                       ((u64)identify.lba48_sectors[1] << 16) |
+                       ((u64)identify.lba48_sectors[0]);
     } else {
         dev->sectors = ((u32)identify.lba28_sectors[1] << 16) |
-                      ((u32)identify.lba28_sectors[0]);
+                       ((u32)identify.lba28_sectors[0]);
     }
 
 
@@ -252,7 +259,7 @@ int ATAdetect_devices(void)
     u16 secondary_ctrl = pci_ide_get_secondary_ctrl();
 
     // primary
-    BOOTUP_PRINT("      Checking Primary Master... ", white());
+    BOOTUP_PRINT("      Checking Primary Master...   ", white());
     if (ATAdetect_device(primary_base, primary_ctrl, 0) == 0) {
         BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, white());
@@ -262,7 +269,7 @@ int ATAdetect_devices(void)
     }
 
     // primary slave
-    BOOTUP_PRINT("      Checking Primary Slave... ", white());
+    BOOTUP_PRINT("      Checking Primary Slave...    ", white());
     if (ATAdetect_device(primary_base, primary_ctrl, 1) == 0) {
         BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, white());
@@ -282,7 +289,7 @@ int ATAdetect_devices(void)
     }
 
     // secondary slave
-    BOOTUP_PRINT("      Checking Secondary Slave... ", white());
+    BOOTUP_PRINT("      Checking Secondary Slave...  ", white());
     if (ATAdetect_device(secondary_base, secondary_ctrl, 1) == 0) {
         BOOTUP_PRINT(" -> Found: ", white());
         BOOTUP_PRINT(ATAdevices[ATAdevice_count - 1].model, white());
@@ -344,7 +351,8 @@ int ATAread_sectors(ATAdevice_t *dev, u64 lba, u8 sector_count, u16 *buffer)
     for (int sector = 0; sector < sector_count; sector++)
     {
         // BSY clear
-        if (ATAwait_bsy(base) != 0) {
+        if (ATAwait_bsy(base) != 0)
+        {
             log("[ATA]", "BSY timeout in sector loop at sector ", error);
             BOOTUP_PRINT_INT(sector, red());
             BOOTUP_PRINT("\n", red());
@@ -353,7 +361,8 @@ int ATAread_sectors(ATAdevice_t *dev, u64 lba, u8 sector_count, u16 *buffer)
 
         // DRQ
         int drq_result = ATAwait_drq(base);
-        if (drq_result != 0) {
+        if (drq_result != 0)
+        {
             log("[ATA]", "DRQ timeout at sector ", error);
             BOOTUP_PRINT_INT(sector, red());
             BOOTUP_PRINT(", status: ", red());

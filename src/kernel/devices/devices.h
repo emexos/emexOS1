@@ -6,6 +6,7 @@
 #include <kernel/devices/random/random.h>
 #include <kernel/devices/input/kbd.h>
 #include <kernel/devices/input/mouse0.h>
+#include <kernel/devices/net/eth0.h>
 #include <kernel/devices/null/null.h>
 #include <kernel/devices/zero/zero.h>
 #include <kernel/devices/disks/hdd0.h>
@@ -21,6 +22,10 @@
 #define MS0NAME "dev_ps2_mouse0"
 #define MS0PATH "/dev/input/mouse0"
 #define MS0UNIVERSAL VERSION_NUM(0, 0, 0, 0)
+
+#define ETH0NAME "dev_eth0"
+#define ETH0PATH "/dev/net/eth0"
+#define ETH0UNIVERSAL VERSION_NUM(0, 1, 0, 0)
 
 #define EFBNAME FBN
 #define FB0NAME "dev_fb0"

@@ -18,8 +18,10 @@
 
 int main(void)
 {
+	printf("system information: \n");
 	printf("emexOS version:" __EMX_VER_ "\n");
 	printf("emexOS build:" __EMX_BUILD_ "\n");
+	printf("\n");
 
     static emxrc_t rc;
     #define __INIT_D_BRACKETS "[" __INIT_D "]"

@@ -73,39 +73,39 @@ typedef enum {
     ATA_DEVICE_SATAPI
 } ATAdevice_type_t;
 typedef struct {
-    u16 base_port;        // base io port (0x1F0 or 0x170)
-    u16 control_port;     // control port (0x3F6 or 0x376)
-    u8 is_slave;          // 0 = master, 1 = slave
-    ATAdevice_type_t type;// type of devise
-    u32 capabilities;     // Device capabilities
-    char model[41];       // Model string
-    char serial[21];      // Serial number
-    u8 lba48_supported;   // LBA48 support flag
-    u64 sectors;
+    u16 	base_port;        // base io port (0x1F0 or 0x170)
+    u16 	control_port;     // control port (0x3F6 or 0x376)
+    u8 		is_slave;          // 0 = master, 1 = slave
+    ATAdevice_type_t 	type;// type of devise
+    u32 	capabilities;     // Device capabilities
+    char 	model[41];       // Model string
+    char 	serial[21];      // Serial number
+    u8 		lba48_supported;   // LBA48 support flag
+    u64 	sectors;
 } ATAdevice_t;
 typedef struct {
-    u16 config;              // W0
-    u16 cylinders;           // W1
-    u16 reserved1;           // W2
-    u16 heads;               // W3
-    u16 reserved2[2];        // W4-W5
-    u16 sectors_per_track;   // W6
-    u16 reserved3[3];        // W7-W9
-    u16 serial[10];          // W10-W19 (20 ASCII characters)
-    u16 reserved4[3];        // W20-W22
-    u16 firmware_rev[4];     // W23-W26 (8 ASCII characters)
-    u16 model[20];           // W27-W46 (40 ASCII characters)
-    u16 max_multiple;        // W47
-    u16 reserved5;           // W48
-    u16 capabilities[2];     // W49-W50
-    u16 reserved6[2];        // W51-W52
-    u16 valid_fields;        // W53
-    u16 reserved7[5];        // W54-W58
-    u16 current_multiple;    // W59
-    u16 lba28_sectors[2];    // W60-W61 (addressabel sectors(28))
-    u16 reserved8[38];       // W62-W99
-    u16 lba48_sectors[4];    // W100-W103 (addressabel sectors(48))
-    u16 reserved9[152];      // W104-W255
+    u16 	config;              // W0
+    u16 	cylinders;           // W1
+    u16 	reserved1;           // W2
+    u16 	heads;               // W3
+    u16 	reserved2[2];        // W4-W5
+    u16 	sectors_per_track;   // W6
+    u16 	reserved3[3];        // W7-W9
+    u16 	serial[10];          // W10-W19 (20 ASCII characters)
+    u16 	reserved4[3];        // W20-W22
+    u16 	firmware_rev[4];     // W23-W26 (8 ASCII characters)
+    u16 	model[20];           // W27-W46 (40 ASCII characters)
+    u16 	max_multiple;        // W47
+    u16 	reserved5;           // W48
+    u16 	capabilities[2];     // W49-W50
+    u16 	reserved6[2];        // W51-W52
+    u16 	valid_fields;        // W53
+    u16 	reserved7[5];        // W54-W58
+    u16 	current_multiple;    // W59
+    u16 	lba28_sectors[2];    // W60-W61 (addressabel sectors(28))
+    u16 	reserved8[38];       // W62-W99
+    u16 	lba48_sectors[4];    // W100-W103 (addressabel sectors(48))
+    u16 	reserved9[152];      // W104-W255
 } __attribute__((packed)) ATAidentify_t;
 
 // pub

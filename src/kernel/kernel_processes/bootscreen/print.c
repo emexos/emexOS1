@@ -1,4 +1,6 @@
 #include "print.h"
+#include "boot.h"
+#include "log.h"
 #include <kernel/graph/graphics.h>
 #include <kernel/kernel_processes/fm/fm.h>
 #include <kernel/communication/serial.h>
@@ -60,7 +62,7 @@ static const char *utf8_next_codepoint(const char *p, u32 *codepoint)
         }
 
         u32 cp = ((u32)(b0 & 0x0F) << 12) |
-                 ((u32)(b1 & 0x3F) << 6) |
+                 ((u32)(b1 & 0x3F) << 6)  |
                  (u32)(b2 & 0x3F);
         // Overlong and UTF-16 surrogate range checks
         if (cp < 0x800 || (cp >= 0xD800 && cp <= 0xDFFF)) {
@@ -157,37 +159,41 @@ static void bs_scroll(u32 line_height) {
 
 static void putcodepoint(u32 codepoint, u32 color)
 {
+	bs_screen_t *src = bs_get_active();
     u32 char_width  = fm_get_char_width() * font_scale;
     u32 char_height = fm_get_char_height() * font_scale;
     u32 char_spacing = char_width;
     u32 line_height = char_height + 2 * font_scale;
 
+    //log_printf(d, "CURSOR", "BEFORE y=%d\n", src->cursor_y);
+
     if (codepoint == '\n')
     {
-        cursor_x = 0;
-        cursor_y += line_height;
+        src->cursor_x = 0;
+        src->cursor_y += line_height;
         // scroll only once, right here
-        if (cursor_y + char_height > fb_height) {
+        if (src->cursor_y + char_height > fb_height) {
             bs_scroll(line_height);
-            cursor_y -= line_height;
+            src->cursor_y -= line_height;
         }
+        //log_printf(d, "CURSOR", "AFTER y=%d\n", src->cursor_y);
         return;
     }
 
-    if (cursor_x + char_width >= fb_width)
+    if (bs_get_active()->cursor_x + char_width >= fb_width)
     {
-        cursor_x = 0;
-        cursor_y += line_height;
+        bs_get_active()->cursor_x = 0;
+        bs_get_active()->cursor_y += line_height;
         // scroll only once, right here
-        if (cursor_y + char_height > fb_height) {
+        if (bs_get_active()->cursor_y + char_height > fb_height) {
             bs_scroll(line_height);
-            cursor_y -= line_height;
+            bs_get_active()->cursor_y -= line_height;
         }
     }
 
     // removed the third redundant scroll check that was here before drawing
-    putchar_at(codepoint, cursor_x, cursor_y, color);
-    cursor_x += char_spacing;
+    putchar_at(codepoint, bs_get_active()->cursor_x, bs_get_active()->cursor_y, color);
+    bs_get_active()->cursor_x += char_spacing;
 }
 
 /*static void aware_scroll_byprint(void)
@@ -281,6 +287,14 @@ void print(const char *str, u32 color)
 
 void reset_cursor(void)
 {
-    cursor_x = 0;
-    cursor_y = 0;
+    bs_get_active()->cursor_x = 0;
+    bs_get_active()->cursor_y = 0;
+}
+
+void print_to(int screen, const char *str, u32 color)
+{
+	int old = bs_active;
+	bs_switch(screen);
+	print(str,color);
+	bs_switch(old);
 }

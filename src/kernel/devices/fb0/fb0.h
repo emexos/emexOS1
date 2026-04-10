@@ -9,31 +9,33 @@
 #define FBN EMEX "fb0"
 
 // fb_var_screeninfo
-typedef struct {
-    u32 xres;
-    u32 yres;
-    u32 xres_virtual;
-    u32 yres_virtual;
-    u32 xoffset;
-    u32 yoffset;
-    u32 bits_per_pixel;
-    u32 grayscale;
-    u32 red_offset;
-    u32 red_length;
-    u32 green_offset;
-    u32 green_length;
-    u32 blue_offset;
-    u32 blue_length;
-    u32 transp_offset;
-    u32 transp_length;
+typedef struct
+{
+    u32 	xres;
+    u32 	yres;
+    u32 	xres_virtual;
+    u32 	yres_virtual;
+    u32 	xoffset;
+    u32 	yoffset;
+    u32 	bits_per_pixel;
+    u32 	grayscale;
+    u32 	red_offset;
+    u32 	red_length;
+    u32 	green_offset;
+    u32 	green_length;
+    u32 	blue_offset;
+    u32 	blue_length;
+    u32 	transp_offset;
+    u32 	transp_length;
 } fb_var_screeninfo_t;
-typedef struct {
-    char id[16];
-    u64 smem_start;
-    u32 smem_len;
-    u32 type;
-    u32 visual;
-    u32 line_length;   // pitch
+typedef struct
+{
+    char 	id[16];
+    u64 	smem_start;
+    u32 	smem_len;
+    u32 	type;
+    u32 	visual;
+    u32 	line_length;   // pitch
 } fb_fix_screeninfo_t;
 
 // /dev/fb0 request codes
@@ -45,8 +47,8 @@ typedef struct {
 #define FBIO_BLIT           0x4611
 
 typedef struct {
-    u32  x, y, w, h;
-    u32 *pixels;
+    u32 	 x, y, w, h;
+    u32 	*pixels;
 } fb_rect_t;
 
 // /dev/fb0 module

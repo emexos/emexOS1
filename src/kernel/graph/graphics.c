@@ -1,6 +1,7 @@
 #include "graphics.h"
 #include <kernel/module/module.h>
 #include <kernel/communication/serial.h>
+#include <kernel/kernel_processes/bootscreen/boot.h>
 
 //donnot put static before the uints!
 u32 *framebuffer = NULL;
@@ -50,8 +51,8 @@ void clear(u32 color)
     u32 h = get_fb_height();
     draw_rect(0, 0, w, h, color);
     //reset_cursor();
-    cursor_y = 0;
-    cursor_x = 0;
+    bs_get_active()->cursor_y = 0;
+    bs_get_active()->cursor_x = 0;
     //print(" ", GFX_BG);
     // OH WHY DID I PUT THIS HERE MONTHS AGO I WONDERED WHERE THE RANDOM SPACE CAME FROM............. :(
 }

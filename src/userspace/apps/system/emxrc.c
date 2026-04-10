@@ -18,6 +18,7 @@ static char tb[256]; // token result buffer
 #define EMX_NAME "ep"
 #define ELF_NAME "elf"
 #define EXE_NAME "exec"
+#define WAI_NAME "wait"
 #define FMT_NAME "f"
 
 //#define BG " &"
@@ -110,9 +111,39 @@ int emxrc_parse(const char *path, emxrc_t *out)
             if (next) strncpy(v->path, next, sizeof(v->path) - 1);
             out->var_count++;
         }
+        //print("text")
+        else if (strcmp(kw, "print") == 0 && out->exec_count < EMXRC_MAX_EXECS)
+        {
+        	emxrc_exec_t *e = &out->execs[out->exec_count];
+         	memset(e, 0, sizeof(*e));
+
+          	e->is_print= 1;
+            tok(); // (
+            char *msg = tok(); // "text"
+            if (msg)
+            {
+            	strncpy(e->message, msg, sizeof(e->message)- 1);
+            }
+            out->exec_count++;
+        }
+        //elog("text")
+        else if (strcmp(kw, "elog") == 0 && out->exec_count < EMXRC_MAX_EXECS)
+        {
+        	emxrc_exec_t *e = &out->execs[out->exec_count];
+         	memset(e, 0, sizeof(*e));
+
+          	e->is_elog = 1;
+            tok(); // (
+            char *msg = tok(); // "text"
+            if (msg)
+            {
+            	strncpy(e->message, msg, sizeof(e->message)- 1);
+            }
+            out->exec_count++;
+        }
 
         // wait <time>
-        else if (strcmp(kw, "wait") == 0 && out->exec_count < EMXRC_MAX_EXECS)
+        else if (strcmp(kw, WAI_NAME) == 0 && out->exec_count < EMXRC_MAX_EXECS)
         {
             emxrc_exec_t *e = &out->execs[out->exec_count];
             memset(e, 0, sizeof(*e));
@@ -180,11 +211,20 @@ void emxrc_run(emxrc_t *rc)
         emxrc_exec_t *e = &rc->execs[i];
 
    	    if (e->is_wait) {
-	        printf(PREFIX "wait %d\n", e->wait_time);
+	        //printf(PREFIX "wait %d\n", e->wait_time);
 	        emx_sleep(e->wait_time);
 	        continue;
 	    }
-
+        if (e->is_print)
+        {
+        	printf("%s\n", e->message);
+        	continue;
+        }
+        if (e->is_elog)
+        {
+        	printf(PREFIX "%s\n", e->message);
+         	continue;
+        }
 
         const char *path = NULL;
         emxrc_fmt_t fmt = e->fmt;

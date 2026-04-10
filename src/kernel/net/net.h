@@ -18,3 +18,5 @@
 #elif SOCKET4
 #	define EITASK "4"
 #endif
+
+void net_poll();

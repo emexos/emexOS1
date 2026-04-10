@@ -13,6 +13,10 @@
 //  layout:
 //    /proc/<pid>/status
 //    /proc/<pid>/maps
+//    /proc/stat
+//    /proc/uptime
+//    /proc/meminfo
+//    /proc/loadavg
 //
 
 #if ENABLE_ULIME
@@ -24,12 +28,8 @@ extern ulime_t *ulime;
 
 static fs_node *procfs_root = NULL; // nothings mounted on start
 
-//
-// helpers
-//
-
-// convert a decimal string to u64
-static u64 procfs_atopid(const char *s) {
+static u64 procfs_atopid(const char *s)
+{
     if (!s || *s == '\0') return 0;
     u64 n = 0;
     const char *p = s;
@@ -43,7 +43,8 @@ static u64 procfs_atopid(const char *s) {
 
     return n;
 }
-static ulime_proc_t *procfs_find_pid(u64 pid) {
+static ulime_proc_t *procfs_find_pid(u64 pid)
+{
     #if ENABLE_ULIME
         if (!ulime) return NULL;
         ulime_proc_t *proc = ulime->ptr_proc_list;
@@ -56,8 +57,9 @@ static ulime_proc_t *procfs_find_pid(u64 pid) {
     #endif
     return NULL;
 }
-static const char *procfs_state_str(u64 state) {
-	// same as ulime procs
+
+static const char *procfs_state_str(u64 state)
+{
     switch (state) {
         case PROC_CREATED: return "CREATED";
         case PROC_READY:   return "READY";
@@ -195,99 +197,79 @@ static ssize_t procfs_read(fs_file *file, void *buf, size_t cnt)
 
     return (ssize_t)to_read;
 }
-static ssize_t procfs_write(fs_file *file, const void *buf, size_t cnt) {
-    {
-        (void)file;(void)buf;(void)cnt;
-    }
+
+static ssize_t procfs_write(fs_file *f, const void *b, size_t n)
+{
+    (void)f; (void)b; (void)n;
     return -1;
 }
-static fs_node *procfs_lookup(fs_node *dir, const char *name)
-{
-    if (dir->type != FS_DIR) return NULL;
 
-    procfs_data *data = (procfs_data *)dir->priv;
-    if (!data) return NULL;
-
-    if (data->kind == PROCFS_KIND_ROOT) {
-        // /proc/<pid> lookup - name must be a decimal pid
-        u64 pid = procfs_atopid(name);
-        if (pid == 0) return NULL;
-
-        // check the process actually exists
-        if (!procfs_find_pid(pid)) return NULL;
-
-        // build pid dir node
-        fs_node *piddir = procfs_mknode(name, FS_DIR, pid, PROCFS_KIND_DIR);
-        if (!piddir) return NULL;
-
-        piddir->ops = dir->ops;
-        return piddir;
-    }
-
-    if (data->kind == PROCFS_KIND_DIR)
-    {
-        // /proc/<pid>/status or /proc/<pid>/maps
-        u8 kind = 0;
-        if (str_equals(name, STATUS_MSG)) {
-            kind = PROCFS_KIND_STATUS;
-        } else if (str_equals(name, MAPS_MSG)) {
-            kind = PROCFS_KIND_MAPS;
-        } else {
-            return NULL;
-        }
-
-        fs_node *fnode = procfs_mknode(name, FS_FILE, data->pid, kind);
-        if (!fnode) return NULL;
-
-        fnode->ops = dir->ops;
-        return fnode;
-    }
-
-    return NULL;
-}
 static fs_ops procfs_ops;
-static fs_node* procfs_readdir(fs_node *dir) {
-    //(void)dir;
 
+static fs_node *procfs_readdir(fs_node *dir)
+{
     if (!dir || !dir->priv) return NULL;
     procfs_data *data = (procfs_data *)dir->priv;
 
-    #if ENABLE_ULIME
+	#if ENABLE_ULIME
 	    if (data->kind == PROCFS_KIND_ROOT)
-		{
-	        if (!ulime) return NULL;
+	    {
+	        /* global /proc/* files come first in the listing */
+	        fs_node *g_stat    = procfs_dir_node("stat", 	PROCFS_KIND_STAT   );
+	        fs_node *g_uptime  = procfs_dir_node("uptime", 	PROCFS_KIND_UPTIME );
+	        fs_node *g_meminfo = procfs_dir_node("meminfo", PROCFS_KIND_MEMINFO);
+	        fs_node *g_loadavg = procfs_dir_node("loadavg", PROCFS_KIND_LOADAVG);
+			fs_node *g_cpuinfo = procfs_dir_node("cpuinfo", PROCFS_KIND_CPUINFO);
 
-	        fs_node *head = NULL;
+	        if (g_stat) g_stat->next = g_uptime;
+	        if (g_uptime) g_uptime->next = g_meminfo;
+	        if (g_meminfo) g_meminfo->next = g_loadavg;
+
+
+	        /* pid dirs come after */
+	        if (!ulime) return g_stat;
+
+	        fs_node *pid_head = NULL;
 	        fs_node *tail = NULL;
+
 	        ulime_proc_t *proc = ulime->ptr_proc_list;
 
 	        while (proc)
-			{
+	        {
 	            char pidstr[24];
 	            u64 pid = proc->pid;
 	            int ti = 0;
 	            char tmp[24];
 
 	            if (pid == 0) { pidstr[0] = '0'; pidstr[1] = '\0'; }
-	            else {
+	            else
+	            {
 	                while (pid > 0) { tmp[ti++] = '0' + (int)(pid % 10); pid /= 10; }
 	                for (int i = 0; i < ti; i++) pidstr[i] = tmp[ti - 1 - i];
 	                pidstr[ti] = '\0';
 	            }
 
 	            fs_node *n = procfs_mknode(pidstr, FS_DIR, proc->pid, PROCFS_KIND_DIR);
-
-	            if (n) {
+	            if (n)
+	            {
 	                n->ops = &procfs_ops;
-	                if (!head) head = n;
+	                if (!pid_head) pid_head = n;
 	                else tail->next = n;
 	                tail = n;
 	            }
 	            proc = proc->next;
 	        }
-	        return head;
+
+	        if (g_loadavg) g_loadavg->next = pid_head;
+	        else if (g_meminfo) g_meminfo->next = pid_head;
+	        else if (g_uptime) g_uptime->next = pid_head;
+	        else if (g_stat) g_stat->next = pid_head;
+
+	        return g_stat ? g_stat : pid_head;
 	    }
-	    if (data->kind == PROCFS_KIND_DIR) {
+
+	    if (data->kind == PROCFS_KIND_DIR)
+	    {
 	        fs_node *status = procfs_mknode(STATUS_MSG, FS_FILE, data->pid, PROCFS_KIND_STATUS);
 	        fs_node *maps   = procfs_mknode(MAPS_MSG,   FS_FILE, data->pid, PROCFS_KIND_MAPS);
 
@@ -297,7 +279,47 @@ static fs_node* procfs_readdir(fs_node *dir) {
 
 	        return status ? status : maps;
 	    }
-    #endif
+	#endif
+
+    return NULL;
+}
+
+static fs_node *procfs_lookup(fs_node *dir, const char *name)
+{
+    if (dir->type != FS_DIR) return NULL;
+
+    procfs_data *data = (procfs_data *)dir->priv;
+    if (!data) return NULL;
+
+    if (data->kind == PROCFS_KIND_ROOT)
+    {
+        if (str_equals(name, "stat")) return procfs_dir_node("stat", PROCFS_KIND_STAT);
+        if (str_equals(name, "uptime")) return procfs_dir_node("uptime", PROCFS_KIND_UPTIME);
+        if (str_equals(name, "meminfo")) return procfs_dir_node("meminfo", PROCFS_KIND_MEMINFO);
+        if (str_equals(name, "loadavg")) return procfs_dir_node("loadavg", PROCFS_KIND_LOADAVG);
+
+        u64 pid = procfs_atopid(name);
+        if (pid == 0) return NULL;
+        if (!procfs_find_pid(pid)) return NULL;
+
+        fs_node *piddir = procfs_mknode(name, FS_DIR, pid, PROCFS_KIND_DIR);
+        if (!piddir) return NULL;
+        piddir->ops = dir->ops;
+        return piddir;
+    }
+
+    if (data->kind == PROCFS_KIND_DIR)
+    {
+        u8 kind = 0;
+        if (str_equals(name, STATUS_MSG))   kind = PROCFS_KIND_STATUS;
+        else if (str_equals(name, MAPS_MSG)) kind = PROCFS_KIND_MAPS;
+        else return NULL;
+
+        fs_node *fnode = procfs_mknode(name, FS_FILE, data->pid, kind);
+        if (!fnode) return NULL;
+        fnode->ops = dir->ops;
+        return fnode;
+    }
 
     return NULL;
 }
@@ -317,9 +339,11 @@ static fs_ops procfs_ops = {
 // mount
 //
 
-static int procfs_mount(const char *src, const char *tgt, fs_mnt *mnt) {
+static int procfs_mount(const char *src, const char *tgt, fs_mnt *mnt)
+{
     {
-        (void)src;(void)tgt;
+        (void)src;
+        (void)tgt;
     }
 
     fs_node *root = procfs_mknode("proc", FS_DIR, 0, PROCFS_KIND_ROOT);
@@ -332,13 +356,15 @@ static int procfs_mount(const char *src, const char *tgt, fs_mnt *mnt) {
     return 0;
 }
 
-static fs_type procfs = {
+static fs_type procfs_type =
+{
     .name  = "procfs",
     .mount = procfs_mount,
     .ops   = &procfs_ops,
 };
 
 // register procfs type
-void procfs_register(void) {
-    fs_register(&procfs);
+void procfs_register(void)
+{
+    fs_register(&procfs_type);
 }
