@@ -1,7 +1,7 @@
 NOTE:
 this is not a complete todo list
 
-[ ] fix log system
+[x] fix log system
 [ ] fix slow bootscreen
 [ ] fix user_config creates a already written file
 [ ] fix fat32 is not registered
@@ -10,22 +10,24 @@ this is not a complete todo list
 [ ] implement png
 [ ] implement mp4
 [ ] implement ahci
+[x] implement acpi
+[ ] implement apic
 [x] implement a libc
 [ ] implement a stub system like vmlinux(virtual memory linux zipped), call it emez (emex's zipped kernel)
 [x] implement procfs
 [ ] implement ext2
 [ ] implement ext4
-[ ] implement window system/server
-[ ] implement desktop enviroment
-[ ] implement window manager
-[ ] implement gzip for rd
+[x] implement window system/server
+[x] implement desktop enviroment
+[x] implement window manager
+[x] implement gzip for rd
 [x] implement cpio for rd
 [ ] implement gzip for userspace
 [ ] implement zip for userspace
 [ ] implement cpio for userspace
 [ ] upgrade theme manager
 [ ] upgrade font manager
-[ ] upgrade bootscreen manager
+[x] upgrade bootscreen manager
 [ ] port DOOM
 
 ⁠

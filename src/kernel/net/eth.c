@@ -1,6 +1,7 @@
 // https://wiki.osdev.org/Communications#Ethernet
 #include "eth.h"
 #include "arp.h"
+#include "ipv4.h"
 #include <drivers/net/net.h>
 #include <memory/main.h>
 #include <kernel/communication/serial.h>
@@ -39,7 +40,7 @@ int eth_send(const u8 dst[ETH_ALEN], u16 type, const void *payload, u16 len)
 
     memcpy(buf + ETH_HDR_LEN, payload, len);
 
-    return net_send(buf, (u16)(ETH_HDR_LEN + len));
+    return netdrivers_send(buf, (u16)(ETH_HDR_LEN + len));
 }
 
 void eth_recv(const void *raw, u16 total_len)
@@ -57,16 +58,8 @@ void eth_recv(const void *raw, u16 total_len)
             arp_recv(payload, plen);
             break;
 
-        /* ipv4:*/
-
-
-
-        // empty
-
-
-
-
         case ETH_TYPE_IPV4:
+            //ipv4_recv(payload, plen);
             break;
 
         default:

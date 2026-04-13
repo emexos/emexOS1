@@ -3,6 +3,7 @@
 #include <string/string.h>
 #include <kernel/mem/klime/klime.h>
 #include <theme/doccr.h>
+#include <kernel/user/users.h>
 
 int fs_open(const char *path, int flags) {
     fs_node *node = fs_resolve(path);
@@ -36,6 +37,15 @@ int fs_open(const char *path, int flags) {
     }
 
     if (!node) return -1;
+
+    // kernel enforced permission check
+    {
+        u8 need = 0;
+        int acc = flags & 0x03;
+        if (acc == O_RDONLY || acc == O_RDWR) need |= FS_PERM_R;
+        if (acc == O_WRONLY || acc == O_RDWR) need |= FS_PERM_W;
+        if (need && !fs_check_perm(node, g_current_uid, g_current_gid, need)) return -1;
+    }
 
     // alloc file struct
     fs_file *file = (fs_file*)klime_create((klime_t*)fs_klime, sizeof(fs_file));
@@ -80,7 +90,7 @@ int fs_close(int fd) {
 ssize_t fs_read(int fd, void *buf, size_t cnt) {
     fs_file *file = fs_get_file(fd);
     if (!file) return -1;
-
+    if (!fs_check_perm(file->node, g_current_uid, g_current_gid, FS_PERM_R)) return -1;
     if (!file->node->ops || !file->node->ops->read) return -1;
 
     return file->node->ops->read(file, buf, cnt);
@@ -89,7 +99,7 @@ ssize_t fs_read(int fd, void *buf, size_t cnt) {
 ssize_t fs_write(int fd, const void *buf, size_t cnt) {
     fs_file *file = fs_get_file(fd);
     if (!file) return -1;
-
+    if (!fs_check_perm(file->node, g_current_uid, g_current_gid, FS_PERM_W)) return -1;
     if (!file->node->ops || !file->node->ops->write) return -1;
 
     return file->node->ops->write(file, buf, cnt);

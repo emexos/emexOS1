@@ -7,6 +7,14 @@
 #include <config/tasks.h>
 //#include <kernel/net/pipe/pipe.h>
 
+#define NET_MAC_LEN 6
+#define NET_IP_LEN  4
+
+void netstack_init();
+
+#include <drivers/net/net.h>
+int net_is_available(void);
+
 // initial tasks
 #ifndef SOCKET1
 #   include <head.h>

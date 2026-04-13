@@ -25,5 +25,6 @@ void str_append_char(char *dest, char c);
 
 void str_from_int(char *buf, int value);
 void str_from_hex(char *buf, u64 value);
+void IntToString(int value, char *buffer); //print.c
 
 #endif

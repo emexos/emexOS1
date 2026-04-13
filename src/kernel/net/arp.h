@@ -14,8 +14,8 @@
 typedef struct {
     u16    hw_type;   /* 1 == ethernet */
     u16    proto;     /* 0x0800 == ipv4 */
-    u8    hw_len;     /* 6 */
-    u8    proto_len;  /* 4 */
+    u8     hw_len;     /* 6 */
+    u8     proto_len;  /* 4 */
     u16    op;
     u8    sender_mac[ETH_ALEN];
     u8    sender_ip[4];

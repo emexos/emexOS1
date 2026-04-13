@@ -27,6 +27,16 @@
 #define FS_MAX_FDS  64
 #define FS_MAX_PATH 200
 
+// permission bits
+#define FS_PERM_R 4
+#define FS_PERM_W 2
+#define FS_PERM_X 1
+
+// default mode values
+#define FS_MODE_FILE 0644
+#define FS_MODE_DIR  0755
+#define FS_MODE_DEV  0660
+
 typedef struct fs_node fs_node;
 typedef struct fs_file fs_file;
 typedef struct fs_mnt  fs_mnt;
@@ -42,6 +52,10 @@ struct fs_node {
 
     u64 size;   // file size (bytes)
     u64 inode;
+
+    u32 uid;
+    u32 gid;
+    u16 mode;
 
     fs_ops *ops;    // open, write, ...
     void *priv;     // fs-specific data
@@ -113,6 +127,9 @@ int fs_addchild(fs_node *parent, fs_node *child);
 int fs_alloc_fd(fs_file *file);
 void fs_free_fd(int fd);
 fs_file* fs_get_file(int fd);
+
+// permission check
+int fs_check_perm(fs_node *node, u32 uid, u32 gid, u8 need);
 
 // syscall interface
 int fs_open(const char *path, int flags);

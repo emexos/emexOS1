@@ -1,17 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-USERNAME_FILE="./dsk/username.txt"
-
-if [ ! -f "$USERNAME_FILE" ]; then
-	echo "error: $USERNAME_FILE not found"
-	exit 1
-fi
-
 #SRC="./dsk/rd"
 #OUT="./dsk/initrd.cpio"
-
-USERNAME="$(tr -d ' \n' < "$USERNAME_FILE")"
 
 if [ -z "USERNAME" ]; then
 	echo "error: username is empty"
@@ -56,16 +47,16 @@ make_initrd "./dsk/rd" "./dsk/initrd.cpio"
 
 TMP="./.tmp_rdh_build"
 rm -rf "$TMP"
-mkdir -p "$TMP/home/$USERNAME" # adds the home directory before the username
+mkdir -p "$TMP"
 
-SRC_USER_DIR="./dsk/rdh/user_id"
+SRC_USER_DIR="./dsk/rdh"
 
 if [ ! -d "$SRC_USER_DIR" ]; then
 	echo "error: $SRC_USER_DIR not found"
 	exit 1
 fi
 
-cp -r "$SRC_USER_DIR"/. "$TMP/home/$USERNAME/"
+cp -r "$SRC_USER_DIR"/. "$TMP/"
 
 (
 	cd "$TMP"

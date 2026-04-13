@@ -2,7 +2,8 @@
 #include <kernel/packages/cpio/cpio.h>
 #include <kernel/file_systems/vfs/vfs.h>
 #include <kernel/inits/fs/init.h>
-#include <kernel/include/reqs.h>       // module_request
+#include <kernel/include/reqs.h>
+#include <kernel/user/users.h>
 #include <string/string.h>
 #include <kernel/communication/serial.h>
 #include <kernel/graph/theme.h>
@@ -60,6 +61,8 @@ int initrd_load(void)
 {
     log("[INITRD]", "loading initrds...\n", d);
 
+    users_init();
+
     if (!module_request.response ||
         module_request.response->module_count == 0)
     {
@@ -98,6 +101,23 @@ int initrd_load(void)
 
     log("[INITRD]", "root filesystem loaded\n", success);
 
+    // load user table from extracted initrd
+    users_load("/emr/users");
+    {
+	    user_entry_t *first = users_get_first_regular();
+	    char to_path[128];
+	    to_path[0] = '\0';
+
+	    if (first) {
+	        //str_append(to_path, "/home/");
+	        str_append(to_path, first->username);
+	    } else {
+	        str_copy(to_path, "pc");
+	    }
+
+	    cpio_set_user_transform("user_id", to_path);
+    }
+
     // put initrdh.cpio to /home
     if (initrdh) {
         log_module("[INITRD] initrdh", initrdh);
@@ -114,7 +134,7 @@ int initrd_load(void)
         int resh = cpio_extract_to_vfs(
             rawh,
             (u64)initrdh->size,
-            "/"
+            "/home"
         );
 
         if (resh < 0) {
@@ -126,6 +146,9 @@ int initrd_load(void)
     } else {
         log("[INITRD]", "initrdh.cpio not found (no /home)\n", warning);
     }
+
+    // ensure home directories exist for all users
+    users_setup_homes();
 
     return 0;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../../../shared/emex.h"
-#include "../../../../kernel/user/sysinfo.h"
+#include "../../../../kernel/user/system/sysinfo.h"
 #include <string.h>
 
 #define __EMEX__          __EMEX_KERNEL

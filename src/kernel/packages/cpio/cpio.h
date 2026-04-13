@@ -62,6 +62,9 @@ int cpio_iter_next(cpio_iter_t *iter, cpio_entry_t *entry);
 int cpio_extract_to_vfs(const u8 *data, u64 size, const char *base_path);
 int cpio_find(const u8 *data, u64 size, const char *name, cpio_entry_t *entry);
 
+// set path component transform for next extraction
+void cpio_set_user_transform(const char *from, const char *to);
+
 
 static inline int cpio_is_file(const cpio_entry_t *e) {
     return (e->mode & CPIO_MODE_IFMT) == CPIO_MODE_IFREG;

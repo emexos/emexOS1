@@ -183,6 +183,13 @@ fs_node* fs_mknode(const char *name, u8 type) {
     str_copy(node->name, name);
     node->type = type;
 
+    // set default ownership and mode
+    node->uid = 0;
+    node->gid = 0;
+    if (type == FS_DIR) node->mode = FS_MODE_DIR;
+    else if (type == FS_DEV) node->mode = FS_MODE_DEV;
+    else node->mode = FS_MODE_FILE;
+
     return node;
 }
 
@@ -230,9 +237,23 @@ int fs_listdir(const char *path, _emx_kdirent_t *buf, int max_entries) {
     return count;
 }
 
-//
-// main init
-//
+// kernel enforced permission check
+int fs_check_perm(fs_node *node, u32 uid, u32 gid, u8 need) {
+    if (!node) return 0;
+    if (uid == 0) return 1;
+
+    u16 bits;
+    if (node->uid == uid) {
+        bits = (node->mode >> 6) & 7;
+    } else if (node->gid == gid) {
+        bits = (node->mode >> 3) & 7;
+    } else {
+        bits = node->mode & 7;
+    }
+
+    return (bits & need) == need;
+}
+
 void fs_init(void) {
     log("[FS]", "init generic VFS\n", d);
 

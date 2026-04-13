@@ -1,6 +1,6 @@
 #include "scalls.h"
 #include <kernel/multitasking/ipc/ipc.h>
-#include <kernel/user/ptrs.h>
+#include <kernel/user/system/ptrs.h>
 
 u64 scall_mq_open(ulime_proc_t *proc, u64 name_ptr, u64 oflag, u64 mode)
 {

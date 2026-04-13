@@ -2,7 +2,7 @@
 	<h1> emexOS </h1>
 
 
- a simple x86_64 Operating System in C
+ a simple x86_64 Operating System in C made from scratch
 
 ![GitHub License](https://img.shields.io/github/license/emexos/emexOS1?style=for-the-badge&label=License&labelColor=black&color=white)
 ![GitHub repo size](https://img.shields.io/github/repo-size/emexos/emexOS1?style=for-the-badge&label=size&labelColor=black&color=white)
@@ -12,6 +12,8 @@
 <a href="https://discord.gg/JFGK4yqSyA">
 	<img src="https://img.shields.io/badge/Join%20the%20Discord-Black?style=for-the-badge&logo=discord&logoColor=white&color=black" alt="Discord Badge" />
 </a>
+
+>emexOS is not linux based<
 
 </div>
 

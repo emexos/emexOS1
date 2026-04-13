@@ -54,6 +54,9 @@
 
     #define WAITPID     61
 
+    #define GETUID  144
+    #define GETGID  155
+
 
     #define SHM_DESTROY 245
 
@@ -101,6 +104,9 @@
     #define MQ_UNLINK 278
     #define MQ_SEND   281
     #define MQ_RECV   282
+
+    #define GETUID  144
+    #define GETGID  155
 
     #define SHM_DESTROY 283
 

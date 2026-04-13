@@ -1,5 +1,5 @@
 #include "user.h"
-#include "calls.h"
+#include "system/calls.h"
 
 #include <kernel/communication/serial.h>
 //#include <kernel/arch/x86_64/exceptions/panic.h>
@@ -24,7 +24,7 @@
 #include <config/user.h>
 
 // memory
-#include <kernel/user/mmap.h>
+#include <kernel/user/system/mmap.h>
 #include <kernel/mem/paging/paging.h>
 #include <kernel/mem/phys/physmem.h>
 
@@ -33,11 +33,12 @@
 #include <kernel/multitasking/multitasking.h>
 
 // sinfo
-#include <kernel/user/sysinfo.h>
+#include <kernel/user/system/sysinfo.h>
+#include <kernel/user/users.h>
 
 #include "scalls/scalls.h"
 
-#include <kernel/user/ptrs.h>
+#include <kernel/user/system/ptrs.h>
 
 //#include <kernel/devices/fb0/fb0.h>
 //#include <kernel/devices/tty/tty0.h>
@@ -163,7 +164,8 @@ u64 scall_write(ulime_proc_t *proc, u64 fd, u64 buf, u64 count) {
 
     // lazy-open /dev/tty0
     static int tty_fd = -1;
-    if (tty_fd < 0) {
+    if (tty_fd < 0)
+    {
         tty_fd = fs_open(TTY0PATH, O_WRONLY);
         if (tty_fd < 0) {
             const char *s = (const char *)buf;
@@ -229,9 +231,12 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3)
         parent->state = PROC_RUNNING;
         g_ulime->ptr_proc_curr = parent;
 
-        if (mt) {
-            for (int i = 0; i < mt->task_count; i++) {
-                if (mt->tasks[i].proc == parent) {
+        if (mt)
+        {
+            for (int i = 0; i < mt->task_count; i++)
+            {
+                if (mt->tasks[i].proc == parent)
+                {
                     mt->current_idx = i;
                     if (mt->tasks[i].kstack)
                         gdt_set_kernel_stack(((u64)mt->tasks[i].kstack + MT_KSTACK_SIZE) & ~0xFULL);
@@ -257,7 +262,8 @@ u64 scall_exit(ulime_proc_t *proc, u64 exit_code, u64 arg2, u64 arg3)
             g_ulime->ptr_proc_curr = t->proc;
             if (t->kstack) gdt_set_kernel_stack(((u64)t->kstack + MT_KSTACK_SIZE) & ~0xFULL);
             printf("[SYSCALL] no waiter, resuming '%s'\n", t->proc->name);
-            if (t->user_ctx.saved) {
+            if (t->user_ctx.saved)
+            {
                 resume_parent_sysret(
                     t->user_ctx.rip, t->user_ctx.rsp,
                     t->user_ctx.rflags, t->proc->pml4_phys,
@@ -291,7 +297,8 @@ static void setup_argv_on_stack(ulime_proc_t *new_proc, char **user_argv, int ar
 
     u64 str_vaddrs[32];
 
-    for (int i = argc - 1; i >= 0; i--) {
+    for (int i = argc - 1; i >= 0; i--)
+    {
         const char *s = user_argv[i];
         u64 len = 0;
         while (s[len]) len++;
@@ -342,7 +349,8 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
 
     ulime_proc_t *new_proc = NULL;
 
-    if (is_elf) {
+    if (is_elf)
+    {
         if (!ulime || !proc_mgr) {
             printf("[SYSCALL] execve: ulime not ready\n");
             return (u64)-1;
@@ -376,20 +384,28 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
             return (u64)-1;
         }
 
+        new_proc->uid = caller->uid;
+        new_proc->gid = caller->gid;
+
         if (elf_load(new_proc, execve_elf_buf, (u64)elf_size) != 0) {
             printf("[SYSCALL] execve: elf_load failed\n");
             return (u64)-1;
         }
-    } else {
+    } else
+    {
 
         int result = emex_launch_app(path, &new_proc);
-        if (result != 0 || !new_proc) {
+        if (result != 0 || !new_proc)
+        {
             printf("[SYSCALL] execve failed with code %d\n", result);
             return (u64)-1;
         }
+        new_proc->uid = caller->uid;
+        new_proc->gid = caller->gid;
     }
 
-    if (is_valid_user_ptr(argv_ptr)) {
+    if (is_valid_user_ptr(argv_ptr))
+    {
         char **user_argv = (char **)argv_ptr;
         int argc = 0;
         while (argc < 31 && user_argv[argc]) argc++;
@@ -397,7 +413,8 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
     }
 
     //blocked_parent     = caller;
-    if (blocked_count < MAX_BLOCKED) {
+    if (blocked_count < MAX_BLOCKED)
+    {
         blocked_entry_t *e = &blocked_list[blocked_count++];
         e->proc = caller;
         e->rip = user_rcx;
@@ -423,9 +440,12 @@ u64 scall_execve(ulime_proc_t *proc, u64 path_ptr, u64 argv_ptr, u64 arg3)
             caller->name, new_proc->name
     );
     extern mt_t *mt;
-    if (mt) {
-        for (int i = 0; i < mt->task_count; i++) {
-            if (mt->tasks[i].proc == new_proc) {
+    if (mt)
+    {
+        for (int i = 0; i < mt->task_count; i++)
+        {
+            if (mt->tasks[i].proc == new_proc)
+            {
                 mt->current_idx = i;
                 if (mt->tasks[i].kstack)
                     gdt_set_kernel_stack(((u64)mt->tasks[i].kstack + MT_KSTACK_SIZE) & ~0xFULL);
@@ -452,7 +472,8 @@ u64 scall_read(ulime_proc_t *proc, u64 fd, u64 buf, u64 count)
     if (fd != 0) return (u64)-1;
 
     static int tty_fd = -1;
-    if (tty_fd < 0) {
+    if (tty_fd < 0)
+    {
         tty_fd = fs_open(TTY0PATH, O_RDONLY);
         if (tty_fd < 0) {
             printf("[SYSCALL] read: cannot open " TTY0PATH "\n");
@@ -490,7 +511,8 @@ u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3)
 
 
     u64 heap_end = proc->heap_base + proc->heap_size;
-    if (addr > heap_end) {
+    if (addr > heap_end)
+    {
         printf("[SYSCALL] brk: OOM — 0x%lX > heap end 0x%lX\n", addr, heap_end);
         return proc->brk;
     }
@@ -501,7 +523,8 @@ u64 scall_brk(ulime_proc_t *proc, u64 addr, u64 arg2, u64 arg3)
     return proc->brk;
 }
 
-u64 scall_open(ulime_proc_t *proc, u64 path_ptr, u64 flags, u64 arg3) {
+u64 scall_open(ulime_proc_t *proc, u64 path_ptr, u64 flags, u64 arg3)
+{
     (void)proc; (void)arg3;
     if (!is_valid_user_ptr(path_ptr)) return (u64)-1;
     int fd = fs_open((const char *)path_ptr, (int)flags);
@@ -513,7 +536,8 @@ u64 scall_close(ulime_proc_t *proc, u64 fd, u64 arg2, u64 arg3) {
     return (u64)fs_close((int)fd);
 }
 
-u64 scall_getdents(ulime_proc_t *proc, u64 path_ptr, u64 buf_ptr, u64 max_entries) {
+u64 scall_getdents(ulime_proc_t *proc, u64 path_ptr, u64 buf_ptr, u64 max_entries)
+{
     (void)proc;
     if (!is_valid_user_ptr(path_ptr) || !is_valid_user_ptr(buf_ptr)) return (u64)-1;
     int n = fs_listdir((const char *)path_ptr, (_emx_kdirent_t *)buf_ptr, (int)max_entries);
@@ -537,7 +561,8 @@ u64 scall_chdir(ulime_proc_t *proc, u64 path_ptr, u64 arg2, u64 arg3)
     char new_path[FS_MAX_PATH];
 
     // handle ".." (go back) before resolution
-    if (str_equals(s, "..")) {
+    if (str_equals(s, ".."))
+    {
         int len = str_len(cwd);
         if (len > 1 && cwd[len - 1] == '/') {
             cwd[len - 1] = '\0';
@@ -621,6 +646,9 @@ u64 scall_fork(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
 
     ulime_proc_t *child = proc_create_proc(proc_mgr, proc->name, proc->entry_point, proc->priority);
     if (!child) return (u64)-1;
+    // propagate user context to child
+    child->uid = proc->uid;
+    child->gid = proc->gid;
 
     u64 hhdm = g_ulime->hpr->offset;
 
@@ -869,6 +897,41 @@ u64 scall_sysinfo(ulime_proc_t *proc, u64 info_addr, u64 a1, u64 a2) {
 	return 0;
 }
 
+// return current process uid
+u64 scall_getuid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
+{
+    (void)arg1; (void)arg2; (void)arg3;
+    return (u64)proc->uid;
+}
+
+// return current process gid
+u64 scall_getgid(ulime_proc_t *proc, u64 arg1, u64 arg2, u64 arg3)
+{
+    (void)arg1; (void)arg2; (void)arg3;
+    return (u64)proc->gid;
+}
+
+// syscall handler (called from assembly) uses find_proc_by_cr3
+u64 syscall_handler(u64 syscall_num, u64 arg1, u64 arg2, u64 arg3)
+{
+    ulime_proc_t *current = find_proc_by_cr3(g_ulime, user_cr3);
+    if (!current) {
+        printf("[SYSCALL] unknown caller cr3=0x%lX\n", user_cr3);
+        return (u64)-1;
+    }
+
+    // set vfs permission context for this syscall
+    g_current_uid = current->uid;
+    g_current_gid = current->gid;
+
+    if (syscall_num < 256 && g_ulime->syscalls[syscall_num]) {
+        return g_ulime->syscalls[syscall_num](current, arg1, arg2, arg3);
+    }
+
+    printf("[SYSCALL] unknown syscall %llu\n", (unsigned long long)syscall_num);
+    return (u64)-1;
+}
+
 void _init_syscalls_table(ulime_t *ulime_ptr) {
     if (!ulime_ptr) return;
 
@@ -899,32 +962,12 @@ void _init_syscalls_table(ulime_t *ulime_ptr) {
     ulime_ptr->syscalls[MUNMAP]          = scall_munmap;
     ulime_ptr->syscalls[FORK]            = scall_fork;
     ulime_ptr->syscalls[WAITPID]         = scall_waitpid;
+    ulime_ptr->syscalls[GETUID]  		 = scall_getuid;
+    ulime_ptr->syscalls[GETGID]  		 = scall_getgid;
 
     // emex specific
     ulime_ptr->syscalls[EMXREBOOT]       = scall_reboot;
 	ulime_ptr->syscalls[EMXSYSINFO]      = scall_sysinfo;
 
     log("[SYSCALL]", "syscall table initialized\n", d);
-}
-
-
-// syscall handler (called from assembly) uses find_proc_by_cr3
-u64 syscall_handler(u64 syscall_num, u64 arg1, u64 arg2, u64 arg3) {
-    if (!g_ulime) {
-        printf("[SYSCALL] error: ulime not initialized\n");
-        return (u64)-1;
-    }
-
-    ulime_proc_t *current = find_proc_by_cr3(g_ulime, user_cr3);
-    if (!current) {
-        printf("[SYSCALL] error: no process for CR3 0x%lX\n", user_cr3);
-        return (u64)-1;
-    }
-
-    if (syscall_num >= 256 || !g_ulime->syscalls[syscall_num]) {
-        printf("[SYSCALL] error: unknown syscall %lu\n", syscall_num);
-        return (u64)-1;
-    }
-
-    return g_ulime->syscalls[syscall_num](current, arg1, arg2, arg3);
 }

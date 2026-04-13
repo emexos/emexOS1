@@ -22,10 +22,10 @@ void graphics_init(struct limine_framebuffer *fb)
     fb_pitch = fb->pitch;
     cursor_y = 0;
     cursor_x = 0;
-    font_scale = 0;
+    font_scale = 1;
 
-    printbs("Welcome to doccrOS \n", GFX_WHITE);
-    printbs("v0.0.1 (alpha)\n", GFX_WHITE);
+    //printbs("Welcome to doccrOS \n", GFX_WHITE);
+    //printbs("v0.0.1 (alpha)\n", GFX_WHITE);
 
     printbs("Graphics\n", GFX_WHITE);
     char res_buf[128]; //donot set this to 64

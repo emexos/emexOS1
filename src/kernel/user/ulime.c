@@ -52,7 +52,8 @@ ulime_t *ulime_init(limine_hhdm_response_t *hpr, klime_t *klime, void *glime, u6
     return ulime;
 }
 
-ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point) {
+ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point)
+{
     // Allocate from ULife INTERNAL pool
     if (ulime->internal_pool_used + sizeof(ulime_proc_t) > ulime->internal_pool_size) {
         printf("[ULIME] ERROR: Out of internal memory\n");
@@ -79,6 +80,10 @@ ulime_proc_t *ulime_proc_create(ulime_t *ulime, u8 *name, u64 entry_point) {
 
     proc->state = PROC_CREATED;
     proc->entry_point = entry_point;
+
+    // default user context: root
+    proc->uid = 0;
+    proc->gid = 0;
 
     proc->heap_size = 4 * 1024 * 1024; // 4 MB
     //proc->heap_size = 8 * 1024 * 1024;

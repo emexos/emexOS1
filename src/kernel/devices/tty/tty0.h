@@ -2,18 +2,13 @@
 #define DEVICE_TTY0_H
 
 #include <kernel/module/module.h>
+#include "tty.h"
 
 #define KEYBOARD0 KBDPATH
 //#define MOUSE0 MS0PATH
 
 
 extern driver_module tty0_module;
-
-// ioctl request codes for tty
-#define TTY_ECHO      0   // normal echo
-#define TTY_NOECHO    1   // no echo at all
-#define TTY_MASKECHO  2
-#define TTY_RAW       3
 
 
 void tty0_write_char(char c);

@@ -7,6 +7,16 @@
 #include <kernel/graph/theme.h>
 #include <theme/doccr.h>
 
+// path transform for user_id folder replacement
+static char _t_from[64] = {0};
+static char _t_to[128] = {0};
+
+void cpio_set_user_transform(const char *from, const char *to) {
+    if (!from || !to) return;
+    str_copy(_t_from, from);
+    str_copy(_t_to, to);
+}
+
 static u32 parse_hex8(const char **p)
 {
     u32 val = 0;
@@ -98,6 +108,18 @@ static void make_path(char *out, const char *base, const char *name)
     // strip leading "./" or lone "."
     if (name[0] == '.' && name[1] == '/') name += 2;
     if (name[0] == '.' && name[1] == '\0') { str_copy(out, base); return; }
+
+    // apply user_id transform on first path component
+    char tname[256];
+    if (_t_from[0]) {
+        int fl = str_len(_t_from);
+        if (str_starts_with(name, _t_from) &&
+            (name[fl] == '/' || name[fl] == '\0')) {
+            str_copy(tname, _t_to);
+            if (name[fl] == '/') str_append(tname, name + fl);
+            name = tname;
+        }
+    }
 
     if (str_equals(base, "/")) {
         out[0] = '/';

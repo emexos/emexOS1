@@ -4,6 +4,10 @@
 #include <theme/doccr.h>
 #include <drivers/drivers.h>
 #include <drivers/net/net.h>
+#include <kernel/net/net.h>
+#include <kernel/kernel_processes/bootscreen/log.h>
+
+//void net_stack_init(void);/* forward */
 
 /*
  * eth0 device in /dev/net/eth0
@@ -12,7 +16,12 @@
 static int eth0_init(void)
 {
     log("[ETH0]", "init /dev/net/eth0\n", d);
-    return net_init();
+    netstack_init();
+    u8 mac[6];
+    netdrivers_get_mac(mac);
+    //char mac_str[32];
+
+    return 0;
 }
 
 /* Returns a dummy handle if a network driver is available. */
@@ -25,7 +34,7 @@ static void *eth0_open(const char *path)
      *
      * net_send() will auto fail if no active driver exists so we use that for checking availability
      */
-    if (!net_available())
+    if (!net_is_available())
         return NULL; /* failure */
 
     return (void *)1;
@@ -43,7 +52,7 @@ static int eth0_read(void *handle, void *buf, size_t count, u64 offset)
     u16 max = count > 0xFFFF ? 0xFFFF : (u16)count; /* driver interface is u16,
     which is the limit */
 
-    return net_recv(buf, max);
+    return netdrivers_recv(buf, max);
 }
 
 /* send a packet through a active network driver*/
@@ -58,7 +67,7 @@ static int eth0_write(void *handle, const void *buf, size_t count, u64 offset)
     u16 len = count > 0xFFFF ? 0xFFFF : (u16)count; /* driver interface is u16,
     which is the limit */
 
-    int ret = net_send(buf, len);
+    int ret = netdrivers_send(buf, len);
 
     return (ret == 0) ? (int)count : -1;
 }

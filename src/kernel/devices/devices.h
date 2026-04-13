@@ -40,9 +40,13 @@
 #define NULPATH "/dev/null"
 #define NULUNIVERSAL VERSION_NUM(0, 0, 0, 0) // always 0.0.0.0
 
+// multi TTYs
 #define TTY0NAME "dev_tty0"
 #define TTY0PATH "/dev/tty0"
 #define TTY0UNIVERSAL VERSION_NUM(0, 0, 1, 2)
+#define TTY1NAME "dev_tty1"
+#define TTY1PATH "/dev/tty1"
+#define TTY1UNIVERSAL VERSION_NUM(0, 0, 1, 2)
 
 #define URNDNAME "dev_urandom"
 #define URNDPATH "/dev/urandom"

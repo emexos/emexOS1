@@ -46,6 +46,8 @@
 #include <kernel/devices/input/mouse0.h>
 #include <kernel/devices/net/eth0.h>
 #include <kernel/devices/tty/tty0.h>
+#include <kernel/devices/tty/tty.h>
+#include <kernel/devices/tty/tty1.h>
 #include <kernel/devices/random/urandom.h>
 #include <kernel/devices/random/random.h>
 
@@ -132,10 +134,10 @@ void _start(void)
         fm_init();
         cmd_init(); //cmdline limine
         log("::", "finished loading esr\n", _d);
-        cursor_x = 0;
-        cursor_y = 0;
+        //cursor_x = 0;
+        //cursor_y = 0;
         font_scale = 1;
-        clear(bg());
+        //clear(bg());
 
         BOOTUP_PRINT("\n\n ======================\n", white());
         BOOTUP_PRINT(" | Welcome to ", white());
@@ -281,9 +283,9 @@ void _start(void)
     limine_module_ss: limine_modules_init(); {
         initrd_load();
         dualslotvalidating();
-        keymaps_load();
-        logos_load();
-        users_load();
+        //keymaps_load();
+        //logos_load();
+        //users_load();
     }
 
     #if ENABLE_ATA == 1
@@ -349,7 +351,8 @@ void _start(void)
         module_register(&kbd_dev_module);
         module_register(&mouse0_module);
         module_register(&eth0_module);
-        module_register(&tty0_module);
+        module_register(&tty0_module);{    tty_set_active(0); }
+        module_register(&tty1_module);
         module_register(&urandom_module);
         module_register(&random_module);
 

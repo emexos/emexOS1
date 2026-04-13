@@ -14,8 +14,8 @@
 
 // load all Limine modules to VFS
 //void dualslotvalidating(void);
-void keymaps_load(void);
-void logos_load(void);
-void users_load(void);
+//void keymaps_load(void);
+//void logos_load(void);
+//void users_load(void);
 
 #endif

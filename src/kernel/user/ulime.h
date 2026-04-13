@@ -6,7 +6,7 @@
 #include <kernel/mem/klime/klime.h>
 #include <kernel/mem/glime/glime.h>
 #include <kernel/mem/phys/physmem.h>
-#include "calls.h"
+#include "system/calls.h"
 
 #define NAMESPACE 14
 #define PIDSPACE 4
@@ -34,6 +34,10 @@ typedef struct ulime_proc {
     u64 mmap_base;    // next virtual address for mmap allocations
 
     u64 vma_base; // or. ELF VMA base
+
+    // user context
+    u32 uid;
+    u32 gid;
 
     struct ulime *ulime;
     struct ulime_proc *next;
