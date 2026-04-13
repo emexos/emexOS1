@@ -19,6 +19,7 @@ int tty0_get_echo_mode(void){ return tty_get_echo(0); }
 
 static int tty0_init(void)
 {
+	tty_init();
     log("[TTY0]", "init /dev/tty0\n", d);
     return 0;
 }

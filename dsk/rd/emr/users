@@ -2,6 +2,6 @@
 
 users[
 	root:0:0:/root
-	emex:1000:1000:/home/emex
+	pc:1000:1000:/home/pc
 	guest:1001:1001:/home/guest
 ]

@@ -13,6 +13,7 @@ int tty1_get_echo_mode(void){ return tty_get_echo(1); }
 
 static int tty1_init(void)
 {
+	tty_init();
     log("[TTY1]", "init /dev/tty1\n", d);
     return 0;
 }

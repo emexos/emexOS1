@@ -10,6 +10,8 @@
 #include <kernel/communication/serial.h>
 #include <theme/doccr.h>
 
+#include <config/system.h>
+
 #define _TTYKBD "/dev/input/keyboard0"
 
 static tty_t tty_table[TTY_COUNT];
@@ -121,10 +123,14 @@ void tty_write_char(int id, char c)
                 if (bs_get_active()->cursor_x >= char_width)
                 {
                     bs_get_active()->cursor_x -= char_width;
-                    draw_rect(bs_get_active()->cursor_x, bs_get_active()->cursor_y, char_width, char_height, t->ansi_bg);
+                    #if TTYNOGUI == 1
+                    	draw_rect(bs_get_active()->cursor_x, bs_get_active()->cursor_y, char_width, char_height, t->ansi_bg);
+                    #endif
                 }
             } else {
-                cprintf(tmp, t->ansi_fg);
+            	#if TTYNOGUI == 1
+                	cprintf(tmp, t->ansi_fg);
+                #endif
             }
             break;
 
@@ -134,8 +140,10 @@ void tty_write_char(int id, char c)
                 t->ansi_param = 0;
                 t->ansi_private = 0;
             } else {
-                cprintf("\033", t->ansi_fg);
-                cprintf(tmp,t->ansi_fg);
+	            #if TTYNOGUI == 1
+	                cprintf("\033", t->ansi_fg);
+	                cprintf(tmp,t->ansi_fg);
+	            #endif
                 t->ansi_state = TTY_ANSI_NORMAL;
             }
             break;
