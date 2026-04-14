@@ -5,11 +5,11 @@
 [x] echo
 [x] cd
 [x] tree
-[ ] pwd
-[ ] touch
+[x] pwd
+[x] touch
 [ ] mkdir
 [ ] rmdir
-[ ] rm
+[x] rm
 [ ] cp
 [ ] ecc (emex c compiler)
 [ ] mv
@@ -37,7 +37,7 @@
 [ ] ping
 [ ] top
 [ ] htop
-[ ] ps
+[x] ps
 [ ] kill
 [ ] killall
 [ ] jobs

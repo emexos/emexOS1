@@ -16,7 +16,7 @@
 
 #define USE_HCF 1
 #define BOOTUP_VISUALS 0 // verbose boot == 0, silent boot == 1
-#define TTYNOGUI 0 // GUI == 0, no GUI == 1
+#define TTYNOGUI 1 // GUI == 0, no GUI == 1
 #define DEBUG_LOGGING 1 // 1 on; 0 off
 
 // 1 == run tests like processes, scheduler which are in early developement and not finished
