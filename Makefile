@@ -18,7 +18,7 @@ fetchDeps:
 
 	@echo "[DEPS] Fetching Limine"
 	@rm -rf $(LIMINE_DIR)
-	@git clone https://codeberg.org/Limine/Limine.git --branch=v10.x-binary --depth=1 $(LIMINE_DIR)
+	@git clone https://codeberg.org/Limine/Limine.git --branch=v11.x-binary --depth=1 $(LIMINE_DIR)
 	@rm -rf $(LIMINE_DIR)/.git
 	@echo "[DEPS] Fetching Limine protocol header file"
 	@wget https://codeberg.org/Limine/limine-protocol/raw/branch/trunk/include/limine.h -O $(LIMINE_DIR)/limine.h
@@ -83,7 +83,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) buildgen $(BUILD_DIR)/kernel.elf disk userspa
 	@mkdir -p $(DISK_DIR)/rd/emr/system/libraries
 	@mkdir -p $(DISK_DIR)/rd/emr/system/libraries/emex
 	@cp -r src/userspace/apps/shell/shell.emx $(DISK_DIR)/rd/emr/system
-	@cp -r src/userspace/apps/guishell/shelly.emx $(DISK_DIR)/rdh/user_id/apps
+	@cp -r src/userspace/apps/guishell/shelly.emx $(DISK_DIR)/rd/emr/system
 	@cp -r src/userspace/apps/system/system.emx $(DISK_DIR)/rd/emr/system/
 	@cp -r src/userspace/apps/system/stinf/stinf.elf $(DISK_DIR)/rd/emr/system/system.emx
 	@cp -r src/userspace/apps/desktop/desktop.elf $(DISK_DIR)/rd/emr/system/

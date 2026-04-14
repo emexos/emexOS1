@@ -13,9 +13,10 @@ fi
 n=$((n+1))
 echo $n > "$BUILD_FILE"
 
-# datum
+# date
 YEAR=$(date +%y)
 MONTH_STR=$(date +%b)
+DAY=$(date +%d)
 
 # month mapping
 case $MONTH_STR in
@@ -33,7 +34,7 @@ case $MONTH_STR in
     Dec) M="DR" ;;
 esac
 
-BUILD="${YEAR}${M}${n}"
+BUILD="${YEAR}${M}.01.${n}"
 
 echo "[BUILDGEN] build = $BUILD"
 

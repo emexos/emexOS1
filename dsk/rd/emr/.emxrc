@@ -7,24 +7,24 @@ var desktop     = ("/emr/system/desktop/desktop.elf")
 var bg_test     = ("/emr/system/sinfo.elf")
 var bg_test2    = ("/emr/system/libraries/cursor.elf")
 var login_path  = ("/emr/system/login.elf")
-var gshell_path = (ep: "/home/emex/apps/shelly.emx")
+var gshell_path = (ep: "/emr/system/shelly.emx")
 var shell_path  = (ep: "/emr/system/shell.emx")
 
 print("succesfully jumped into userspace...")
 
-exec /emr/system/system.emx/initd.elf
-exec /bin/meminfo.elf
+//exec /emr/system/system.emx/initd.elf
+//exec /bin/meminfo.elf
 exec stinf
 wait 3
 
 
 // deactivated the desktop until it works
-//exec -bg desktop
+exec -bg desktop
 
 //exec -bg bg_test
 //exec -bg bg_test
 
 
 // last things which should happen
-//exec login_path
-exec -f"ep" shell_path
+exec login_path
+exec -f"ep" gshell_path

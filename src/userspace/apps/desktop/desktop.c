@@ -138,11 +138,28 @@ static void sync_home_to_current(void)
         	w, w->home_cx, w->home_cy, w->home_cw, w->home_ch,
             &ox, &oy, &ow, &oh
         );
-        comp_fill(ox, oy, ow, oh, DT_BG);
-
-        if (
-        	w->orig_cx != w->home_cx || w->orig_cy != w->home_cy
-        ) comp_fill(w->orig_cx, w->orig_cy, w->orig_cw, w->orig_ch, DT_BG);
+        int nox, noy, now_, noh;
+        _old_full_rect(w, cx, cy, cw, ch, &nox, &noy, &now_, &noh);
+        {
+            int ix0 = ox > nox ? ox : nox;
+            int iy0 = oy > noy ? oy : noy;
+            int ix1 = (ox+ow)<(nox+now_) ? (ox+ow) : (nox+now_);
+            int iy1 = (oy+oh)<(noy+noh) ? (oy+oh) : (noy+noh);
+            if (ix0 >= ix1 || iy0 >= iy1) {
+                comp_fill(ox, oy, ow, oh, DT_BG);
+            } else {
+                if (oy < iy0)
+                    comp_fill(ox, oy, ow, iy0-oy, DT_BG);
+                if (oy+oh > iy1)
+                    comp_fill(ox, iy1, ow, (oy+oh)-iy1, DT_BG);
+                if (iy0 < iy1) {
+                    if (ox < ix0)
+                        comp_fill(ox, iy0, ix0-ox, iy1-iy0, DT_BG);
+                    if (ox+ow > ix1)
+                        comp_fill(ix1, iy0, (ox+ow)-ix1, iy1-iy0, DT_BG);
+                }
+            }
+        }
 
         w->home_cx = cx;
         w->home_cy = cy;
