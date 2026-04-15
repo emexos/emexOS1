@@ -30,6 +30,7 @@ all:
 	@$(MAKE) -C bin/ps
 	@$(MAKE) -C bin/pwd
 	@$(MAKE) -C bin/meminfo
+	@$(MAKE) -C bin/dofetch
 
 clean:
 	@$(MAKE) -C libc clean
@@ -63,5 +64,6 @@ clean:
 	@$(MAKE) -C bin/ps clean
 	@$(MAKE) -C bin/pwd clean
 	@$(MAKE) -C bin/meminfo clean
+	@$(MAKE) -C bin/dofetch clean
 
 .PHONY: all clean

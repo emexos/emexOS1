@@ -137,6 +137,7 @@ void tty_write_char(int id, char c)
         case TTY_ANSI_ESC:
             if (c == '[') {
                 t->ansi_state = TTY_ANSI_CSI;
+                t->ansi_param_count = 0;
                 t->ansi_param = 0;
                 t->ansi_private = 0;
             } else {
@@ -154,11 +155,54 @@ void tty_write_char(int id, char c)
             } else if (c == '?') {
                 t->ansi_private = 1;
             } else if (c == ';') {
-                t->ansi_fg = tty_ansi_color(t->ansi_param);
+                t->ansi_params[t->ansi_param_count++] = t->ansi_param;
                 t->ansi_param = 0;
             } else if (c == 'm') {
-                t->ansi_fg = tty_ansi_color(t->ansi_param);
+                t->ansi_params[t->ansi_param_count++] = t->ansi_param;
+
+                for (int i = 0; i < t->ansi_param_count; i++) {
+                    int p = t->ansi_params[i];
+
+                    if (p == 0) {
+                        t->ansi_fg = 0xFFFFFFFF;
+                        t->ansi_bg = 0xFF000000;
+                    }
+
+                    else if (p >= 30 && p <= 37) {
+                        t->ansi_fg = tty_ansi_color(p);
+                    }
+                    else if (p >= 90 && p <= 97) {
+                        t->ansi_fg = tty_ansi_color(p);
+                    }
+
+                    else if (p >= 40 && p <= 47) {
+                        t->ansi_bg = tty_ansi_color(p - 10);
+                    }
+                    else if (p >= 100 && p <= 107) {
+                        t->ansi_bg = tty_ansi_color(p - 60);
+                    }
+
+                    else if (p == 38) {
+                        if (i + 4 < t->ansi_param_count &&
+                            t->ansi_params[i + 1] == 2)
+                        {
+                            int r = t->ansi_params[i + 2];
+                            int g = t->ansi_params[i + 3];
+                            int b = t->ansi_params[i + 4];
+
+                            t->ansi_fg =
+                                (0xFF << 24) |
+                                (r << 16) |
+                                (g << 8) |
+                                (b);
+
+                            i += 4;
+                        }
+                    }
+                }
+
                 t->ansi_param = 0;
+                t->ansi_param_count = 0;
                 t->ansi_state = TTY_ANSI_NORMAL;
             } else if (c == 'J') {
                 if (t->ansi_param == 2) clear(bg());

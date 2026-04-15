@@ -12,11 +12,11 @@
 //-////////////////////////////////////////-//
 
 #define BUFFER 256
-#define SHELL_PROMPT "\033[0mx1:\033[31m[pc@emex]#\033[0m "
-#define SHELL_CONFIG "/.config/shelly/"
+#define SHELL_PROMPT "\n\033[0mx1:\033[31m[pc@emex]#\033[0m "
+#define SHELL_CONFIG "/.config/exsh/"
 #define BIN_PATH "/bin/"
 
-#define WELCOME_MESSAGE "\n\n\033[0m Welcome to shelly, emexOS's default shell.\n Type \"ls /bin\" for a list of commands.\n\n"
+#define WELCOME_MESSAGE "\n\n\033[0m Welcome to eXsh, emexOS's default shell.\n Type \"ls /bin\" for a list of commands.\n\n"
 
 
 static int parse_args(char *buf, char **argv, int max_args)

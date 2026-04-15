@@ -28,6 +28,8 @@ typedef struct {
     u32 cursor_y;
     int kbd_fd;
     int valid;
+    int ansi_params[16];
+    int ansi_param_count;
 } tty_t;
 
 void tty_init(void);

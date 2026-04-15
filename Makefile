@@ -107,6 +107,7 @@ $(ISO): limine.conf $(LIMINE_TOOL) buildgen $(BUILD_DIR)/kernel.elf disk userspa
 	@cp src/userspace/bin/pwd/pwd.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/ps/ps.elf $(DISK_DIR)/rd/bin/
 	@cp src/userspace/bin/meminfo/meminfo.elf $(DISK_DIR)/rd/bin/
+	@cp src/userspace/bin/dofetch/dofetch.elf $(DISK_DIR)/rd/bin/
 
 	@echo "[MK] copying libs..."
 	@cp src/userspace/libs/cursor/cursor.elf $(DISK_DIR)/rd/emr/system/libraries
