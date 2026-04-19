@@ -4,24 +4,27 @@ LIBC   := ../../libc
 LIBS_D := ../../libs
 
 CFLAGS := -ffreestanding -nostdlib -fno-builtin -fno-stack-protector \
-        -fno-PIE -fno-pic -m64 -march=x86-64 -mno-sse -mno-sse2    \
-        -mno-mmx -mno-red-zone -Wall -Wextra -std=gnu11            \
-        -I$(LIBC)/include       \
-        -I$(LIBS_D)/emexfb0     \
-        -I$(LIBS_D)/font8x12
+          -fno-PIE -fno-pic -m64 -march=x86-64 -mno-sse -mno-sse2    \
+          -mno-mmx -mno-red-zone -Wall -Wextra -std=gnu11            \
+          -I$(LIBC)/include                                          \
+          -I$(LIBS_D)/font8x12                                       \
+          -I$(LIBS_D)/libbmp                                         \
+          -I$(LIBS_D)/emxfb0
 
 LDFLAGS := -nostdlib -static -no-pie -T ../../user.ld
 
-LIBS := $(LIBS_D)/font8x12/libfont8x12.a
+LIBS := $(LIBS_D)/font8x12/libfont8x12.a  \
+        $(LIBS_D)/libbmp/libbmp.a         \
+        $(LIBS_D)/emxfb0/libemxfb0.a
 
 OBJS := desktop.o \
         compositor/comp.o \
+        cmd/cmd.o \
         bg/bg.o \
         win/win.o \
         cursor/cursor.o \
         render/render.o \
         input/input.o \
-        cmd/cmd.o
 
 all: libs clean desktop.elf
 
@@ -42,9 +45,10 @@ $(LIBC)/build/crt0.o $(LIBC)/build/libc.a:
 
 libs:
 	$(MAKE) -C $(LIBS_D)/font8x12
+	$(MAKE) -C $(LIBS_D)/libbmp
+	$(MAKE) -C $(LIBS_D)/emxfb0
 
 clean:
-	rm -f *.o compositor/*.o bg/*.o win/*.o cursor/*.o \
-	      render/*.o input/*.o cmd/*.o desktop.elf
+	rm -f *.o compositor/*.o bg/*.o win/*.o cursor/*.o render/*.o input/*.o cmd/*.o desktop.elf
 
 .PHONY: all libs clean

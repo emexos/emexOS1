@@ -41,7 +41,8 @@ static void push_rect(cmd_result_t *r, dt_win_t *wn)
 
 static void process_line(const char *line, cmd_result_t *result)
 {
-    if (!line[0] || line[0] == '\n') return;
+    if (!line[0] || line[0] == '\n' || line[0] == '\0') return;
+
     char cmd = line[0];
     const char *p = line + 1;
 
@@ -103,17 +104,28 @@ static void process_line(const char *line, cmd_result_t *result)
 void cmd_process(cmd_result_t *result)
 {
     static char buf[4096];
-    result->count = 0; result->win_changed = 0;
+    static char zeros[4096];
+
+    result->count = 0;
+    result->win_changed = 0;
+
     int fd = open(DT_CMD, O_RDONLY);
     int n = (int)read(fd, buf, sizeof(buf) - 1);
-    if (fd < 0) return;
+    if (fd < 0) return; /* if file exists */
 
     close(fd); if (n <= 0) return;
     buf[n] = '\0';
-    fd = open(DT_CMD, O_WRONLY | O_CREAT); if (fd >= 0) close(fd);
+    if (buf[0] == '\0') return;
 
+    fd = open(DT_CMD, O_WRONLY | O_CREAT);
+    if (fd >= 0)
+    {
+        write(fd, zeros, (unsigned)n);
+        close(fd);
+    }
+
+    /* process*/
     const char *line = buf;
-
     while (*line) {
         process_line(line, result);
         while (*line && *line != '\n') line++;
@@ -131,6 +143,11 @@ int cmd_check_dirty(void)
     close(fd);
     if (n <= 0 || buf[0] != '1') return 0;
 
-    fd = open(DT_DIRTY, O_WRONLY | O_CREAT); if (fd >= 0) close(fd);
+    fd = open(DT_DIRTY, O_WRONLY | O_CREAT);
+    if (fd >= 0)
+    {
+        write(fd, "0", 1);
+        close(fd);
+    }
     return 1;
 }

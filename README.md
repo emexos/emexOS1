@@ -13,7 +13,7 @@
 	<img src="https://img.shields.io/badge/Join%20the%20Discord-Black?style=for-the-badge&logo=discord&logoColor=white&color=black" alt="Discord Badge" />
 </a>
 
->emexOS is not linux based<
+(emexOS is not linux based)
 
 </div>
 

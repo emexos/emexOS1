@@ -46,16 +46,20 @@ static void _cmd_append(const char *line)
 {
     static char existing[4096];
     int elen = 0;
+    int actual = 0;
     int fd = open(DT_CMD, O_RDONLY);
 
     if (fd >= 0)
     {
-        elen = (int)read(fd, existing, sizeof(existing) - 1);
+        int r = (int)read(fd, existing, sizeof(existing) - 1);
         close(fd);
-        if (elen < 0) elen = 0;
-        existing[elen] = '\0';
-    } else {
-        existing[0] = '\0';
+
+        if (r > 0)
+        {
+            existing[r] = '\0';
+            while (actual < r && existing[actual] != '\0') actual++;
+            elen = actual;
+        }
     }
 
     fd = open(DT_CMD, O_WRONLY | O_CREAT);
@@ -71,7 +75,7 @@ static int _createWindow(
     int x, int y, int w, int h,
     unsigned int style
 ){
-    // fmt: O pid style x y w h title\n
+    /* fmt: O pid style x y w h title\n */
     char buf[256];
     int  p = 0;
     buf[p++] = 'O'; buf[p++] = ' ';
@@ -90,7 +94,7 @@ static int _createWindow(
 
 static void _closeWindow(void)
 {
-    // fmt: C pid\n
+    /* fmt: C pid\n */
     char buf[32];
     int  p = 0;
     buf[p++] = 'C'; buf[p++] = ' ';
@@ -102,7 +106,7 @@ static void _closeWindow(void)
 
 static void _setTitle(const char *title)
 {
-    // fmt: T pid title\n
+    /* fmt: T pid title\n */
     char buf[256];
     int  p = 0;
 
@@ -145,7 +149,7 @@ static int _getCursor(int *x, int *y)
     return 0;
 }
 
-// for desktop.
+// for "desktop."
 Desktop desktop = {
     .createWindow = _createWindow,
     .closeWindow  = _closeWindow,
