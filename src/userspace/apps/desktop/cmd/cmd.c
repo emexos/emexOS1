@@ -39,10 +39,21 @@ static void push_rect(cmd_result_t *r, dt_win_t *wn)
     d->wh  = wn->h;
 }
 
+static void clear_file(const char *path, int n)
+{
+    if (n <= 0) return;
+    int fd = open(path, O_WRONLY | O_CREAT);
+    if (fd < 0) return;
+    static char clr[4096];
+    int cnt = n < 4096 ? n : 4096;
+    for (int i = 0; i < cnt; i++) clr[i] = '\n';
+    write(fd, clr, (unsigned)cnt);
+    close(fd);
+}
+
 static void process_line(const char *line, cmd_result_t *result)
 {
-    if (!line[0] || line[0] == '\n' || line[0] == '\0') return;
-
+    if (!line[0] || line[0] == '\n') return;
     char cmd = line[0];
     const char *p = line + 1;
 
@@ -55,7 +66,6 @@ static void process_line(const char *line, cmd_result_t *result)
 
         int x = str_to_int(next_tok(&p)), y = str_to_int(next_tok(&p));
         int w = str_to_int(next_tok(&p)), h = str_to_int(next_tok(&p));
-        int idx = win_add(pid, title, x, y, w, h, style);
         int ti = 0;
 
 
@@ -64,6 +74,7 @@ static void process_line(const char *line, cmd_result_t *result)
 
         title[ti] = '\0';
 
+        int idx = win_add(pid, title, x, y, w, h, style);
         win_focus(idx);
         result->win_changed = 1;
 
@@ -104,8 +115,7 @@ static void process_line(const char *line, cmd_result_t *result)
 void cmd_process(cmd_result_t *result)
 {
     static char buf[4096];
-    static char zeros[4096];
-
+    //static char zeros[4096];
     result->count = 0;
     result->win_changed = 0;
 
@@ -117,12 +127,7 @@ void cmd_process(cmd_result_t *result)
     buf[n] = '\0';
     if (buf[0] == '\0') return;
 
-    fd = open(DT_CMD, O_WRONLY | O_CREAT);
-    if (fd >= 0)
-    {
-        write(fd, zeros, (unsigned)n);
-        close(fd);
-    }
+    clear_file(DT_CMD, n);
 
     /* process*/
     const char *line = buf;
@@ -146,7 +151,7 @@ int cmd_check_dirty(void)
     fd = open(DT_DIRTY, O_WRONLY | O_CREAT);
     if (fd >= 0)
     {
-        write(fd, "0", 1);
+        write(fd, "\n\n", 2);
         close(fd);
     }
     return 1;

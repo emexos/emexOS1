@@ -246,12 +246,14 @@ int main(void)
 
         poll_tick++;
 
+        int app_dirty = 0;
         if (poll_tick >= POLL_INTERVAL)
         {
             poll_tick = 0;
             cmd_process(&cr);
-            if (cr.win_changed)    need_full = 1;
-            if (cmd_check_dirty()) need_full = 1;
+            if (cr.win_changed) need_full = 1;
+            app_dirty = cmd_check_dirty();
+            if (app_dirty) need_full = 1;
         }
 
         input_frame_begin(&is);

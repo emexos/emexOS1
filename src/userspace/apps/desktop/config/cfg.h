@@ -25,9 +25,9 @@
 #define DT_TITLE_PB 2  // pad. top
 #define DT_BORDER   1  // border width
 
-#define DT_CLOSE_X  6  // x offset
-#define DT_CLOSE_Y  3  // y offset
-#define DT_CLOSE_SZ 12 // square size
+#define DT_CLOSE_X  7  // x offset
+#define DT_CLOSE_Y  5  // y offset
+#define DT_CLOSE_SZ 8 // square size
 
 // font rendering
 #define DT_FW 8
