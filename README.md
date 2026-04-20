@@ -18,23 +18,23 @@
 </div>
 
 ## Build Dependencies 
-For building and compiling emexOS, ensure you have the following installed,
+For building and compiling emexOS, ensure you have the following installed:
 - x86_64 GCC cross-compiler - This is our preferred compiler for the source code. Currently, emexOS only supports 64-bit x86 machines, but we plan to support more architectures in the future.
 - [NASM](https://www.nasm.us/) - Assembler.
 - [QEMU](https://www.qemu.org/) - Our preferred emulator.
 - [Xorriso](https://www.gnu.org/software/xorriso/) - ISO creation.
 - [Git](https://git-scm.com/) and [wget](https://www.gnu.org/software/wget/) - To fetch dependencies.
-- cpio (use brew install cpio) - for the ram disk
+- cpio (use brew install cpio) - For the RAM disk.
 
 You can use [Zig](https://ziglang.org/) instead of GCC if you prefer to.
 
 ## For Nix Users 
-Ensure you have flakes enabled first and then run `nix develop` to enter the provided development shell which will have all build dependencies and such installed for you. I'd recommend updating the flake using `nix flake update` as it's sometimes not updated for long periods of time.
+Ensure you have flakes enabled first, then run `nix develop` to enter the provided development shell which will have all build dependencies and such installed for you. I'd recommend updating the flake using `nix flake update` as it's sometimes not updated for long periods of time.
 
 ## Building and Compiling 
 With all build dependencies installed, you can finally build and run emexOS.
 > [!CAUTION]
-> emexOS currently only supports ATA disks, if such a disk is detected emexOS **WILL/CAN DELETE IT WITHOUT ASKING** (if you have OVERWRITEALL set to 1 in the configs which is by default 0.)
+> emexOS currently only supports ATA disks, if such a disk is detected emexOS **WILL/CAN DELETE IT WITHOUT ASKING** (if you have OVERWRITEALL set to 1 in the configs which is by default 0).
 
 **Using gnu-make**
 - `make fetchDeps` - Fetch all libraries and such that emexOS depends on e.g. Limine. `git` and `wget` are used for this.
@@ -49,7 +49,7 @@ With all build dependencies installed, you can finally build and run emexOS.
 - `zig build -Dnofetch -Dclean` - Remove (cache, output), build and run.
 
 ## Console 
-After booting, you will be asked for a password + user both are "emex" by default, to log in. The password can be changed in `shared/config/user.h`.
+After booting, you will be asked for a password and username, both are `emex` by default. The password can be changed in `shared/config/user.h`.
 
 Currently, no SMP support is available just yet so emexOS runs using only a single core.
 
