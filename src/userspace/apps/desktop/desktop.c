@@ -146,17 +146,17 @@ static void sync_home_to_current(void)
             int ix1 = (ox+ow)<(nox+now_) ? (ox+ow) : (nox+now_);
             int iy1 = (oy+oh)<(noy+noh) ? (oy+oh) : (noy+noh);
             if (ix0 >= ix1 || iy0 >= iy1) {
-                comp_fill(ox, oy, ow, oh, DT_BG);
+                bg_draw_rect(ox, oy, ow, oh);
             } else {
                 if (oy < iy0)
-                    comp_fill(ox, oy, ow, iy0-oy, DT_BG);
+                    bg_draw_rect(ox, oy, ow, iy0-oy);
                 if (oy+oh > iy1)
-                    comp_fill(ox, iy1, ow, (oy+oh)-iy1, DT_BG);
+                    bg_draw_rect(ox, iy1, ow, (oy+oh)-iy1);
                 if (iy0 < iy1) {
                     if (ox < ix0)
-                        comp_fill(ox, iy0, ix0-ox, iy1-iy0, DT_BG);
+                        bg_draw_rect(ox, iy0, ix0-ox, iy1-iy0);
                     if (ox+ow > ix1)
-                        comp_fill(ix1, iy0, (ox+ow)-ix1, iy1-iy0, DT_BG);
+                        bg_draw_rect(ix1, iy0, (ox+ow)-ix1, iy1-iy0);
                 }
             }
         }
@@ -174,13 +174,13 @@ static void clear_old_frames(cmd_result_t *cr, drag_info_t *drag_prev)
     {
         drag_info_t *d = &cr->rects[i];
 
-        if (d->valid) comp_fill(d->wx, d->wy, d->ww, d->wh, DT_BG);
+        if (d->valid) bg_draw_rect(d->wx, d->wy, d->ww, d->wh);
     }
     if (drag_prev && drag_prev->valid)
     {
-        comp_fill(
+        bg_draw_rect(
         	drag_prev->wx, drag_prev->wy,
-            drag_prev->ww, drag_prev->wh, DT_BG
+            drag_prev->ww, drag_prev->wh
         );
 
         drag_prev->valid = 0;

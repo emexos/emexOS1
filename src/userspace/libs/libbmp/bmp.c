@@ -116,14 +116,14 @@ int bmp_load(const char *path, bmp_image_t *img)
     _bmp_dib_t dib;
 
     int fd = open(path, O_RDONLY);
-    int w = dib.width;
-    int h = dib.height;
     int top_down = 0;
 
     if (fd < 0) return -1;
     if (_read_exact(fd, &fhdr, (int)sizeof(fhdr)) != 0) goto fail;
     if (fhdr.sig[0] != 'B' || fhdr.sig[1] != 'M') goto fail;
     if (_read_exact(fd, &dib, (int)sizeof(dib)) != 0) goto fail;
+    int w = dib.width;
+    int h = dib.height;
     if (dib.bpp != 24 && dib.bpp != 32) goto fail; // only uncompressed
     if (dib.compression != 0 && dib.compression != 3) goto fail;
     if (h < 0) { h = -h; top_down = 1; }

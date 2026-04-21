@@ -24,7 +24,7 @@ OBJS := desktop.o \
         win/win.o \
         cursor/cursor.o \
         render/render.o \
-        input/input.o \
+        input/input.o
 
 all: libs clean desktop.elf
 
@@ -44,9 +44,9 @@ $(LIBC)/build/crt0.o $(LIBC)/build/libc.a:
 	$(MAKE) -C $(LIBC)
 
 libs:
+	$(MAKE) -C $(LIBS_D)/emxfb0
 	$(MAKE) -C $(LIBS_D)/font8x12
 	$(MAKE) -C $(LIBS_D)/libbmp
-	$(MAKE) -C $(LIBS_D)/emxfb0
 
 clean:
 	rm -f *.o compositor/*.o bg/*.o win/*.o cursor/*.o render/*.o input/*.o cmd/*.o desktop.elf
