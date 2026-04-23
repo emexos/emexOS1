@@ -1,6 +1,3 @@
-//USER=emex
-//HOME=/home/$USER
-
 var lsblk       = ("/bin/lsblk.elf")
 var stinf       = ("/emr/system/system.emx/stinf.elf")
 var desktop     = ("/emr/system/desktop.elf")
@@ -12,9 +9,15 @@ var shell_path  = (ep: "/emr/system/shell.emx")
 
 print("succesfully jumped into userspace...")
 
-//exec /emr/system/system.emx/initd.elf
-//exec /bin/meminfo.elf
-exec stinf
+if stinf
+	print("stinf found... loading...")
+	exec stinf
+	//exec /emr/system/system.emx/initd.elf
+	//exec /bin/meminfo.elf
+else
+	log("warning: stinf not found")
+endif
+
 wait 3
 
 

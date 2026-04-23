@@ -25,6 +25,9 @@ typedef struct {
     int is_wait;
     int is_print;
     int is_elog;
+    int is_if;
+    int is_else;
+    int is_endif;
     char message[256];
     int wait_time;
 } emxrc_exec_t;

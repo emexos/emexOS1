@@ -20,6 +20,9 @@ static char tb[256]; // token result buffer
 #define EXE_NAME "exec"
 #define WAI_NAME "wait"
 #define FMT_NAME "f"
+#define IFS_NAME "if"
+#define ELS_NAME "else"
+#define EIF_NAME "endif"
 
 //#define BG " &"
 #define BG ""
@@ -199,6 +202,34 @@ int emxrc_parse(const char *path, emxrc_t *out)
 
             out->exec_count++;
         }
+        else if (strcmp(kw, IFS_NAME) == 0 && out->exec_count < EMXRC_MAX_EXECS)
+        {
+      		emxrc_exec_t *e = &out->execs[out->exec_count];
+        	memset(e, 0, sizeof(*e));
+
+         	e->is_if = 1;
+
+          	char *var = tok();
+           	if (var) {
+            	strncpy(e->var_name, var, sizeof(e->var_name) - 1);
+            }
+        }
+        else if (strcmp(kw, ELS_NAME) == 0)
+        {
+      		emxrc_exec_t *e = &out->execs[out->exec_count];
+        	memset(e, 0, sizeof(*e));
+
+         	e->is_else = 1;
+          	out->exec_count++;
+        }
+        else if (strcmp(kw, EIF_NAME) == 0)
+        {
+      		emxrc_exec_t *e = &out->execs[out->exec_count];
+        	memset(e, 0, sizeof(*e));
+
+         	e->is_endif = 1;
+          	out->exec_count++;
+        }
         skipline();
     }
     return 0;
@@ -209,6 +240,9 @@ void emxrc_run(emxrc_t *rc)
 	//printf("strt emexrc_run");
     for (int i = 0; i < rc->exec_count; i++) {
         emxrc_exec_t *e = &rc->execs[i];
+
+        int skip = 0;
+        int condition = 0;
 
    	    if (e->is_wait) {
 	        //printf(PREFIX "wait %d\n", e->wait_time);
@@ -225,6 +259,34 @@ void emxrc_run(emxrc_t *rc)
         	printf(PREFIX "%s\n", e->message);
          	continue;
         }
+        if(e->is_if)
+        {
+        	condition = 0;
+
+	        for (int j = 0; j < rc->var_count; j++)
+	        {
+		        if (strcmp(rc->vars[j].name, e->var_name) == 0)
+	        	{
+					condition = 1;
+					break;
+				}
+	        }
+
+			skip = !condition;
+			continue;
+        }
+        if (e->is_else)
+        {
+        	skip = !skip;
+			continue;
+        }
+        if (e->is_endif)
+        {
+        	skip = 0;
+			continue;
+        }
+
+        if (skip) continue;
 
         const char *path = NULL;
         emxrc_fmt_t fmt = e->fmt;

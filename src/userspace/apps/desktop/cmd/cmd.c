@@ -25,20 +25,6 @@ static const char *next_tok(const char **p)
     return tok;
 }
 
-static void push_rect(cmd_result_t *r, dt_win_t *wn)
-{
-    if (!wn || r->count >= CMD_DIRTY_MAX) return;
-    drag_info_t *d = &r->rects[r->count++];
-
-    d->valid = 1;
-
-    d->pid = wn->pid;
-    d->wx  = wn->x;
-    d->wy  = wn->y;
-    d->ww  = wn->w;
-    d->wh  = wn->h;
-}
-
 static void clear_file(const char *path, int n)
 {
     if (n <= 0) return;
@@ -81,9 +67,6 @@ static void process_line(const char *line, cmd_result_t *result)
     } else if (cmd == 'C')
     {
         pid_t pid = (pid_t)str_to_int(next_tok(&p));
-        int idx = win_find_pid(pid);
-
-        if (idx >= 0) push_rect(result, win_get(idx));
         win_remove(pid);
         result->win_changed = 1;
 
@@ -106,7 +89,6 @@ static void process_line(const char *line, cmd_result_t *result)
         int nx = str_to_int(next_tok(&p)), ny = str_to_int(next_tok(&p));
         int idx = win_find_pid(pid);
 
-        if (idx >= 0) push_rect(result, win_get(idx));
         win_move(idx, nx, ny);
         result->win_changed = 1;
     }
@@ -116,7 +98,6 @@ void cmd_process(cmd_result_t *result)
 {
     static char buf[4096];
     //static char zeros[4096];
-    result->count = 0;
     result->win_changed = 0;
 
     int fd = open(DT_CMD, O_RDONLY);

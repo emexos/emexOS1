@@ -16,31 +16,6 @@ static void scopy(char *dst, const char *src, int max)
     dst[i] = '\0';
 }
 
-static void compute_home(dt_win_t *w)
-{
-    unsigned int style = w->style;
-    if (style & DT_POPUP) {
-        w->home_cx = w->x + 1;
-        w->home_cy = w->y + 1;
-        w->home_cw = w->w - 2;
-        w->home_ch = w->h - 2;
-    } else if (style & DT_NOTITLE) {
-        w->home_cx = w->x + DT_BORDER;
-        w->home_cy = w->y + DT_BORDER;
-        w->home_cw = w->w - DT_BORDER * 2;
-        w->home_ch = w->h - DT_BORDER * 2;
-    } else {
-        w->home_cx = w->x + DT_BORDER;
-        w->home_cy = w->y + DT_TITLE_H + 1;
-        w->home_cw = w->w - DT_BORDER * 2;
-        w->home_ch = w->h - DT_TITLE_H - 1 - DT_BORDER;
-    }
-    w->orig_cx = w->home_cx;
-    w->orig_cy = w->home_cy;
-    w->orig_cw = w->home_cw;
-    w->orig_ch = w->home_ch;
-}
-
 int win_add(
 	pid_t pid, const char *title,
     int x, int y, int w, int h, unsigned int style
@@ -62,7 +37,6 @@ int win_add(
             wins[i].z = z_next++;
 
             scopy(wins[i].title, title, DT_TITLE_MAX);
-            compute_home(&wins[i]);
 
             win_cnt++;
 

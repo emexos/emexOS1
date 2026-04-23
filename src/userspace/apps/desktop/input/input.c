@@ -8,35 +8,16 @@ static int g_last_btn = 0;
 static int g_drag_idx = -1;
 static int g_drag_ox = 0;
 static int g_drag_oy = 0;
-static int g_drag_prev_locked = 0;
 
 void input_init(void)
 {
     g_last_btn = 0;
     g_drag_idx = -1;
-    g_drag_prev_locked = 0;
 }
 
 void input_frame_begin(input_state_t *is)
 {
     (void)is;
-
-    g_drag_prev_locked = 0;
-}
-
-// records the OLD FR
-static void record_first(input_state_t *is, dt_win_t *wn)
-{
-    if (g_drag_prev_locked) return;
-    is->drag_prev.valid = 1;
-
-    is->drag_prev.pid = wn->pid;
-    is->drag_prev.wx  = wn->x;
-    is->drag_prev.wy  = wn->y;
-    is->drag_prev.ww  = wn->w;
-    is->drag_prev.wh  = wn->h;
-
-    g_drag_prev_locked = 1;
 }
 
 static int handle_one(mouse_event_t *ev, input_state_t *is)
@@ -69,7 +50,7 @@ static int handle_one(mouse_event_t *ev, input_state_t *is)
             if (win_hit_close(top_idx, mx, my))
             {
                 dt_win_t *wn = win_get(top_idx);
-                if (wn) { record_first(is, wn); win_remove(wn->pid); }
+                if (wn) { win_remove(wn->pid); }
                 //
             }else if (win_hit_title(top_idx, mx, my))
             {
